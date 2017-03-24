@@ -94,7 +94,7 @@
         return buildFrameRunner( window.mozRequestAnimationFrame );
       } else {
         return buildFrameRunner( function( f ) {
-          window.setTimeout( f, 16 );
+          window.setTimeout( f, 0 );
         });
       }
 

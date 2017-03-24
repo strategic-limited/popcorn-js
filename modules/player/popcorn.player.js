@@ -103,7 +103,7 @@
 
           basePlayer.currentTime = basePlayer.currentTime + ( date - baselineTime );
           basePlayer.dispatchEvent( "timeupdate" );
-          timeout = setTimeout( timeupdate, 10 );
+          timeout = setTimeout( timeupdate, 0 );
         }
 
         baselineTime = date;

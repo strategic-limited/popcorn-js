@@ -101,7 +101,7 @@
       style.top = position.top  + media.offsetHeight - ctxContainer.offsetHeight - 40 + "px";
       style.left = position.left + "px";
 
-      setTimeout( updatePosition, 10 );
+      setTimeout( updatePosition, 0 );
     };
 
     ctxContainer.id = id || "";

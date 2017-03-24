@@ -51,7 +51,7 @@
       global.oRequestAnimationFrame ||
       global.msRequestAnimationFrame ||
       function( callback, element ) {
-        global.setTimeout( callback, 16 );
+        global.setTimeout( callback, 0 );
       };
   }()),
 
