@@ -2207,9 +2207,10 @@
   // Returns wrapped plugin function
   function safeTry( fn, pluginName ) {
     return function() {
+      var _this = this;
       var handler = function() {
         try {
-          return fn.apply( this, arguments );
+          return fn.apply( _this, arguments );
         } catch ( ex ) {
 
           // Push plugin function errors into logging queue
@@ -2221,7 +2222,7 @@
 
           // Trigger an error that the instance can listen for
           // and react to
-          this.emit( "pluginerror", Popcorn.plugin.errors );
+          _this.emit( "pluginerror", Popcorn.plugin.errors );
         }
       };
       if (isSafari()) {
