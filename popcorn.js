@@ -1695,7 +1695,13 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              natives.end.call( obj, event, byStart );
+              if ( !isSafari() ) {
+                natives.end.call( obj, event, byStart );
+              } else {
+                setTimeout(function () {
+                  natives.end.call( obj, event, byStart );
+                }, 350);
+              }
 
               obj.emit( trackend,
                 Popcorn.extend({}, byStart, {
@@ -1733,7 +1739,13 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              natives.start.call( obj, event, byEnd );
+              if ( !isSafari() ) {
+                natives.start.call( obj, event, byEnd );
+              } else {
+                setTimeout(function () {
+                  natives.start.call( obj, event, byEnd );
+                }, 350);
+              }
 
               obj.emit( trackstart,
                 Popcorn.extend({}, byEnd, {
