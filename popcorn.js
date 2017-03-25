@@ -1,5 +1,13 @@
 (function(global, document) {
 
+  function isSafari() {
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.indexOf('safari') != -1) {
+      return ua.indexOf('chrome') == -1;
+    }
+    return false;
+  }
+
   // Popcorn.js does not support archaic browsers
   if ( !document.addEventListener ) {
     global.Popcorn = {
@@ -2199,20 +2207,27 @@
   // Returns wrapped plugin function
   function safeTry( fn, pluginName ) {
     return function() {
-      try {
-        return fn.apply( this, arguments );
-      } catch ( ex ) {
+      var handler = function() {
+        try {
+          return fn.apply( this, arguments );
+        } catch ( ex ) {
 
-        // Push plugin function errors into logging queue
-        Popcorn.plugin.errors.push({
-          plugin: pluginName,
-          thrown: ex,
-          source: fn.toString()
-        });
+          // Push plugin function errors into logging queue
+          Popcorn.plugin.errors.push({
+            plugin: pluginName,
+            thrown: ex,
+            source: fn.toString()
+          });
 
-        // Trigger an error that the instance can listen for
-        // and react to
-        this.emit( "pluginerror", Popcorn.plugin.errors );
+          // Trigger an error that the instance can listen for
+          // and react to
+          this.emit( "pluginerror", Popcorn.plugin.errors );
+        }
+      };
+      if (isSafari()) {
+        setTimeout(handler, 300);
+      } else {
+        handler();
       }
     };
   }
