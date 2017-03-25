@@ -2224,9 +2224,10 @@
           this.emit( "pluginerror", Popcorn.plugin.errors );
         }
       } else {
+        var _this = this;
         setTimeout(function() {
           try {
-            return fn.apply( this, arguments );
+            return fn.apply( _this, arguments );
           } catch ( ex ) {
 
             // Push plugin function errors into logging queue
@@ -2238,7 +2239,7 @@
 
             // Trigger an error that the instance can listen for
             // and react to
-            this.emit( "pluginerror", Popcorn.plugin.errors );
+            _this.emit( "pluginerror", Popcorn.plugin.errors );
           }
         }, 400);
       }
