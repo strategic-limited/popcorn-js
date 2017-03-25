@@ -1642,13 +1642,7 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              if (!isSafari()) {
-                natives.start.call( obj, event, byStart );
-              } else {
-                setTimeout(function() {
-                  natives.start.call( obj, event, byStart );
-                }, 500);
-              }
+              natives.start.call( obj, event, byStart );
 
               obj.emit( trackstart,
                 Popcorn.extend({}, byStart, {
@@ -2213,20 +2207,40 @@
   // Returns wrapped plugin function
   function safeTry( fn, pluginName ) {
     return function() {
-      try {
-        return fn.apply( this, arguments );
-      } catch ( ex ) {
+      if ( !isSafari() ) {
+        try {
+          return fn.apply( this, arguments );
+        } catch ( ex ) {
 
-        // Push plugin function errors into logging queue
-        Popcorn.plugin.errors.push({
-          plugin: pluginName,
-          thrown: ex,
-          source: fn.toString()
-        });
+          // Push plugin function errors into logging queue
+          Popcorn.plugin.errors.push({
+            plugin: pluginName,
+            thrown: ex,
+            source: fn.toString()
+          });
 
-        // Trigger an error that the instance can listen for
-        // and react to
-        this.emit( "pluginerror", Popcorn.plugin.errors );
+          // Trigger an error that the instance can listen for
+          // and react to
+          this.emit( "pluginerror", Popcorn.plugin.errors );
+        }
+      } else {
+        setTimeout(function() {
+          try {
+            return fn.apply( this, arguments );
+          } catch ( ex ) {
+
+            // Push plugin function errors into logging queue
+            Popcorn.plugin.errors.push({
+              plugin: pluginName,
+              thrown: ex,
+              source: fn.toString()
+            });
+
+            // Trigger an error that the instance can listen for
+            // and react to
+            this.emit( "pluginerror", Popcorn.plugin.errors );
+          }
+        }, 400);
       }
     };
   }
