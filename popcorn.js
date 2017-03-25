@@ -1605,7 +1605,13 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              natives.end.call( obj, event, byEnd );
+              if ( !isSafari() ) {
+                natives.end.call( obj, event, byEnd );
+              } else {
+                setTimeout(function () {
+                  natives.end.call( obj, event, byEnd );
+                }, 300);
+              }
 
               obj.emit( trackend,
                 Popcorn.extend({}, byEnd, {
@@ -1642,7 +1648,13 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              natives.start.call( obj, event, byStart );
+              if ( !isSafari() ) {
+                natives.start.call( obj, event, byStart );
+              } else {
+                setTimeout(function () {
+                  natives.start.call( obj, event, byStart );
+                }, 300);
+              }
 
               obj.emit( trackstart,
                 Popcorn.extend({}, byStart, {
@@ -2207,41 +2219,20 @@
   // Returns wrapped plugin function
   function safeTry( fn, pluginName ) {
     return function() {
-      if ( !isSafari() ) {
-        try {
-          return fn.apply( this, arguments );
-        } catch ( ex ) {
+      try {
+        return fn.apply( this, arguments );
+      } catch ( ex ) {
 
-          // Push plugin function errors into logging queue
-          Popcorn.plugin.errors.push({
-            plugin: pluginName,
-            thrown: ex,
-            source: fn.toString()
-          });
+        // Push plugin function errors into logging queue
+        Popcorn.plugin.errors.push({
+          plugin: pluginName,
+          thrown: ex,
+          source: fn.toString()
+        });
 
-          // Trigger an error that the instance can listen for
-          // and react to
-          this.emit( "pluginerror", Popcorn.plugin.errors );
-        }
-      } else {
-        var _this = this;
-        setTimeout(function() {
-          try {
-            return fn.apply( _this, arguments );
-          } catch ( ex ) {
-
-            // Push plugin function errors into logging queue
-            Popcorn.plugin.errors.push({
-              plugin: pluginName,
-              thrown: ex,
-              source: fn.toString()
-            });
-
-            // Trigger an error that the instance can listen for
-            // and react to
-            _this.emit( "pluginerror", Popcorn.plugin.errors );
-          }
-        }, 400);
+        // Trigger an error that the instance can listen for
+        // and react to
+        this.emit( "pluginerror", Popcorn.plugin.errors );
       }
     };
   }
