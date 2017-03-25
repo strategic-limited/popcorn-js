@@ -1647,7 +1647,7 @@
               } else {
                 setTimeout(function() {
                   natives.start.call( obj, event, byStart );
-                }, 200);
+                }, 500);
               }
 
               obj.emit( trackstart,
