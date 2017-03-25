@@ -1,13 +1,5 @@
 (function(global, document) {
 
-  function isSafari() {
-    var ua = navigator.userAgent.toLowerCase();
-    if (ua.indexOf('safari') != -1) {
-      return ua.indexOf('chrome') == -1;
-    }
-    return false;
-  }
-
   // Popcorn.js does not support archaic browsers
   if ( !document.addEventListener ) {
     global.Popcorn = {
@@ -1605,13 +1597,7 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              if ( !isSafari() ) {
-                natives.end.call( obj, event, byEnd );
-              } else {
-                setTimeout(function () {
-                  natives.end.call( obj, event, byEnd );
-                }, 350);
-              }
+              natives.end.call( obj, event, byEnd );
 
               obj.emit( trackend,
                 Popcorn.extend({}, byEnd, {
@@ -1648,13 +1634,7 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              if ( !isSafari() ) {
-                natives.start.call( obj, event, byStart );
-              } else {
-                setTimeout(function () {
-                  natives.start.call( obj, event, byStart );
-                }, 350);
-              }
+              natives.start.call( obj, event, byStart );
 
               obj.emit( trackstart,
                 Popcorn.extend({}, byStart, {
@@ -1695,13 +1675,7 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              if ( !isSafari() ) {
-                natives.end.call( obj, event, byStart );
-              } else {
-                setTimeout(function () {
-                  natives.end.call( obj, event, byStart );
-                }, 350);
-              }
+              natives.end.call( obj, event, byStart );
 
               obj.emit( trackend,
                 Popcorn.extend({}, byStart, {
@@ -1739,13 +1713,7 @@
 
             if ( !obj.data.disabled[ type ] ) {
 
-              if ( !isSafari() ) {
-                natives.start.call( obj, event, byEnd );
-              } else {
-                setTimeout(function () {
-                  natives.start.call( obj, event, byEnd );
-                }, 350);
-              }
+              natives.start.call( obj, event, byEnd );
 
               obj.emit( trackstart,
                 Popcorn.extend({}, byEnd, {
