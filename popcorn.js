@@ -2206,8 +2206,8 @@
 
   // Returns wrapped plugin function
   function safeTry( fn, pluginName ) {
+    var _this = this;
     return function() {
-      var _this = this;
       var handler = function() {
         try {
           return fn.apply( _this, arguments );
