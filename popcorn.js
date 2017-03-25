@@ -1610,7 +1610,7 @@
               } else {
                 setTimeout(function () {
                   natives.end.call( obj, event, byEnd );
-                }, 300);
+                }, 350);
               }
 
               obj.emit( trackend,
@@ -1653,7 +1653,7 @@
               } else {
                 setTimeout(function () {
                   natives.start.call( obj, event, byStart );
-                }, 300);
+                }, 350);
               }
 
               obj.emit( trackstart,
