@@ -277,7 +277,8 @@
       }
       addYouTubeEvent( "pause", onFirstPause );
       player.pauseVideo();
-      player.seekTo( 0 );
+      // Safari doesn't want to seek from initial position so doing such dirty hack
+      player.seekTo( navigator.userAgent.match(/(Safari)/g) ? 0.000001 : 0);
     }
 
     function addYouTubeEvent( event, listener ) {
