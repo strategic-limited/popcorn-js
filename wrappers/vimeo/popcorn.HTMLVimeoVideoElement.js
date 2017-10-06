@@ -78,6 +78,8 @@
       });
       player.on('progress', function (event) {
         self.dispatchEvent("progress");
+        self.dispatchEvent( "seeking" );
+        console.log('seeking');
         onCurrentTime(parseFloat(event.seconds));
       });
       player.on('play', onPlay);
@@ -85,17 +87,26 @@
       player.on('ended', onEnded);
       player.on('seeked', function (event) {
         onCurrentTime(parseFloat(event.seconds));
+        console.log('seeked');
         onSeeked();
+      });
+      player.on('error', function (error) {
+        impl.error = error;
+        self.dispatchEvent("error");
       });
       player.on('volumechange', function (event) {
         onVolume(event.volume);
       });
 
-      player.getDuration();
-
       impl.networkState = self.NETWORK_LOADING;
       self.dispatchEvent("loadstart");
       self.dispatchEvent("progress");
+
+      impl.readyState = self.HAVE_METADATA;
+      self.dispatchEvent( "loadedmetadata" );
+
+      impl.readyState = self.HAVE_ENOUGH_DATA;
+      self.dispatchEvent( "canplaythrough" );
     }
 
     function updateDuration(newDuration) {
