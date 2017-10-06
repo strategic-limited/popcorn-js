@@ -292,13 +292,6 @@
 
       // Create the base vimeo player string. It will always have query string options
       src = VIMEO_HOST + '/video/' + ( /\d+$/ ).exec(src.path) + "?";
-      /*for (key in queryKey) {
-        if (queryKey.hasOwnProperty(key)) {
-          optionsArray.push(encodeURIComponent(key) + "=" +
-            encodeURIComponent(queryKey[key]));
-        }
-      }
-      src += optionsArray.join("&");*/
 
       initVimeoAPI(function () {
         elem.id = playerUID;
