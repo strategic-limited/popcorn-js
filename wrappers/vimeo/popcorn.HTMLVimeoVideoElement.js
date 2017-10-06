@@ -19,6 +19,7 @@
         callback();
       });
       script.src = 'https://player.vimeo.com/api/player.js';
+      // this is a trick to allow Vimeo API get initialised, because for not it uses require.js
       requireDefine = window.define;
       window.define = function() {};
       document.head.appendChild(script);
