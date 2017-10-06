@@ -1,57 +1,40 @@
-(function( Popcorn, window, document ) {
+(function (Popcorn, window, document) {
 
   var
 
-  CURRENT_TIME_MONITOR_MS = 16,
-  EMPTY_STRING = "",
-  VIMEO_HOST = "https://player.vimeo.com";
+    EMPTY_STRING = "",
+    VIMEO_HOST = "https://player.vimeo.com"
+  ;
 
-  // Utility wrapper around postMessage interface
-  function VimeoPlayer( vimeoIFrame ) {
-    var self = this,
-      url = vimeoIFrame.src.split('?')[0],
-      muted = 0;
-
-    if( url.substr(0, 2) === '//' ) {
-      url = window.location.protocol + url;
-    }
-
-    function sendMessage( method, params ) {
-      var data = JSON.stringify({
-        method: method,
-        value: params
+  function initVimeoAPI(callback) {
+    var script;
+    var requireDefine;
+    // If script is already there, check if it is loaded.
+    if (window.Vimeo) {
+      callback();
+    } else {
+      script = document.createElement('script');
+      script.addEventListener('load', function(event) {
+        window.define = requireDefine;
+        callback();
       });
-
-      // The iframe has been destroyed, it just doesn't know it
-      if ( !vimeoIFrame.contentWindow ) {
-        return;
-      }
-
-      vimeoIFrame.contentWindow.postMessage( data, url );
+      script.src = 'https://player.vimeo.com/api/player.js';
+      requireDefine = window.define;
+      window.define = function() {};
+      document.head.appendChild(script);
     }
-
-    var methods = ( "play pause paused seekTo unload getCurrentTime getDuration " +
-                    "getVideoEmbedCode getVideoHeight getVideoWidth getVideoUrl " +
-                    "getColor setColor setLoop getVolume setVolume addEventListener" ).split(" ");
-    methods.forEach( function( method ) {
-      // All current methods take 0 or 1 args, always send arg0
-      self[ method ] = function( arg0 ) {
-        sendMessage( method, arg0 );
-      };
-    });
   }
 
-
-  function HTMLVimeoVideoElement( id ) {
+  function HTMLVimeoVideoElement(id) {
 
     // Vimeo iframe API requires postMessage
-    if( !window.postMessage ) {
+    if (!window.postMessage) {
       throw "ERROR: HTMLVimeoVideoElement requires window.postMessage";
     }
 
     var self = new Popcorn._MediaElementProto(),
-      parent = typeof id === "string" ? Popcorn.dom.find( id ) : id,
-      elem = document.createElement( "iframe" ),
+      parent = typeof id === "string" ? Popcorn.dom.find(id) : id,
+      elem = document.createElement("div"),
       impl = {
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
@@ -78,344 +61,229 @@
       player,
       playerPaused = true,
       playerReadyCallbacks = [],
-      timeUpdateInterval,
       currentTimeInterval,
       lastCurrentTime = 0;
 
     // Namespace all events we'll produce
-    self._eventNamespace = Popcorn.guid( "HTMLVimeoVideoElement::" );
+    self._eventNamespace = Popcorn.guid("HTMLVimeoVideoElement::");
 
     self.parentNode = parent;
 
     // Mark type as Vimeo
     self._util.type = "Vimeo";
 
-    function addPlayerReadyCallback( callback ) {
-      playerReadyCallbacks.unshift( callback );
-    }
-
-    function onPlayerReady( event ) {
-      player.addEventListener( 'loadProgress' );
-      player.addEventListener( 'playProgress' );
-      player.addEventListener( 'play' );
-      player.addEventListener( 'pause' );
-      player.addEventListener( 'finish' );
-      player.addEventListener( 'seek' );
+    function onPlayerReady(event) {
+      player.on('timeupdate', function (event) {
+        onCurrentTime(event.seconds);
+      });
+      player.on('progress', function (event) {
+        self.dispatchEvent("progress");
+        onCurrentTime(parseFloat(event.seconds));
+      });
+      player.on('play', onPlay);
+      player.on('pause', onPause);
+      player.on('ended', onEnded);
+      player.on('seeked', function (event) {
+        onCurrentTime(parseFloat(event.seconds));
+        onSeeked();
+      });
+      player.on('volumechange', function (event) {
+        onVolume(event.volume);
+      });
 
       player.getDuration();
 
       impl.networkState = self.NETWORK_LOADING;
-      self.dispatchEvent( "loadstart" );
-      self.dispatchEvent( "progress" );
+      self.dispatchEvent("loadstart");
+      self.dispatchEvent("progress");
     }
 
-    function updateDuration( newDuration ) {
+    function updateDuration(newDuration) {
       var oldDuration = impl.duration;
 
-      if( oldDuration !== newDuration ) {
+      if (oldDuration !== newDuration) {
         impl.duration = newDuration;
-        self.dispatchEvent( "durationchange" );
+        self.dispatchEvent("durationchange");
 
         // Deal with first update of duration
-        if( isNaN( oldDuration ) ) {
+        if (isNaN(oldDuration)) {
           impl.networkState = self.NETWORK_IDLE;
           impl.readyState = self.HAVE_METADATA;
-          self.dispatchEvent( "loadedmetadata" );
+          self.dispatchEvent("loadedmetadata");
 
-          self.dispatchEvent( "loadeddata" );
+          self.dispatchEvent("loadeddata");
 
           impl.readyState = self.HAVE_FUTURE_DATA;
-          self.dispatchEvent( "canplay" );
+          self.dispatchEvent("canplay");
 
           impl.readyState = self.HAVE_ENOUGH_DATA;
-          self.dispatchEvent( "canplaythrough" );
+          self.dispatchEvent("canplaythrough");
           // Auto-start if necessary
-          if( impl.autoplay ) {
+          if (impl.autoplay) {
             self.play();
           }
 
           var i = playerReadyCallbacks.length;
-          while( i-- ) {
-            playerReadyCallbacks[ i ]();
-            delete playerReadyCallbacks[ i ];
+          while (i--) {
+            playerReadyCallbacks[i]();
+            delete playerReadyCallbacks[i];
           }
         }
       }
     }
 
-    function getDuration() {
-      if( !playerReady ) {
-        // Queue a getDuration() call so we have correct duration info for loadedmetadata
-        addPlayerReadyCallback( function() { getDuration(); } );
-      }
-
-      player.getDuration();
-    }
-
     function destroyPlayer() {
-      if( !( playerReady && player ) ) {
+      if (!( playerReady && player )) {
         return;
       }
-      clearInterval( currentTimeInterval );
       player.pause();
+      player.unload();
 
-      window.removeEventListener( 'message', onStateChange, false );
-      parent.removeChild( elem );
-      elem = document.createElement( "iframe" );
+      parent.removeChild(elem);
+      elem = document.createElement("iframe");
     }
 
-    self.play = function() {
+    self.play = function () {
       impl.paused = false;
-      if( !playerReady ) {
-        addPlayerReadyCallback( function() { self.play(); } );
-        return;
-      }
 
       player.play();
     };
 
-    function changeCurrentTime( aTime ) {
-      if( !playerReady ) {
-        addPlayerReadyCallback( function() { changeCurrentTime( aTime ); } );
-        return;
-      }
-
+    function changeCurrentTime(aTime) {
       onSeeking();
-      player.seekTo( aTime );
+      player.setCurrentTime(aTime);
     }
 
     function onSeeking() {
       impl.seeking = true;
-      self.dispatchEvent( "seeking" );
+      self.dispatchEvent("seeking");
     }
 
     function onSeeked() {
       impl.seeking = false;
-      self.dispatchEvent( "timeupdate" );
-      self.dispatchEvent( "seeked" );
-      self.dispatchEvent( "canplay" );
-      self.dispatchEvent( "canplaythrough" );
+      self.dispatchEvent("timeupdate");
+      self.dispatchEvent("seeked");
+      self.dispatchEvent("canplay");
+      self.dispatchEvent("canplaythrough");
     }
 
-    self.pause = function() {
+    self.pause = function () {
       impl.paused = true;
-      if( !playerReady ) {
-        addPlayerReadyCallback( function() { self.pause(); } );
-        return;
-      }
 
       player.pause();
     };
 
     function onPause() {
       impl.paused = true;
-      if ( !playerPaused ) {
+      if (!playerPaused) {
         playerPaused = true;
-        clearInterval( timeUpdateInterval );
-        self.dispatchEvent( "pause" );
+        self.dispatchEvent("pause");
       }
-    }
-
-    function onTimeUpdate() {
-      self.dispatchEvent( "timeupdate" );
     }
 
     function onPlay() {
-      if( impl.ended ) {
-        changeCurrentTime( 0 );
+      if (impl.ended) {
+        changeCurrentTime(0);
       }
 
-      if ( !currentTimeInterval ) {
-        currentTimeInterval = setInterval( monitorCurrentTime,
-                                           CURRENT_TIME_MONITOR_MS ) ;
-
+      if (!currentTimeInterval) {
         // Only 1 play when video.loop=true
-        if ( impl.loop ) {
-          self.dispatchEvent( "play" );
+        if (impl.loop) {
+          self.dispatchEvent("play");
         }
       }
 
-      timeUpdateInterval = setInterval( onTimeUpdate,
-                                        self._util.TIMEUPDATE_MS );
-
       impl.paused = false;
-      if( playerPaused ) {
+      if (playerPaused) {
         playerPaused = false;
 
         // Only 1 play when video.loop=true
-        if ( !impl.loop ) {
-          self.dispatchEvent( "play" );
+        if (!impl.loop) {
+          self.dispatchEvent("play");
         }
-        self.dispatchEvent( "playing" );
+        self.dispatchEvent("playing");
       }
     }
 
     function onEnded() {
-      if( impl.loop ) {
-        changeCurrentTime( 0 );
+      if (impl.loop) {
+        changeCurrentTime(0);
         self.play();
       } else {
         impl.ended = true;
-        self.dispatchEvent( "ended" );
+        self.dispatchEvent("ended");
       }
     }
 
-    function onCurrentTime( aTime ) {
+    function onCurrentTime(aTime) {
       var currentTime = impl.currentTime = aTime;
 
-      if( currentTime !== lastCurrentTime ) {
-        self.dispatchEvent( "timeupdate" );
+      if (currentTime !== lastCurrentTime) {
+        self.dispatchEvent("timeupdate");
       }
 
       lastCurrentTime = impl.currentTime;
     }
 
-    // We deal with the startup load messages differently than
-    // we will once the player is fully ready and loaded.
-    // When the player is "ready" it is playable, but not
-    // yet seekable.  We need to force a play() to get data
-    // to download (mimic preload=auto), or seeks will fail.
-    function startupMessage( event ) {
-      if( event.origin !== VIMEO_HOST ) {
-        return;
-      }
-
-      var data;
-      try {
-        data = JSON.parse( event.data );
-      } catch ( ex ) {
-        console.warn( ex );
-      }
-
-      if ( data.player_id != playerUID ) {
-        return;
-      }
-
-      switch ( data.event ) {
-        case "ready":
-          player = new VimeoPlayer( elem );
-          player.addEventListener( "loadProgress" );
-          player.addEventListener( "pause" );
-          player.setVolume( 0 );
-          if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            player.play();
-            setTimeout(onPlayerReady, 3000);
-          } else {
-            onPlayerReady();
-          }
-          break;
-        case "loadProgress":
-          var duration = parseFloat( data.data.duration );
-          if( duration > 0 && !playerReady ) {
-            playerReady = true;
-            player.pause();
-          }
-          break;
-        case "pause":
-          player.setVolume( 1 );
-          // Switch message pump to use run-time message callback vs. startup
-          window.removeEventListener( "message", startupMessage, false );
-          window.addEventListener( "message", onStateChange, false );
-          onPlayerReady();
-          break;
-         default:
-          player.setVolume( 1 );
-          // Switch message pump to use run-time message callback vs. startup
-          window.removeEventListener( "message", startupMessage, false );
-          window.addEventListener( "message", onStateChange, false );
-          onPlayerReady();
-          break;
+    function onVolume(aValue) {
+      if (impl.volume !== aValue) {
+        impl.volume = aValue;
+        self.dispatchEvent("volumechange");
       }
     }
 
-    function onStateChange( event ) {
-      if( event.origin !== VIMEO_HOST ) {
-        return;
-      }
+    function setVolume(aValue) {
+      impl.volume = aValue;
 
-      var data;
-      try {
-        data = JSON.parse( event.data );
-      } catch ( ex ) {
-        console.warn( ex );
-      }
+      player.setVolume(aValue);
+      self.dispatchEvent("volumechange");
+    }
 
-      if ( data.player_id != playerUID ) {
-        return;
-      }
+    function getVolume() {
+      // If we're muted, the volume is cached on impl.muted.
+      return impl.muted > 0 ? impl.muted : impl.volume;
+    }
 
-      // Methods
-      switch ( data.method ) {
-        case "getCurrentTime":
-          onCurrentTime( parseFloat( data.value ) );
-          break;
-        case "getDuration":
-          updateDuration( parseFloat( data.value ) );
-          break;
-        case "getVolume":
-          onVolume( parseFloat( data.value ) );
-          break;
-      }
+    function setMuted(aMute) {
 
-      // Events
-      switch ( data.event ) {
-        case "loadProgress":
-          self.dispatchEvent( "progress" );
-          updateDuration( parseFloat( data.data.duration ) );
-          break;
-        case "playProgress":
-          onCurrentTime( parseFloat( data.data.seconds ) );
-          break;
-        case "play":
-          onPlay();
-          break;
-        case "pause":
-          onPause();
-          break;
-        case "finish":
-          onEnded();
-          break;
-        case "seek":
-          onCurrentTime( parseFloat( data.data.seconds ) );
-          onSeeked();
-          break;
-         default:
-         self.dispatchEvent( "progress" );
-         document.getElementsByClassName("loading-message")[0].style.display = "none";
-          break;
+      // Move the existing volume onto muted to cache
+      // until we unmute, and set the volume to 0.
+      if (aMute) {
+        impl.muted = impl.volume;
+        setVolume(0);
+      } else {
+        impl.muted = 0;
+        setVolume(impl.muted);
       }
     }
 
-    function monitorCurrentTime() {
-      player.getCurrentTime();
+    function getMuted() {
+      return impl.muted > 0;
     }
 
-    function changeSrc( aSrc ) {
-      if( !self._canPlaySrc( aSrc ) ) {
+    function changeSrc(aSrc) {
+      if (!self._canPlaySrc(aSrc)) {
         impl.error = {
           name: "MediaError",
           message: "Media Source Not Supported",
           code: MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
         };
-        self.dispatchEvent( "error" );
+        self.dispatchEvent("error");
         return;
       }
 
       impl.src = aSrc;
 
-      if( playerReady ) {
+      if (playerReady) {
         destroyPlayer();
       }
 
       playerReady = false;
 
-      var src = self._util.parseUri( aSrc ),
+      var src = self._util.parseUri(aSrc),
         queryKey = src.queryKey,
         key,
         optionsArray = [
-          // Vimeo API options first
-          "api=1",
-          "player_id=" + playerUID,
           // Turn off as much of the metadata/branding as possible
           "title=0",
           "byline=0",
@@ -430,189 +298,158 @@
       delete queryKey.autoplay;
 
       // Create the base vimeo player string. It will always have query string options
-      src = VIMEO_HOST + '/video/' + ( /\d+$/ ).exec( src.path ) + "?";
-      for( key in queryKey ) {
-        if ( queryKey.hasOwnProperty( key ) ) {
-          optionsArray.push( encodeURIComponent( key ) + "=" +
-                             encodeURIComponent( queryKey[ key ] ) );
+      src = VIMEO_HOST + '/video/' + ( /\d+$/ ).exec(src.path) + "?";
+      /*for (key in queryKey) {
+        if (queryKey.hasOwnProperty(key)) {
+          optionsArray.push(encodeURIComponent(key) + "=" +
+            encodeURIComponent(queryKey[key]));
         }
       }
-      src += optionsArray.join( "&" );
+      src += optionsArray.join("&");*/
 
-      elem.id = playerUID;
-      elem.style.width = "100%";
-      elem.style.height = "100%";
-      elem.frameBorder = 0;
-      elem.webkitAllowFullScreen = true;
-      elem.mozAllowFullScreen = true;
-      elem.allowFullScreen = true;
-      parent.appendChild( elem );
-      elem.src = src;
-
-      window.addEventListener( "message", startupMessage, false );
-    }
-
-    function onVolume( aValue ) {
-      if( impl.volume !== aValue ) {
-        impl.volume = aValue;
-        self.dispatchEvent( "volumechange" );
-      }
-    }
-
-    function setVolume( aValue ) {
-      impl.volume = aValue;
-
-      if( !playerReady ) {
-        addPlayerReadyCallback( function() {
-          setVolume( aValue );
+      initVimeoAPI(function () {
+        elem.id = playerUID;
+        player = new Vimeo.Player(elem, {
+          url: src,
+          autoplay: impl.autoplay,
+          loop: false,
+          byline: false,
+          portrait: false,
+          title: false
         });
-        return;
-      }
-      player.setVolume( aValue );
-      self.dispatchEvent( "volumechange" );
-    }
 
-    function getVolume() {
-      // If we're muted, the volume is cached on impl.muted.
-      return impl.muted > 0 ? impl.muted : impl.volume;
-    }
+        parent.appendChild(elem);
 
-    function setMuted( aMute ) {
-      if( !playerReady ) {
-        impl.muted = aMute ? 1 : 0;
-        addPlayerReadyCallback( function() {
-          setMuted( aMute );
+        player.ready().then(function () {
+          if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+            player.setVolume(0);
+            player.play().then(function () {
+              player.pause();
+              player.getDuration().then(function (duration) {
+                player.setVolume(1);
+                updateDuration(duration);
+                onPlayerReady();
+              });
+            });
+          } else {
+            onPlayerReady();
+          }
         });
-        return;
-      }
-
-      // Move the existing volume onto muted to cache
-      // until we unmute, and set the volume to 0.
-      if( aMute ) {
-        impl.muted = impl.volume;
-        setVolume( 0 );
-      } else {
-        impl.muted = 0;
-        setVolume( impl.muted );
-      }
+      });
     }
 
-    function getMuted() {
-      return impl.muted > 0;
-    }
-
-    Object.defineProperties( self, {
+    Object.defineProperties(self, {
 
       src: {
-        get: function() {
+        get: function () {
           return impl.src;
         },
-        set: function( aSrc ) {
-          if( aSrc && aSrc !== impl.src ) {
-            changeSrc( aSrc );
+        set: function (aSrc) {
+          if (aSrc && aSrc !== impl.src) {
+            changeSrc(aSrc);
           }
         }
       },
 
       autoplay: {
-        get: function() {
+        get: function () {
           return impl.autoplay;
         },
-        set: function( aValue ) {
-          impl.autoplay = self._util.isAttributeSet( aValue );
+        set: function (aValue) {
+          impl.autoplay = self._util.isAttributeSet(aValue);
         }
       },
 
       loop: {
-        get: function() {
+        get: function () {
           return impl.loop;
         },
-        set: function( aValue ) {
-          impl.loop = self._util.isAttributeSet( aValue );
+        set: function (aValue) {
+          impl.loop = self._util.isAttributeSet(aValue);
         }
       },
 
       width: {
-        get: function() {
+        get: function () {
           return self.parentNode.offsetWidth;
         }
       },
 
       height: {
-        get: function() {
+        get: function () {
           return self.parentNode.offsetHeight;
         }
       },
 
       currentTime: {
-        get: function() {
+        get: function () {
           return impl.currentTime;
         },
-        set: function( aValue ) {
-          changeCurrentTime( aValue );
+        set: function (aValue) {
+          changeCurrentTime(aValue);
         }
       },
 
       duration: {
-        get: function() {
+        get: function () {
           return impl.duration;
         }
       },
 
       ended: {
-        get: function() {
+        get: function () {
           return impl.ended;
         }
       },
 
       paused: {
-        get: function() {
+        get: function () {
           return impl.paused;
         }
       },
 
       seeking: {
-        get: function() {
+        get: function () {
           return impl.seeking;
         }
       },
 
       readyState: {
-        get: function() {
+        get: function () {
           return impl.readyState;
         }
       },
 
       networkState: {
-        get: function() {
+        get: function () {
           return impl.networkState;
         }
       },
 
       volume: {
-        get: function() {
+        get: function () {
           return getVolume();
         },
-        set: function( aValue ) {
-          if( aValue < 0 || aValue > 1 ) {
+        set: function (aValue) {
+          if (aValue < 0 || aValue > 1) {
             throw "Volume value must be between 0.0 and 1.0";
           }
 
-          setVolume( aValue );
+          setVolume(aValue);
         }
       },
 
       muted: {
-        get: function() {
+        get: function () {
           return getMuted();
         },
-        set: function( aValue ) {
-          setMuted( self._util.isAttributeSet( aValue ) );
+        set: function (aValue) {
+          setMuted(self._util.isAttributeSet(aValue));
         }
       },
 
       error: {
-        get: function() {
+        get: function () {
           return impl.error;
         }
       }
@@ -624,19 +461,19 @@
     return self;
   }
 
-  Popcorn.HTMLVimeoVideoElement = function( id ) {
-    return new HTMLVimeoVideoElement( id );
+  Popcorn.HTMLVimeoVideoElement = function (id) {
+    return new HTMLVimeoVideoElement(id);
   };
 
   // Helper for identifying URLs we know how to play.
-  Popcorn.HTMLVimeoVideoElement._canPlaySrc = function( url ) {
-    return ( (/player.vimeo.com\/video\/\d+/).test( url ) ||
-             (/vimeo.com\/\d+/).test( url ) ) ? "probably" : EMPTY_STRING;
+  Popcorn.HTMLVimeoVideoElement._canPlaySrc = function (url) {
+    return ( (/player.vimeo.com\/video\/\d+/).test(url) ||
+      (/vimeo.com\/\d+/).test(url) ) ? "probably" : EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of video/x-vimeo
-  Popcorn.HTMLVimeoVideoElement.canPlayType = function( type ) {
+  Popcorn.HTMLVimeoVideoElement.canPlayType = function (type) {
     return type === "video/x-vimeo" ? "probably" : EMPTY_STRING;
   };
 
-}( Popcorn, window, document ));
+}(Popcorn, window, document));
