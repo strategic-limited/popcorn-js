@@ -19,7 +19,6 @@
         callback();
       });
       script.src = 'https://player.vimeo.com/api/player.js';
-      // this is a trick to allow Vimeo API get initialised, because for not it uses require.js
       requireDefine = window.define;
       window.define = function() {};
       document.head.appendChild(script);
@@ -282,14 +281,7 @@
       playerReady = false;
 
       var src = self._util.parseUri(aSrc),
-        queryKey = src.queryKey,
-        key,
-        optionsArray = [
-          // Turn off as much of the metadata/branding as possible
-          "title=0",
-          "byline=0",
-          "portrait=0"
-        ];
+        queryKey = src.queryKey;
 
       // Sync loop and autoplay based on URL params, and delete.
       // We'll manage both internally.
@@ -316,7 +308,8 @@
           loop: false,
           byline: false,
           portrait: false,
-          title: false
+          title: false,
+          responsive: true
         });
 
         parent.appendChild(elem);
