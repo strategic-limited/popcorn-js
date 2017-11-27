@@ -10,11 +10,6 @@
   var videoElement;
   var initialZindex;
 
-  function initializeVRView(callback) {
-    // If the VRView API isn't loaded, do it now.
-    Popcorn.getScript( VRVIEW_TOOLKIT_URL, callback );
-  }
-
   function HTMLVRViewVideoElement(id) {
 
     if (!window.postMessage) {
@@ -256,11 +251,7 @@
         self.dispatchEvent("progress");
       }
 
-      if (!window.VRView) {
-        initializeVRView(initializePlayer);
-      } else {
-        initializePlayer();
-      }
+      initializePlayer();
     }
 
     function monitorCurrentTime() {
