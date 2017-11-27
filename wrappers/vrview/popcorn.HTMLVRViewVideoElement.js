@@ -553,7 +553,8 @@
 
   // We'll attempt to support a mime type of video/x-youtube
   Popcorn.HTMLVRViewVideoElement.canPlayType = function (type) {
-    return type === "video/x-vr360" ? "probably" : EMPTY_STRING;
+    return "probably";
+    //return type === "video/x-vr360" ? "probably" : EMPTY_STRING;
   };
 
 }(Popcorn, window, document));
