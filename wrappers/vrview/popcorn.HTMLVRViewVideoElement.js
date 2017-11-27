@@ -56,6 +56,8 @@
 
     function onPlayerReady(event) {
 
+      console.log('360 Video Player ready');
+
       var onMuted = function () {
         if (self.muted) {
           // force an initial play on the video, to remove autostart on initial seekTo.
