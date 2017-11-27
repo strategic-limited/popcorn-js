@@ -137,7 +137,6 @@
       self.dispatchEvent("canplay");
 
       mediaReady = true;
-      bufferedInterval = setInterval(monitorBuffered, 50);
 
       while (mediaReadyCallbacks.length) {
         mediaReadyCallbacks[0]();
@@ -282,15 +281,6 @@
         impl.currentTime = playerTime;
       } else if (ABS(playerTime - impl.currentTime) < 1) {
         onSeeked();
-      }
-    }
-
-    function monitorBuffered() {
-      var fraction = player.getVideoLoadedFraction();
-
-      if (fraction && lastLoadedFraction !== fraction) {
-        lastLoadedFraction = fraction;
-        onProgress();
       }
     }
 
