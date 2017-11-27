@@ -1,7 +1,4 @@
 (function (Popcorn, window, document) {
-
-  var VRVIEW_TOOLKIT_URL = "https://storage.googleapis.com/vrview/2.0/build/vrview.min.js";
-
   var
     EMPTY_STRING = "",
     ABS = Math.abs,
