@@ -67,9 +67,8 @@
       var onMuted = function () {
         if (self.muted) {
           // force an initial play on the video, to remove autostart on initial seekTo.
-          addYouTubeEvent("play", onFirstPlay);
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            player.playVideo();
+            player.play();
           } else {
             self.dispatchEvent("loadedmetadata");
             setTimeout(function () {
@@ -108,17 +107,10 @@
         self.dispatchEvent("durationchange");
       }
 
-      addYouTubeEvent("play", onPlay);
-      addYouTubeEvent("pause", onPause);
       // Set initial paused state
       if (impl.autoplay || !impl.paused) {
-        removeYouTubeEvent("play", onReady);
         impl.paused = false;
-        addMediaReadyCallback(function () {
-          if (!impl.paused) {
-            onPlay();
-          }
-        });
+        onPlay();
       }
 
       // Ensure video will now be unmuted when playing due to the mute on initial load.
