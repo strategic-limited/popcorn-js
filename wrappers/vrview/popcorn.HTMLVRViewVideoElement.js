@@ -198,6 +198,8 @@
 
       impl.src = aSrc;
 
+      elem.style.width = '100%';
+      elem.style.height = '100%';
       elem.id = Popcorn.guid("vrview_");
       parent.appendChild(elem);
 
