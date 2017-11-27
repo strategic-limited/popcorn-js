@@ -532,7 +532,7 @@
 
   // Helper for identifying URLs we know how to play.
   Popcorn.HTMLVRViewVideoElement._canPlaySrc = function (url) {
-    return "probably";
+    return (/(.)*\.mp4/).test( url ) ? "probably" : EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of video/x-youtube
