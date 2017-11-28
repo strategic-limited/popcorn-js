@@ -51,7 +51,7 @@
 
     self.parentNode = parent;
 
-    // Mark this as YouTube
+    // Mark this as VRView
     self._util.type = "VRView";
 
     function onPlayerReady() {
@@ -68,12 +68,13 @@
             el.click();
           }
         }, 10);
-        //remove loading image so we can click actual youtube play button
+        //remove loading image so we can click actual VRView play button
         document.getElementsByClassName("loading-message")[0].style.display = "none";
         if (videoElement) {
           videoElement.style.zIndex = 99999999999;
         }
-
+      } else {
+        onReady();
       }
     }
 
@@ -222,7 +223,6 @@
 
         player.on('ready', function() {
           onPlayerReady();
-          onReady();
         });
         player.on('pause', onPause);
         player.on('play', onPlay);
@@ -266,7 +266,6 @@
     }
 
     function onSeeking() {
-      // a seek in youtube fires a paused event.
       // we don't want to listen for this, so this state catches the event.
       impl.seeking = true;
       self.dispatchEvent("seeking");
@@ -282,6 +281,10 @@
     }
 
     function onPlay() {
+      if (!player.isRepeatingPlay) {
+        onReady();
+        player.isRepeatingPlay = true;
+      }
       if (impl.ended) {
         changeCurrentTime(0);
         impl.ended = false;
@@ -511,7 +514,7 @@
     return (/(.)*\.mp4/).test( url ) ? "probably" : EMPTY_STRING;
   };
 
-  // We'll attempt to support a mime type of video/x-youtube
+  // We'll attempt to support a mime type of video/x-vr360
   Popcorn.HTMLVRViewVideoElement.canPlayType = function (type) {
     return "probably";
     //return type === "video/x-vr360" ? "probably" : EMPTY_STRING;
