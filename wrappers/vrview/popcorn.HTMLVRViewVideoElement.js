@@ -228,12 +228,11 @@
         });
 
         setTimeout(function() {
-
+          player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
+          player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
+          player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
         }, 300);
 
-        player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
-        player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
-        player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
 
         player.on('ready', function() {
           onPlayerReady();
