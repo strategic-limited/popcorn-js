@@ -144,13 +144,12 @@
       mediaReadyCallbacks = [];
       clearInterval(currentTimeInterval);
       clearInterval(bufferedInterval);
+      elem.off('click');
       player.stop();
       player.off('pause');
       player.off('play');
       player.off('timeupdate');
       player.off('ended');
-      //player.clearVideo();
-      //player.destroy();
       elem = document.createElement("div");
     }
 
@@ -212,6 +211,9 @@
           //is_vr_off: true,
         });
 
+        elem.on('click', function() {
+          player[impl.paused ? 'play' : 'pause']();
+        });
         player.on('ready', function() {
           onPlayerReady();
           onReady();
