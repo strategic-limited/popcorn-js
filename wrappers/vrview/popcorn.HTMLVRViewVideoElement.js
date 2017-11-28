@@ -212,7 +212,18 @@
           //is_vr_off: true,
         });
 
-        player.on('click', function() { player[impl.paused ? 'play' : 'pause'](); });
+        player.iframe.contentDocument.addEventListener('mousedown', function() {
+          delete player.isDragging;
+        });
+        player.iframe.contentDocument.addEventListener('mousemove', function() {
+          vrView.isDragging = true;
+        });
+        player.iframe.contentDocument.addEventListener('mouseup', function() {
+          if (!player.isDragging) {
+            player[impl.paused ? 'play' : 'pause']();
+          }
+          delete player.isDragging;
+        });
         player.on('ready', function() {
           onPlayerReady();
           onReady();
