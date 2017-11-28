@@ -54,7 +54,7 @@
     // Mark this as YouTube
     self._util.type = "VRView";
 
-    function onPlayerReady(event) {
+    function onPlayerReady() {
 
       console.log('360 Video Player ready');
 
@@ -88,9 +88,6 @@
       // Browsers using flash will have the pause() call take too long and cause some
       // sound to leak out. Muting before to prevent this.
       self.muted = true;
-
-      // ensure we are muted.
-      onMuted();
     }
 
     function onReady() {
@@ -132,42 +129,8 @@
       // We can't easily determine canplaythrough, but will send anyway.
       impl.readyState = self.HAVE_ENOUGH_DATA;
       self.dispatchEvent("canplaythrough");
+      player.pause();
     }
-
-    function onFirstPause() {
-      removeYouTubeEvent("pause", onFirstPause);
-      // IE sometimes refuses to seek to exactly 0.
-      var playerTime = player.getCurrentTime();
-      if (playerTime > 0 && !( playerTime < 0.2 && !impl.seeking && playerState === YT.PlayerState.PAUSED )) {
-        setTimeout(onFirstPause, 0);
-        return;
-      }
-
-      if (impl.autoplay || !impl.paused) {
-        addYouTubeEvent("play", onReady);
-        player.playVideo();
-      } else {
-        onReady();
-      }
-    }
-
-    // This function needs duration and first play to be ready.
-    function onFirstPlay() {
-      if (videoElement) {
-        videoElement.style.zIndex = initialZindex;
-      }
-
-      removeYouTubeEvent("play", onFirstPlay);
-      if (player.getCurrentTime() === 0) {
-        setTimeout(onFirstPlay, 0);
-        return;
-      }
-      addYouTubeEvent("pause", onFirstPause);
-      player.pauseVideo();
-      // Safari doesn't want to seek from initial position so doing such dirty hack
-      player.seekTo(navigator.userAgent.match(/(Safari)/g) ? 0.000001 : 0);
-    }
-
 
     function destroyPlayer() {
       if (!( playerReady && player )) {
@@ -182,6 +145,10 @@
       clearInterval(currentTimeInterval);
       clearInterval(bufferedInterval);
       player.stop();
+      player.off('pause');
+      player.off('play');
+      player.off('timeupdate');
+      player.off('ended');
       //player.clearVideo();
       //player.destroy();
       elem = document.createElement("div");
@@ -225,6 +192,10 @@
       playerVars.controls = playerVars.controls || impl.controls ? 2 : 0;
       impl.controls = playerVars.controls;
 
+      if (player) {
+        destroyPlayer();
+      }
+
       function initializePlayer() {
         player = new VRView.Player('#' + elem.id, {
           width: '100%',
@@ -241,7 +212,10 @@
           //is_vr_off: true,
         });
 
-        player.on('ready', onPlayerReady);
+        player.on('ready', function() {
+          onPlayerReady();
+          onReady();
+        });
         player.on('pause', onPause);
         player.on('play', onPlay);
         player.on('timeupdate', onTimeUpdate);
@@ -275,7 +249,7 @@
       impl.currentTime = aTime;
 
       onSeeking();
-      player.currentTime = aTime;
+      player.setCurrentTime(aTime);
       onSeeked();
     }
 
@@ -462,12 +436,6 @@
             throw "Volume value must be between 0.0 and 1.0";
           }
           impl.volume = aValue;
-          if (!mediaReady) {
-            addMediaReadyCallback(function () {
-              self.volume = aValue;
-            });
-            return;
-          }
           player.setVolume(impl.volume);
           self.dispatchEvent("volumechange");
         }
@@ -505,7 +473,7 @@
                   return 0;
                 }
 
-                return impl.duration * lastLoadedFraction;
+                return impl.duration;
               }
 
               //throw fake DOMException/INDEX_SIZE_ERR
