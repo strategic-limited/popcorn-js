@@ -211,10 +211,10 @@
           //is_vr_off: true,
         });
 
-        player.iframe.addEventListener('mousemove', function() {
+        elem.addEventListener('mousemove', function() {
           player.isDragging = true;
         }, false);
-        player.iframe.addEventListener('mouseup', function() {
+        elem.addEventListener('mouseup', function() {
           console.log('mouse check');
           if (!player.isDragging) {
             player[impl.paused ? 'play' : 'pause']();
