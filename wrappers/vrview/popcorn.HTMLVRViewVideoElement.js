@@ -144,6 +144,7 @@
       mediaReadyCallbacks = [];
       clearInterval(currentTimeInterval);
       clearInterval(bufferedInterval);
+      player.off('click');
       player.stop();
       player.off('pause');
       player.off('play');
@@ -211,17 +212,7 @@
           //is_vr_off: true,
         });
 
-        elem.addEventListener('mousemove', function() {
-          player.isDragging = true;
-        }, false);
-        elem.addEventListener('mouseup', function() {
-          console.log('mouse check');
-          if (!player.isDragging) {
-            player[impl.paused ? 'play' : 'pause']();
-          }
-          delete player.isDragging;
-        }, false);
-
+        player.on('click', function() { player[impl.paused ? 'play' : 'pause'](); });
         player.on('ready', function() {
           onPlayerReady();
           onReady();
