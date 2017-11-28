@@ -132,6 +132,21 @@
       player.pause();
     }
 
+    function handleMouseUp() {
+      if (!player.isDragging) {
+        player[impl.paused ? 'play' : 'pause']();
+      }
+      player.isDragging = false;
+    }
+
+    function handleMouseMove() {
+      player.isDragging = true;
+    }
+
+    function handleMouseDown() {
+      player.isDragging = false;
+    }
+
     function destroyPlayer() {
       if (!( playerReady && player )) {
         return;
@@ -213,19 +228,13 @@
         });
 
         setTimeout(function() {
-          player.iframe.contentDocument.addEventListener('mousedown', function() {
-            player.isDragging = false;
-          });
-          player.iframe.contentDocument.addEventListener('mousemove', function() {
-            player.isDragging = true;
-          });
-          player.iframe.contentDocument.addEventListener('mouseup', function() {
-            if (!player.isDragging) {
-              player[impl.paused ? 'play' : 'pause']();
-            }
-            player.isDragging = false;
-          });
+
         }, 300);
+
+        player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
+        player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
+        player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
+
         player.on('ready', function() {
           onPlayerReady();
           onReady();
