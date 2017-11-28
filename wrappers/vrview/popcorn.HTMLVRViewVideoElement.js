@@ -144,7 +144,6 @@
       mediaReadyCallbacks = [];
       clearInterval(currentTimeInterval);
       clearInterval(bufferedInterval);
-      elem.off('click');
       player.stop();
       player.off('pause');
       player.off('play');
@@ -211,9 +210,9 @@
           //is_vr_off: true,
         });
 
-        elem.on('click', function() {
+        elem.onclick = function() {
           player[impl.paused ? 'play' : 'pause']();
-        });
+        };
         player.on('ready', function() {
           onPlayerReady();
           onReady();
