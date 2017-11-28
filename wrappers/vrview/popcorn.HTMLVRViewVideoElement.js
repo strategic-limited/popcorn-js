@@ -282,8 +282,8 @@
 
     function onPlay() {
       if (!player.isRepeatingPlay) {
-        onReady();
         player.isRepeatingPlay = true;
+        onReady();
       }
       if (impl.ended) {
         changeCurrentTime(0);
