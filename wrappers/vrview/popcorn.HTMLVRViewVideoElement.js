@@ -214,14 +214,17 @@
 
         player.iframe.contentDocument.addEventListener('mousedown', function() {
           delete player.isDragging;
+          console.log('iframe mousedown');
         });
         player.iframe.contentDocument.addEventListener('mousemove', function() {
           player.isDragging = true;
+          console.log('iframe mousemove');
         });
         player.iframe.contentDocument.addEventListener('mouseup', function() {
           if (!player.isDragging) {
             player[impl.paused ? 'play' : 'pause']();
           }
+          console.log('iframe mouseup');
           delete player.isDragging;
         });
         player.on('ready', function() {
