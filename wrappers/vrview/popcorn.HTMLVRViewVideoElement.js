@@ -212,19 +212,20 @@
           //is_vr_off: true,
         });
 
-        var eventReceiver = document.getElementById(elem.id).children[0].contentDocument;
-        eventReceiver.addEventListener('mousedown', function() {
-          player.isDragging = false;
-        });
-        eventReceiver.addEventListener('mousemove', function() {
-          player.isDragging = true;
-        });
-        eventReceiver.addEventListener('mouseup', function() {
-          if (!player.isDragging) {
-            player[impl.paused ? 'play' : 'pause']();
-          }
-          player.isDragging = false;
-        });
+        setTimeout(function() {
+          player.iframe.contentDocument.addEventListener('mousedown', function() {
+            player.isDragging = false;
+          });
+          player.iframe.contentDocument.addEventListener('mousemove', function() {
+            player.isDragging = true;
+          });
+          player.iframe.contentDocument.addEventListener('mouseup', function() {
+            if (!player.isDragging) {
+              player[impl.paused ? 'play' : 'pause']();
+            }
+            player.isDragging = false;
+          });
+        }, 300);
         player.on('ready', function() {
           onPlayerReady();
           onReady();
