@@ -216,7 +216,7 @@
           delete player.isDragging;
         });
         player.iframe.contentDocument.addEventListener('mousemove', function() {
-          vrView.isDragging = true;
+          player.isDragging = true;
         });
         player.iframe.contentDocument.addEventListener('mouseup', function() {
           if (!player.isDragging) {
