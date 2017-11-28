@@ -149,6 +149,7 @@
       player.off('play');
       player.off('timeupdate');
       player.off('ended');
+      player = null;
       elem = document.createElement("div");
     }
 
@@ -210,9 +211,16 @@
           //is_vr_off: true,
         });
 
-        elem.onclick = function() {
-          player[impl.paused ? 'play' : 'pause']();
-        };
+        player.iframe.contentDocument.addEventListener('mousemove', function() {
+          player.isDragging = true;
+        }, false);
+        player.iframe.contentDocument.addEventListener('mouseup', function() {
+          if (!player.isDragging) {
+            player[impl.paused ? 'play' : 'pause']();
+          }
+          delete player.isDragging;
+        }, false);
+
         player.on('ready', function() {
           onPlayerReady();
           onReady();
