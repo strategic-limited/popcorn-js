@@ -228,9 +228,10 @@
         });
 
         setTimeout(function() {
-          elem.addEventListener('mousedown', handleMouseDown);
-          elem.addEventListener('mousemove', handleMouseMove);
-          elem.addEventListener('mouseup', handleMouseUp);
+          var handler = document.getElementById(elem.id);
+          handler.addEventListener('mousedown', handleMouseDown);
+          handler.addEventListener('mousemove', handleMouseMove);
+          handler.addEventListener('mouseup', handleMouseUp);
         }, 300);
 
 
