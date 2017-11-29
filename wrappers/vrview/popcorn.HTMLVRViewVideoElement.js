@@ -8,10 +8,6 @@
 
   function HTMLVRViewVideoElement(id) {
 
-    function isMobile() {
-      return navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g);
-    }
-
     if (!window.postMessage) {
       throw "ERROR: HTMLVRViewVideoElement requires window.postMessage";
     }
@@ -42,10 +38,7 @@
       loopedPlay = false,
       player,
       playerPaused = true,
-      mediaReadyCallbacks = [],
-      playerState = -1,
       bufferedInterval,
-      lastLoadedFraction = 0,
       currentTimeInterval,
       timeUpdateInterval;
 
@@ -102,8 +95,6 @@
 
       impl.readyState = self.HAVE_METADATA;
       self.dispatchEvent("loadedmetadata");
-      currentTimeInterval = setInterval(monitorCurrentTime,
-        CURRENT_TIME_MONITOR_MS);
 
       self.dispatchEvent("loadeddata");
 
@@ -111,11 +102,6 @@
       self.dispatchEvent("canplay");
 
       mediaReady = true;
-
-      while (mediaReadyCallbacks.length) {
-        mediaReadyCallbacks[0]();
-        mediaReadyCallbacks.shift();
-      }
 
       // We can't easily determine canplaythrough, but will send anyway.
       impl.readyState = self.HAVE_ENOUGH_DATA;
@@ -147,7 +133,6 @@
       mediaReady = false;
       loopedPlay = false;
       impl.currentTime = 0;
-      mediaReadyCallbacks = [];
       clearInterval(currentTimeInterval);
       clearInterval(bufferedInterval);
       player.off('click');
@@ -202,47 +187,39 @@
         destroyPlayer();
       }
 
-      function initializePlayer() {
-        player = new VRView.Player('#' + elem.id, {
-          width: '100%',
-          height: '100%',
-          video: aSrc,
-          is_stereo: false,
-          loop: false,
-          hide_fullscreen_button: true,
-          //volume: 0.4,
-          //muted: true,
-          //is_debug: true,
-          //default_heading: 90,
-          //is_yaw_only: true,
-          //is_vr_off: true,
-        });
+      player = new VRView.Player('#' + elem.id, {
+        width: '100%',
+        height: '100%',
+        video: aSrc,
+        is_stereo: false,
+        loop: false,
+        hide_fullscreen_button: true,
+        //volume: 0.4,
+        //muted: true,
+        //is_debug: true,
+        //default_heading: 90,
+        //is_yaw_only: true,
+        //is_vr_off: true,
+      });
 
-        setTimeout(function() {
-          player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
-          player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
-          player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
-        }, 300);
+      setTimeout(function() {
+        player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
+        player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
+        player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
+      }, 300);
 
-        if (isMobile()) {
-          onPlayerReady();
-          onReady();
-        } else {
-          player.on('ready', onPlayerReady);
-          player.on('click', function() {
-            player[impl.paused ? 'play' : 'pause']();
-          });
-        }
-        player.on('pause', onPause);
-        player.on('play', onPlay);
-        player.on('ended', onEnded);
+      player.on('ready', onPlayerReady);
+      /*player.on('click', function() {
+        player[impl.paused ? 'play' : 'pause']();
+      });*/
+      player.on('pause', onPause);
+      player.on('play', onPlay);
+      player.on('timeupdate', monitorCurrentTime);
+      player.on('ended', onEnded);
 
-        impl.networkState = self.NETWORK_LOADING;
-        self.dispatchEvent("loadstart");
-        self.dispatchEvent("progress");
-      }
-
-      initializePlayer();
+      impl.networkState = self.NETWORK_LOADING;
+      self.dispatchEvent("loadstart");
+      self.dispatchEvent("progress");
     }
 
     function monitorCurrentTime() {
@@ -262,15 +239,11 @@
       if (aTime === impl.currentTime) {
         return;
       }
-      impl.currentTime = aTime;
 
       onSeeking();
       player.setCurrentTime(aTime);
+      impl.currentTime = aTime;
       onSeeked();
-    }
-
-    function onTimeUpdate() {
-      self.dispatchEvent("timeupdate");
     }
 
     function onSeeking() {
@@ -293,8 +266,6 @@
         changeCurrentTime(0);
         impl.ended = false;
       }
-      timeUpdateInterval = setInterval(onTimeUpdate,
-        self._util.TIMEUPDATE_MS);
       impl.paused = false;
       if (playerPaused) {
         playerPaused = false;
@@ -302,7 +273,7 @@
         // Only 1 play when video.loop=true
         if (( impl.loop && !loopedPlay ) || !impl.loop) {
           loopedPlay = true;
-          self.dispatchEvent("play");
+          //self.dispatchEvent("play");
         }
         self.dispatchEvent("playing");
       }
@@ -318,7 +289,7 @@
       if (!playerPaused) {
         playerPaused = true;
         clearInterval(timeUpdateInterval);
-        self.dispatchEvent("pause");
+        //self.dispatchEvent("pause");
       }
     }
 
@@ -343,7 +314,7 @@
       impl.muted = aValue;
       player.mute(aValue);
 
-      self.dispatchEvent("volumechange");
+      //self.dispatchEvent("volumechange");
     }
 
     function getMuted() {
