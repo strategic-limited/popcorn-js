@@ -9,6 +9,10 @@
 
   function HTMLVRViewVideoElement(id) {
 
+    function isMobile() {
+      return navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g);
+    }
+
     if (!window.postMessage) {
       throw "ERROR: HTMLVRViewVideoElement requires window.postMessage";
     }
@@ -221,9 +225,11 @@
           player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
         }, 300);
 
-        player.on('ready', function() {
+        if (isMobile()) {
           onPlayerReady();
-        });
+        } else {
+          player.on('ready', onPlayerReady);
+        }
         player.on('pause', onPause);
         player.on('play', onPlay);
         player.on('ended', onEnded);
