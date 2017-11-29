@@ -226,7 +226,6 @@
         });
         player.on('pause', onPause);
         player.on('play', onPlay);
-        player.on('timeupdate', onTimeUpdate);
         player.on('ended', onEnded);
 
         impl.networkState = self.NETWORK_LOADING;
