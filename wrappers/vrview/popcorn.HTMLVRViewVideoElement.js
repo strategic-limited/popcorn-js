@@ -5,7 +5,6 @@
     CURRENT_TIME_MONITOR_MS = 10;
 
   var videoElement;
-  var initialZindex;
 
   function HTMLVRViewVideoElement(id) {
 
@@ -227,6 +226,7 @@
 
         if (isMobile()) {
           onPlayerReady();
+          onReady();
         } else {
           player.on('ready', onPlayerReady);
         }
@@ -286,10 +286,6 @@
     }
 
     function onPlay() {
-      if (!player.isRepeatingPlay) {
-        player.isRepeatingPlay = true;
-        onReady();
-      }
       if (impl.ended) {
         changeCurrentTime(0);
         impl.ended = false;
@@ -307,10 +303,6 @@
         }
         self.dispatchEvent("playing");
       }
-    }
-
-    function onProgress() {
-      self.dispatchEvent("progress");
     }
 
     self.play = function () {
