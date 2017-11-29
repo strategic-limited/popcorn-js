@@ -72,6 +72,7 @@
       } else {
         onReady();
       }
+      playerPaused = true;
     }
 
     function onReady() {
