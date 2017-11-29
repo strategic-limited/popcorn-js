@@ -229,6 +229,9 @@
           onReady();
         } else {
           player.on('ready', onPlayerReady);
+          player.on('click', function() {
+            player[impl.paused ? 'play' : 'pause']();
+          });
         }
         player.on('pause', onPause);
         player.on('play', onPlay);
