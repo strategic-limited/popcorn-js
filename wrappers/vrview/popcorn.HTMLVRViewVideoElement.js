@@ -97,6 +97,9 @@
       impl.readyState = self.HAVE_METADATA;
       self.dispatchEvent("loadedmetadata");
 
+      currentTimeInterval = setInterval(monitorCurrentTime,
+        CURRENT_TIME_MONITOR_MS);
+
       self.dispatchEvent("loadeddata");
 
       impl.readyState = self.HAVE_FUTURE_DATA;
@@ -247,6 +250,10 @@
       onSeeked();
     }
 
+    function onTimeUpdate() {
+      self.dispatchEvent("timeupdate");
+    }
+
     function onSeeking() {
       // we don't want to listen for this, so this state catches the event.
       impl.seeking = true;
@@ -267,6 +274,8 @@
         changeCurrentTime(0);
         impl.ended = false;
       }
+      timeUpdateInterval = setInterval(onTimeUpdate,
+        self._util.TIMEUPDATE_MS);
       impl.paused = false;
       if (playerPaused) {
         playerPaused = false;
@@ -274,7 +283,7 @@
         // Only 1 play when video.loop=true
         if (( impl.loop && !loopedPlay ) || !impl.loop) {
           loopedPlay = true;
-          //self.dispatchEvent("play");
+          self.dispatchEvent("play");
         }
         self.dispatchEvent("playing");
       }
@@ -290,7 +299,7 @@
       if (!playerPaused) {
         playerPaused = true;
         clearInterval(timeUpdateInterval);
-        //self.dispatchEvent("pause");
+        self.dispatchEvent("pause");
       }
     }
 
