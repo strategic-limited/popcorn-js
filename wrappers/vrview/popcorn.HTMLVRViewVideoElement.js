@@ -69,6 +69,8 @@
         if (videoElement) {
           videoElement.style.zIndex = 99999999999;
         }
+      } else {
+        player.pause();
       }
       playerPaused = true;
       onReady();
@@ -275,12 +277,14 @@
         player.isRepeatingPlay = true;
         self.dispatchEvent("loadedmetadata");
 
-        setTimeout(function () {
-          var el = document.getElementById("controls-big-play-button");
-          if (el) {
-            el.click();
-          }
-        }, 10);
+        if (isMobile()) {
+          setTimeout(function () {
+            var el = document.getElementById("controls-big-play-button");
+            if (el) {
+              el.click();
+            }
+          }, 10);
+        }
       }
       if (impl.ended) {
         changeCurrentTime(0);
