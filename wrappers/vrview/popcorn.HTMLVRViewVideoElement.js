@@ -158,14 +158,9 @@
       mediaReady = false;
       loopedPlay = false;
       impl.currentTime = 0;
-      if (!isMobile()) {
-        player.iframe.contentDocument.removeEventListener('mousedown', handleMouseDown);
-        player.iframe.contentDocument.removeEventListener('mousemove', handleMouseMove);
-        player.iframe.contentDocument.removeEventListener('mouseup', handleMouseUp);
-      } else {
-        player.iframe.contentDocument.removeEventListener('touchstart', handleTouchStart);
-        player.iframe.contentDocument.removeEventListener('touchend', handleTouchEnd);
-      }
+      player.iframe.contentDocument.removeEventListener('mousedown', handleMouseDown);
+      player.iframe.contentDocument.removeEventListener('mousemove', handleMouseMove);
+      player.iframe.contentDocument.removeEventListener('mouseup', handleMouseUp);
       clearInterval(currentTimeInterval);
       clearInterval(bufferedInterval);
       player.off('click');
@@ -236,14 +231,9 @@
       });
 
       setTimeout(function() {
-        if (!isMobile()) {
-          player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
-          player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
-          player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
-        } else {
-          player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
-          player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
-        }
+        player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
+        player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
+        player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
       }, 300);
 
       player.on('ready', onPlayerReady);
