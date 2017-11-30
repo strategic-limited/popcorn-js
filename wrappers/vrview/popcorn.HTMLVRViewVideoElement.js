@@ -74,8 +74,8 @@
           videoElement.style.zIndex = 99999999999;
         }
       }
-      onReady();
       playerPaused = true;
+      onReady();
     }
 
     function onReady() {
