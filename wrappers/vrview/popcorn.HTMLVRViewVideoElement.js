@@ -130,6 +130,20 @@
       player.isDragging = false;
     }
 
+    function handleTouchStart(event) {
+      player.touchEvent = event;
+    }
+
+    function handleTouchEnd(event) {
+      var originalTouch = player.touchEvent && player.touchEvent.changedTouches[0];
+      var currentTouch = event.changedTouches[0];
+      if (originalTouch && currentTouch
+        && originalTouch.clientX === currentTouch.clientX && originalTouch.clientY === currentTouch.clientY) {
+        player[impl.paused ? 'play' : 'pause']();
+      }
+      delete player.touchEvent;
+    }
+
     function destroyPlayer() {
       if (!( playerReady && player )) {
         return;
@@ -139,6 +153,14 @@
       mediaReady = false;
       loopedPlay = false;
       impl.currentTime = 0;
+      if (!isMobile()) {
+        player.iframe.contentDocument.removeEventListener('mousedown', handleMouseDown);
+        player.iframe.contentDocument.removeEventListener('mousemove', handleMouseMove);
+        player.iframe.contentDocument.removeEventListener('mouseup', handleMouseUp);
+      } else {
+        player.iframe.contentDocument.removeEventListener('touchstart', handleTouchStart);
+        player.iframe.contentDocument.removeEventListener('touchend', handleTouchEnd);
+      }
       clearInterval(currentTimeInterval);
       clearInterval(bufferedInterval);
       player.off('click');
@@ -209,9 +231,14 @@
       });
 
       setTimeout(function() {
-        player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
-        player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
-        player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
+        if (!isMobile()) {
+          player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
+          player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
+          player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
+        } else {
+          player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
+          player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
+        }
       }, 300);
 
       player.on('ready', onPlayerReady);
