@@ -119,14 +119,11 @@
     };
 
     protoElement.dispatchEvent = function( name ) {
-      var customEvent = document.createEvent( "CustomEvent" ),
-        detail = {
-          type: name,
-          target: this.parentNode,
-          data: null
-        };
-
-      customEvent.initCustomEvent( this._eventNamespace + name, false, false, detail );
+      var customEvent = new CustomEvent(this._eventNamespace + name, {
+        type: name,
+        target: this.parentNode,
+        data: null
+      });
       document.dispatchEvent( customEvent );
     };
 
