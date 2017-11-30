@@ -114,7 +114,14 @@
       // We can't easily determine canplaythrough, but will send anyway.
       impl.readyState = self.HAVE_ENOUGH_DATA;
       self.dispatchEvent("canplaythrough");
-      self.pause();
+      if (isMobile()) {
+        setTimeout(function() {
+          self.pause();
+          changeCurrentTime(0);
+        }, 200);
+      } else {
+        self.pause();
+      }
     }
 
     function handleMouseUp() {
