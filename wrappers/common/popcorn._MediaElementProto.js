@@ -113,7 +113,7 @@
       var customEvent = document.createEvent( "CustomEvent" ),
         detail = {
           type: name,
-          target: this.parentNode,
+          target: document,
           data: null
         };
 
