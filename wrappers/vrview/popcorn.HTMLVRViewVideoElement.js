@@ -69,9 +69,10 @@
         if (videoElement) {
           videoElement.style.zIndex = 99999999999;
         }
+      } else {
+        onReady();
       }
       playerPaused = true;
-      onReady();
     }
 
     function onReady() {
@@ -270,6 +271,10 @@
     }
 
     function onPlay() {
+      if (!player.isRepeatingPlay) {
+        player.isRepeatingPlay = true;
+        onReady();
+      }
       if (impl.ended) {
         changeCurrentTime(0);
         impl.ended = false;
