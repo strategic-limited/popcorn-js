@@ -128,7 +128,7 @@
 
       customEvent.initCustomEvent( this._eventNamespace + name, false, false, detail );
       if (isSafari()) {
-        setTimeout(function() { document.dispatchEvent( customEvent ); }, 0);
+        setTimeout(function() { document.dispatchEvent( customEvent ); }, 10);
       } else {
         document.dispatchEvent( customEvent );
       }
