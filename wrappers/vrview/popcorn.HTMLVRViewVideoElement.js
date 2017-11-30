@@ -73,9 +73,8 @@
         if (videoElement) {
           videoElement.style.zIndex = 99999999999;
         }
-      } else {
-        onReady();
       }
+      onReady();
       playerPaused = true;
     }
 
@@ -118,8 +117,6 @@
       self.dispatchEvent("canplaythrough");
       if (!isMobile()) {
         player.pause();
-      } else {
-        self.play();
       }
     }
 
@@ -227,13 +224,7 @@
         player[impl.paused ? 'play' : 'pause']();
       });*/
       player.on('pause', onPause);
-      player.on('play', function() {
-        if (isMobile() && !player.isRepeatingPlay) {
-          player.isRepeatingPlay = true;
-          onReady();
-        }
-        onPlay();
-      });
+      player.on('play', onPlay);
       //player.on('timeupdate', monitorCurrentTime);
       player.on('ended', onEnded);
 
