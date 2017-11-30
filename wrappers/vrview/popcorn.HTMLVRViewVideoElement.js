@@ -311,7 +311,11 @@
 
     self.pause = function () {
       impl.paused = true;
+      var _playerPaused = playerPaused;
       player.pause();
+      if (_playerPaused) {
+        onPause();
+      }
     };
 
     function onEnded() {
