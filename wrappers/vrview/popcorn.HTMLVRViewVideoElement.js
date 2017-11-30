@@ -62,12 +62,6 @@
 
       if (isMobile()) {
         self.dispatchEvent("loadedmetadata");
-        setTimeout(function () {
-          var el = document.getElementById("controls-big-play-button");
-          if (el) {
-            el.click();
-          }
-        }, 10);
         //remove loading image so we can click actual VRView play button
         document.getElementsByClassName("loading-message")[0].style.display = "none";
         if (videoElement) {
@@ -114,15 +108,7 @@
       // We can't easily determine canplaythrough, but will send anyway.
       impl.readyState = self.HAVE_ENOUGH_DATA;
       self.dispatchEvent("canplaythrough");
-      if (isMobile()) {
-        setTimeout(function() {
-          self.dispatchEvent("pause");
-          self.pause();
-          changeCurrentTime(0);
-        }, 200);
-      } else {
-        self.pause();
-      }
+      self.pause();
     }
 
     function handleMouseUp() {
@@ -308,6 +294,12 @@
 
     self.play = function () {
       impl.paused = false;
+      setTimeout(function () {
+        var el = document.getElementById("controls-big-play-button");
+        if (el) {
+          el.click();
+        }
+      }, 10);
       player.play();
     };
 
