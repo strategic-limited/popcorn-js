@@ -237,6 +237,7 @@
       } else if (ABS(playerTime - impl.currentTime) < 1) {
         onSeeked();
       }
+      onTimeUpdate();
     }
 
     function changeCurrentTime(aTime) {
