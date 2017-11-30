@@ -13,6 +13,15 @@
    * (c) Steven Levithan <stevenlevithan.com>
    * MIT License
    */
+
+  function isSafari() {
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.indexOf('safari') !== -1) {
+      return ua.indexOf('chrome') === -1;
+    }
+    return false;
+  }
+
   function parseUri (str) {
     var	o   = parseUri.options,
         m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
@@ -118,8 +127,11 @@
         };
 
       customEvent.initCustomEvent( this._eventNamespace + name, false, false, detail );
-      customEvent.target = customEvent.target || document;
-      document.dispatchEvent( customEvent );
+      if (isSafari()) {
+        setTimeout(function() { document.dispatchEvent( customEvent ); }, 0);
+      } else {
+        document.dispatchEvent( customEvent );
+      }
     };
 
     protoElement.load = Popcorn.nop;
