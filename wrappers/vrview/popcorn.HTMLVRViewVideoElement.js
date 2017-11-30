@@ -6,6 +6,10 @@
 
   var videoElement;
 
+  function isMobile() {
+    return (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g));
+  }
+
   function HTMLVRViewVideoElement(id) {
 
     if (!window.postMessage) {
@@ -56,7 +60,7 @@
 
       playerReady = true;
 
-      if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+      if (isMobile()) {
         self.dispatchEvent("loadedmetadata");
         setTimeout(function () {
           var el = document.getElementById("controls-big-play-button");
@@ -83,15 +87,17 @@
         self.dispatchEvent("durationchange");
       }
 
-      // Set initial paused state
-      if (impl.autoplay || !impl.paused) {
-        impl.paused = false;
-        onPlay();
-      }
+      if (!isMobile()) {
+        // Set initial paused state
+        if (impl.autoplay || !impl.paused) {
+          impl.paused = false;
+          onPlay();
+        }
 
-      // Ensure video will now be unmuted when playing due to the mute on initial load.
-      if (!impl.muted) {
-        self.muted = false;
+        // Ensure video will now be unmuted when playing due to the mute on initial load.
+        if (!impl.muted) {
+          self.muted = false;
+        }
       }
 
       impl.readyState = self.HAVE_METADATA;
@@ -110,7 +116,9 @@
       // We can't easily determine canplaythrough, but will send anyway.
       impl.readyState = self.HAVE_ENOUGH_DATA;
       self.dispatchEvent("canplaythrough");
-      player.pause();
+      if (!isMobile()) {
+        player.pause();
+      }
     }
 
     function handleMouseUp() {
@@ -271,7 +279,7 @@
     }
 
     function onPlay() {
-      if (!player.isRepeatingPlay) {
+      if (isMobile() && !player.isRepeatingPlay) {
         player.isRepeatingPlay = true;
         onReady();
       }
