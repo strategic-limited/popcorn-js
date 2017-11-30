@@ -227,7 +227,13 @@
         player[impl.paused ? 'play' : 'pause']();
       });*/
       player.on('pause', onPause);
-      player.on('play', onPlay);
+      player.on('play', function() {
+        if (isMobile() && !player.isRepeatingPlay) {
+          player.isRepeatingPlay = true;
+          onReady();
+        }
+        onPlay();
+      });
       //player.on('timeupdate', monitorCurrentTime);
       player.on('ended', onEnded);
 
@@ -281,10 +287,6 @@
     }
 
     function onPlay() {
-      if (isMobile() && !player.isRepeatingPlay) {
-        player.isRepeatingPlay = true;
-        onReady();
-      }
       if (impl.ended) {
         changeCurrentTime(0);
         impl.ended = false;
