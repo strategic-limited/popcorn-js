@@ -116,6 +116,7 @@
       self.dispatchEvent("canplaythrough");
       if (isMobile()) {
         setTimeout(function() {
+          self.dispatchEvent("pause");
           self.pause();
           changeCurrentTime(0);
         }, 200);
