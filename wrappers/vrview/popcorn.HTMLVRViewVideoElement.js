@@ -131,7 +131,12 @@
     }
 
     function handleTouchStart(event) {
-      player.touchEvent = event;
+      if (player.touchEvent === undefined) {
+        // we're skipping first handle of this touch event chain
+        player.touchEvent = null;
+      } else {
+        player.touchEvent = event;
+      }
     }
 
     function handleTouchEnd(event) {
@@ -141,7 +146,7 @@
         && originalTouch.clientX === currentTouch.clientX && originalTouch.clientY === currentTouch.clientY) {
         player[impl.paused ? 'play' : 'pause']();
       }
-      delete player.touchEvent;
+      player.touchEvent = null;
     }
 
     function destroyPlayer() {
