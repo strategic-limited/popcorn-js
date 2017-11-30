@@ -14,14 +14,6 @@
    * MIT License
    */
 
-  function isSafari() {
-    var ua = navigator.userAgent.toLowerCase();
-    if (ua.indexOf('safari') !== -1) {
-      return ua.indexOf('chrome') === -1;
-    }
-    return false;
-  }
-
   function parseUri (str) {
     var	o   = parseUri.options,
         m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
