@@ -161,6 +161,8 @@
       player.iframe.contentDocument.removeEventListener('mousedown', handleMouseDown);
       player.iframe.contentDocument.removeEventListener('mousemove', handleMouseMove);
       player.iframe.contentDocument.removeEventListener('mouseup', handleMouseUp);
+      player.iframe.contentDocument.removeEventListener('touchstart', handleTouchStart);
+      player.iframe.contentDocument.removeEventListener('touchend', handleTouchEnd);
       clearInterval(currentTimeInterval);
       clearInterval(bufferedInterval);
       player.off('click');
@@ -234,6 +236,8 @@
         player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
         player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
         player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
+        player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
+        player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
       }, 300);
 
       player.on('ready', onPlayerReady);
@@ -324,7 +328,9 @@
           self.dispatchEvent("play");
         }
         self.dispatchEvent("playing");
-        Popcorn.current.play();
+        if (isMobile()) {
+          Popcorn.current.play();
+        }
       }
     }
 
@@ -339,7 +345,9 @@
         playerPaused = true;
         clearInterval(timeUpdateInterval);
         self.dispatchEvent("pause");
-        Popcorn.current.pause();
+        if (isMobile()) {
+          Popcorn.current.pause();
+        }
       }
     }
 
