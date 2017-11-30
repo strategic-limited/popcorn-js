@@ -100,7 +100,6 @@
       }
 
       impl.readyState = self.HAVE_METADATA;
-      self.dispatchEvent("loadedmetadata");
 
       currentTimeInterval = setInterval(monitorCurrentTime,
         CURRENT_TIME_MONITOR_MS);
@@ -276,6 +275,10 @@
     }
 
     function onPlay() {
+      if (!player.isRepeatingPlay) {
+        player.isRepeatingPlay = true;
+        self.dispatchEvent("loadedmetadata");
+      }
       if (impl.ended) {
         changeCurrentTime(0);
         impl.ended = false;
@@ -311,11 +314,7 @@
 
     self.pause = function () {
       impl.paused = true;
-      var _playerPaused = playerPaused;
       player.pause();
-      if (_playerPaused) {
-        onPause();
-      }
     };
 
     function onEnded() {
