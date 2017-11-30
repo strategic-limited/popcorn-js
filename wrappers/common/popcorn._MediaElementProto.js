@@ -113,11 +113,12 @@
       var customEvent = document.createEvent( "CustomEvent" ),
         detail = {
           type: name,
-          target: document,
+          target: this.parentNode,
           data: null
         };
 
       customEvent.initCustomEvent( this._eventNamespace + name, false, false, detail );
+      customEvent.target = customEvent.target || document;
       document.dispatchEvent( customEvent );
     };
 
