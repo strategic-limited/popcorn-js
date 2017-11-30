@@ -117,7 +117,7 @@
 
     function handleMouseUp() {
       if (!player.isDragging) {
-        player[impl.paused ? 'play' : 'pause']();
+        self[impl.paused ? 'play' : 'pause']();
       }
       player.isDragging = false;
     }
@@ -144,7 +144,7 @@
       var currentTouch = event.changedTouches[0];
       if (originalTouch && currentTouch
         && originalTouch.clientX === currentTouch.clientX && originalTouch.clientY === currentTouch.clientY) {
-        player[impl.paused ? 'play' : 'pause']();
+        self[impl.paused ? 'play' : 'pause']();
       }
       player.touchEvent = null;
     }
