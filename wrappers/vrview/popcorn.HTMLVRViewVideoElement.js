@@ -274,6 +274,13 @@
       if (!player.isRepeatingPlay) {
         player.isRepeatingPlay = true;
         self.dispatchEvent("loadedmetadata");
+
+        setTimeout(function () {
+          var el = document.getElementById("controls-big-play-button");
+          if (el) {
+            el.click();
+          }
+        }, 10);
       }
       if (impl.ended) {
         changeCurrentTime(0);
@@ -296,12 +303,6 @@
 
     self.play = function () {
       impl.paused = false;
-      setTimeout(function () {
-        var el = document.getElementById("controls-big-play-button");
-        if (el) {
-          el.click();
-        }
-      }, 10);
       player.play();
     };
 
