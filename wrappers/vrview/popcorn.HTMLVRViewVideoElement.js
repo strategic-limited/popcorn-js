@@ -324,6 +324,7 @@
           self.dispatchEvent("play");
         }
         self.dispatchEvent("playing");
+        Popcorn.current.play();
       }
     }
 
@@ -338,6 +339,7 @@
         playerPaused = true;
         clearInterval(timeUpdateInterval);
         self.dispatchEvent("pause");
+        Popcorn.current.pause();
       }
     }
 
