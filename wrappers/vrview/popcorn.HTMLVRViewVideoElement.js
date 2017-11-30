@@ -62,8 +62,10 @@
 
       if (isMobile()) {
         self.dispatchEvent("loadedmetadata");
-        //remove loading image so we can click actual VRView play button
+        //remove loading image, thumbs and big play button so we can click actual VRView play button
         document.getElementsByClassName("loading-message")[0].style.display = "none";
+        document.getElementById("thumbnail-container").style.display = "none";
+        document.getElementById("controls-big-play-button").style.display = "none";
         if (videoElement) {
           videoElement.style.zIndex = 99999999999;
         }
