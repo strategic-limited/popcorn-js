@@ -98,7 +98,7 @@
       }
 
       impl.readyState = self.HAVE_METADATA;
-
+      self.dispatchEvent( "loadedmetadata" );
       currentTimeInterval = setInterval(monitorCurrentTime,
         CURRENT_TIME_MONITOR_MS);
 
