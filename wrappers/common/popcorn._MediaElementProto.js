@@ -13,6 +13,7 @@
    * (c) Steven Levithan <stevenlevithan.com>
    * MIT License
    */
+
   function parseUri (str) {
     var	o   = parseUri.options,
         m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
