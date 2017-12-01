@@ -232,13 +232,13 @@
         //is_vr_off: true,
       });
 
-      setTimeout(function() {
+      window.addEventListener("load", function() {
         player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
         player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
         player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
         player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
         player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
-      }, 300);
+      });
 
       player.on('ready', onPlayerReady);
       /*player.on('click', function() {
