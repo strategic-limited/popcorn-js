@@ -247,6 +247,7 @@
         player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
         player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
         //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
+        //TODO: investigate for correct handling of this case (best is event-based)
       }, isSafari () ? 300 : 1000);
 
       player.on('ready', onPlayerReady);
