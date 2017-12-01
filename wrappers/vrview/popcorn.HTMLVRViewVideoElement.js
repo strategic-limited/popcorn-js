@@ -10,6 +10,14 @@
     return (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g));
   }
 
+  function isSafari() {
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.indexOf('safari') !== -1) {
+      return ua.indexOf('chrome') === -1;
+    }
+    return false;
+  }
+
   function HTMLVRViewVideoElement(id) {
 
     if (!window.postMessage) {
@@ -238,7 +246,8 @@
         player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
         player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
         player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
-      }, 1000);
+        //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
+      }, isSafari () ? 300 : 1000);
 
       player.on('ready', onPlayerReady);
       /*player.on('click', function() {
