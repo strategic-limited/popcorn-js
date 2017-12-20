@@ -228,7 +228,7 @@
       player = new VRView.Player('#' + elem.id, {
         width: '100%',
         height: '100%',
-        video: encodeURIComponent(aSrc),
+        video: encodeURIComponent(aSrc.split('vr360://').reverse()[0]),
         is_stereo: false,
         loop: false,
         hide_fullscreen_button: true,
@@ -550,7 +550,7 @@
 
   // Helper for identifying URLs we know how to play.
   Popcorn.HTMLVRViewVideoElement._canPlaySrc = function (url) {
-    return (/(.)*\.mp4/).test( url ) ? "probably" : EMPTY_STRING;
+    return (/vr360:\/\/(.)*\.(mp4|m3u8|mpd)/).test( url ) ? "probably" : EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of video/x-vr360
