@@ -407,6 +407,9 @@
     // That way an error event can be told to backup to Flash if it fails.
     if ( src.length === 1 ) {
       videoElement = document.createElement( "video" );
+      // setting playsinline to play it on mobiles correctly
+      videoElement.setAttribute('playsinline', '');
+      videoElement.setAttribute('webkit-playsinline', '');
       videoElement.id = videoID;
       node.appendChild( videoElement );
       setTimeout( function() {
