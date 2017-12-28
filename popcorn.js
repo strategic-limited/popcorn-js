@@ -180,6 +180,7 @@
 
       //  Throw if an attempt is made to use an ID that already exists
       if ( Popcorn.byId( this.id ) ) {
+        // TODO: resolve this issue correctly
         return; //throw new Error( "Popcorn.js Error: Cannot use duplicate ID (" + this.id + ")" );
       }
 
