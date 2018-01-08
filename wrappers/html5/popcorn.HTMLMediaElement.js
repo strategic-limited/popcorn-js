@@ -30,6 +30,9 @@
     var parent = typeof id === "string" ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
+    media.setAttribute('playsinline', '');
+    media.setAttribute('webkit-playsinline', '');
+
     parent.appendChild(media);
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
