@@ -179,10 +179,12 @@
       this.id = this.options.id || Popcorn.guid( nodeName );
 
       //  Throw if an attempt is made to use an ID that already exists
+      // TODO: resolve this issue correctly
+      /*
       if ( Popcorn.byId( this.id ) ) {
-        // TODO: resolve this issue correctly
-        return; //throw new Error( "Popcorn.js Error: Cannot use duplicate ID (" + this.id + ")" );
+        throw new Error( "Popcorn.js Error: Cannot use duplicate ID (" + this.id + ")" );
       }
+      */
 
       this.isDestroyed = false;
 
