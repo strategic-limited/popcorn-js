@@ -345,11 +345,11 @@
   // it will default to using an HTML5 video in the target.
   Popcorn.smart = function( target, src, options ) {
     var node = typeof target === "string" ? Popcorn.dom.find( target ) : target,
-        i, srci, j, media, mediaWrapper, popcorn, srcLength, 
+        i, srci, j, media, mediaWrapper, popcorn, srcLength,
         // We leave HTMLVideoElement and HTMLAudioElement wrappers out
         // of the mix, since we'll default to HTML5 video if nothing
         // else works.  Waiting on #1254 before we add YouTube to this.
-        wrappers = "HTMLYouTubeVideoElement HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement".split(" ");
+      wrappers = "HTMLVRViewVideoElement HTMLYouTubeVideoElement HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement HTMLVideoElement".split(" ");
 
     if ( !node ) {
       Popcorn.error( "Specified target `" + target + "` was not found." );
@@ -407,6 +407,9 @@
     // That way an error event can be told to backup to Flash if it fails.
     if ( src.length === 1 ) {
       videoElement = document.createElement( "video" );
+      // setting playsinline to play it on mobiles correctly
+      videoElement.setAttribute('playsinline', '');
+      videoElement.setAttribute('webkit-playsinline', '');
       videoElement.id = videoID;
       node.appendChild( videoElement );
       setTimeout( function() {
