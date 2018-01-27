@@ -65,7 +65,7 @@
       lastCurrentTime = 0;
 
     // Namespace all events we'll produce
-    self._eventNamespace = ''; //Popcorn.guid("HTMLVimeoVideoElement::");
+    self._eventNamespace = Popcorn.guid("HTMLVimeoVideoElement::");
 
     self.parentNode = parent;
 
@@ -79,13 +79,11 @@
       player.on('progress', function (event) {
         self.dispatchEvent("progress");
         self.dispatchEvent( "seeking" );
-        //onCurrentTime(parseFloat(event.seconds));
       });
       player.on('play', onPlay);
       player.on('pause', onPause);
       player.on('ended', onEnded);
       player.on('seeked', function (event) {
-        //onCurrentTime(parseFloat(event.seconds));
         onSeeked();
       });
       player.on('error', function (error) {
@@ -170,7 +168,7 @@
 
     function onSeeked() {
       impl.seeking = false;
-      self.dispatchEvent(Popcorn.current.media._eventNamespace + "timeupdate", {});
+      self.dispatchEvent("timeupdate");
       self.dispatchEvent("seeked");
       self.dispatchEvent("canplay");
       self.dispatchEvent("canplaythrough");
@@ -229,7 +227,6 @@
 
       if (currentTime !== lastCurrentTime) {
         Popcorn.current.media.currentTime = aTime;
-        //self.dispatchEvent(Popcorn.current.media._eventNamespace + "timeupdate", {currentTime: aTime});
       }
 
       lastCurrentTime = impl.currentTime;
@@ -310,8 +307,6 @@
           autoplay: impl.autoplay,
           loop: false,
           byline: false,
-          height: '150%',
-          width: '150%',
           portrait: false,
           title: false,
           responsive: true
