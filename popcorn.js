@@ -965,7 +965,7 @@
             evt = document.createEvent( eventInterface );
             evt.initEvent( type, true, true, global, 1 );
 
-            this.media.dispatchEvent( evt );
+            this.media.dispatchEvent( type );
 
             return this;
           }
