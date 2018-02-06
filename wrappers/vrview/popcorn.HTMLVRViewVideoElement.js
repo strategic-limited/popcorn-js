@@ -6,6 +6,17 @@
 
   var videoElement;
 
+  function resolveHttpRedirects(url, callback) {
+
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+      if (oReq.readyState === XMLHttpRequest.DONE && oReq.status === 200)
+        callback(oReq.responseURL);
+    });
+    oReq.open("HEAD", url);
+    oReq.send();
+  }
+
   function isMobile() {
     return (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g));
   }
@@ -225,39 +236,42 @@
         destroyPlayer();
       }
 
-      player = new VRView.Player('#' + elem.id, {
-        width: '100%',
-        height: '100%',
-        video: encodeURIComponent(aSrc.split('vr360://').reverse()[0]),
-        is_stereo: false,
-        loop: false,
-        hide_fullscreen_button: true,
-        //volume: 0.4,
-        //muted: true,
-        //is_debug: true,
-        //default_heading: 90,
-        //is_yaw_only: true,
-        //is_vr_off: true,
+      // need to resolve redirects as it will fail on Safari
+      resolveHttpRedirects(encodeURIComponent(aSrc.split('vr360://').reverse()[0]), function (srcUrl) {
+        player = new VRView.Player('#' + elem.id, {
+          width: '100%',
+          height: '100%',
+          video: srcUrl,
+          is_stereo: false,
+          loop: false,
+          hide_fullscreen_button: true,
+          //volume: 0.4,
+          //muted: true,
+          //is_debug: true,
+          //default_heading: 90,
+          //is_yaw_only: true,
+          //is_vr_off: true,
+        });
+
+        setTimeout(function() {
+          player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
+          player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
+          player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
+          player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
+          player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
+          //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
+          //TODO: investigate for correct handling of this case (best is event-based)
+        }, isSafari () ? 300 : 1000);
+
+        player.on('ready', onPlayerReady);
+        /*player.on('click', function() {
+          player[impl.paused ? 'play' : 'pause']();
+        });*/
+        player.on('pause', onPause);
+        player.on('play', onPlay);
+        //player.on('timeupdate', monitorCurrentTime);
+        player.on('ended', onEnded);
       });
-
-      setTimeout(function() {
-        player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
-        player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
-        player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
-        player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
-        player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
-        //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
-        //TODO: investigate for correct handling of this case (best is event-based)
-      }, isSafari () ? 300 : 1000);
-
-      player.on('ready', onPlayerReady);
-      /*player.on('click', function() {
-        player[impl.paused ? 'play' : 'pause']();
-      });*/
-      player.on('pause', onPause);
-      player.on('play', onPlay);
-      //player.on('timeupdate', monitorCurrentTime);
-      player.on('ended', onEnded);
 
       impl.networkState = self.NETWORK_LOADING;
       self.dispatchEvent("loadstart");
