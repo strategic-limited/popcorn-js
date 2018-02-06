@@ -237,11 +237,11 @@
       }
 
       // need to resolve redirects as it will fail on Safari
-      resolveHttpRedirects(encodeURIComponent(aSrc.split('vr360://').reverse()[0]), function (srcUrl) {
+      resolveHttpRedirects(aSrc.split('vr360://').reverse()[0], function (srcUrl) {
         player = new VRView.Player('#' + elem.id, {
           width: '100%',
           height: '100%',
-          video: srcUrl,
+          video: encodeURIComponent(srcUrl),
           is_stereo: false,
           loop: false,
           hide_fullscreen_button: true,
