@@ -264,14 +264,13 @@
 
         setTimeout(function() {
           //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
+          player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
+          player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
+          player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
+          player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
+          player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
           //TODO: investigate for correct handling of this case (best is event-based)
         }, isSafari () ? 300 : 1000);
-
-        player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
-        player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
-        player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
-        player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
-        player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
       });
 
       impl.networkState = self.NETWORK_LOADING;
