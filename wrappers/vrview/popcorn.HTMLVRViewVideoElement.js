@@ -253,16 +253,6 @@
           //is_vr_off: true,
         });
 
-        setTimeout(function() {
-          player.iframe.contentDocument.addEventListener('mousedown', handleMouseDown);
-          player.iframe.contentDocument.addEventListener('mousemove', handleMouseMove);
-          player.iframe.contentDocument.addEventListener('mouseup', handleMouseUp);
-          player.iframe.contentDocument.addEventListener('touchstart', handleTouchStart);
-          player.iframe.contentDocument.addEventListener('touchend', handleTouchEnd);
-          //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
-          //TODO: investigate for correct handling of this case (best is event-based)
-        }, isSafari () ? 300 : 1000);
-
         player.on('ready', onPlayerReady);
         /*player.on('click', function() {
           player[impl.paused ? 'play' : 'pause']();
@@ -271,6 +261,18 @@
         player.on('play', onPlay);
         //player.on('timeupdate', monitorCurrentTime);
         player.on('ended', onEnded);
+
+        player.iframe.onload = function () {
+          player.iframe.contentDocument.body.addEventListener('mousedown', handleMouseDown);
+          player.iframe.contentDocument.body.addEventListener('mousemove', handleMouseMove);
+          player.iframe.contentDocument.body.addEventListener('mouseup', handleMouseUp);
+          player.iframe.contentDocument.body.addEventListener('touchstart', handleTouchStart);
+          player.iframe.contentDocument.body.addEventListener('touchend', handleTouchEnd);
+        };
+        setTimeout(function() {
+          //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
+          //TODO: investigate for correct handling of this case (best is event-based)
+        }, isSafari () ? 300 : 1000);
       });
 
       impl.networkState = self.NETWORK_LOADING;
