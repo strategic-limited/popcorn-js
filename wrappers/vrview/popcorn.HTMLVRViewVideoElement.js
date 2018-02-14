@@ -263,11 +263,15 @@
         player.on('ended', onEnded);
 
         player.iframe.onload = function () {
-          player.iframe.contentDocument.body.addEventListener('mousedown', handleMouseDown);
-          player.iframe.contentDocument.body.addEventListener('mousemove', handleMouseMove);
-          player.iframe.contentDocument.body.addEventListener('mouseup', handleMouseUp);
-          player.iframe.contentDocument.body.addEventListener('touchstart', handleTouchStart);
-          player.iframe.contentDocument.body.addEventListener('touchend', handleTouchEnd);
+          try {
+            player.iframe.contentDocument.body.addEventListener('mousedown', handleMouseDown);
+            player.iframe.contentDocument.body.addEventListener('mousemove', handleMouseMove);
+            player.iframe.contentDocument.body.addEventListener('mouseup', handleMouseUp);
+            player.iframe.contentDocument.body.addEventListener('touchstart', handleTouchStart);
+            player.iframe.contentDocument.body.addEventListener('touchend', handleTouchEnd);
+          } catch (ex) {
+            console.warn('Unable to link touch events to 360 Player.');
+          }
         };
         setTimeout(function() {
           //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
