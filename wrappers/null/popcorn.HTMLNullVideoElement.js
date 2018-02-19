@@ -382,6 +382,11 @@
       duration: {
         get: function() {
           return getDuration();
+        },
+        set: function(val) {
+          if (val) {
+            this.duration = val;
+          }
         }
       },
 
