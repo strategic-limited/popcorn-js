@@ -381,7 +381,7 @@
 
       duration: {
         get: function() {
-          return getDuration();
+          return this.duration;
         },
         set: function(val) {
           if (val && this.duration !== val) {
