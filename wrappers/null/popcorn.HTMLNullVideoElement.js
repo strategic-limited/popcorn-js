@@ -384,7 +384,7 @@
           return getDuration();
         },
         set: function(val) {
-          if (val) {
+          if (val && this.duration !== val) {
             this.duration = val;
           }
         }
