@@ -22,8 +22,6 @@
   //   #t=5,100  -- a null video of 100s, which starts at 5s (i.e., 95s duration)
   temporalRegex = /#t=(\d+\.?\d*)?,?(\d+\.?\d*)/;
 
-  var _duration;
-
   function NullPlayer( options ) {
     this.startTime = 0;
     this.currentTime = options.currentTime || 0;
@@ -383,11 +381,11 @@
 
       duration: {
         get: function() {
-          return _duration;
+          return getDuration();
         },
         set: function(val) {
-          if (val && this.duration !== val) {
-            _duration = val;
+          if (val && player.duration !== val) {
+            player.duration = val;
           }
         }
       },
