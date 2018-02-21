@@ -83,10 +83,7 @@
       player.on('play', onPlay);
       player.on('pause', onPause);
       player.on('ended', onEnded);
-      player.on('seeked', function (event) {
-        Popcorn.current.media.currentTime = event.seconds;
-        onSeeked();
-      });
+      player.on('seeked', onSeeked);
       player.on('error', function (error) {
         impl.error = error;
         self.dispatchEvent("error");
@@ -167,10 +164,10 @@
       self.dispatchEvent("seeking");
     }
 
-    function onSeeked() {
+    function onSeeked(event) {
       impl.seeking = false;
       self.dispatchEvent("timeupdate");
-      self.dispatchEvent("seeked");
+      self.dispatchEvent("seeked", event);
       self.dispatchEvent("canplay");
       self.dispatchEvent("canplaythrough");
     }

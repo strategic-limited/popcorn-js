@@ -110,12 +110,12 @@
       document.removeEventListener( this._eventNamespace + type, listener, useCapture );
     };
 
-    protoElement.dispatchEvent = function( name ) {
+    protoElement.dispatchEvent = function( name, data ) {
       var customEvent = document.createEvent( "CustomEvent" ),
         detail = {
           type: name,
           target: this.parentNode,
-          data: null
+          data: data
         };
 
       customEvent.initCustomEvent( this._eventNamespace + name, false, false, detail );
