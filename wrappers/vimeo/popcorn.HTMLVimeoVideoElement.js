@@ -84,6 +84,7 @@
       player.on('pause', onPause);
       player.on('ended', onEnded);
       player.on('seeked', function (event) {
+        Popcorn.current.media.currentTime = event.seconds;
         onSeeked();
       });
       player.on('error', function (error) {
@@ -226,7 +227,7 @@
       var currentTime = impl.currentTime = aTime;
 
       if (currentTime !== lastCurrentTime) {
-        Popcorn.current.media.currentTime = aTime;
+        self.dispatchEvent("timeupdate");
       }
 
       lastCurrentTime = impl.currentTime;
