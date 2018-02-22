@@ -72,13 +72,13 @@
     // Mark type as Vimeo
     self._util.type = "Vimeo";
 
-    function onPlayerReady(event) {
+    function onPlayerReady() {
       player.on('timeupdate', function (event) {
         onCurrentTime(parseFloat(event.seconds));
       });
       player.on('progress', function (event) {
+        player.buffered = event;
         self.dispatchEvent("progress");
-        self.dispatchEvent( "seeking" );
       });
       player.on('play', onPlay);
       player.on('pause', onPause);
@@ -444,6 +444,21 @@
         get: function () {
           return impl.error;
         }
+      },
+
+      buffered: {
+        get: function () {
+          return {
+            start: function () {
+              return 0;
+            },
+            end: function () {
+              return (player.buffered && player.buffered.seconds) || 0;
+            },
+            length: 1
+          };
+        },
+        configurable: true
       }
     });
 
