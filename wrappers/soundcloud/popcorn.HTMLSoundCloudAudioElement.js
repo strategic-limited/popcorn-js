@@ -61,7 +61,7 @@
         loop: false,
         poster: EMPTY_STRING,
         // SC Volume values are 0-100, we remap to 0-1 in volume getter/setter
-        volume: 1,
+        volume: 100,
         muted: 0,
         currentTime: 0,
         duration: NaN,
@@ -175,7 +175,7 @@
             player.unbind( SC.Widget.Events.PAUSE );
 
             // Play/Pause cycle is done, restore volume and continue loading.
-            player.setVolume( 1 );
+            player.setVolume( 100 );
             player.bind( SC.Widget.Events.SEEK, function() {
               player.unbind( SC.Widget.Events.SEEK );
               onLoaded();
@@ -495,7 +495,7 @@
         });
         return;
       }
-      player.setVolume( aValue );
+      player.setVolume( aValue * 100 );
       self.dispatchEvent( "volumechange" );
     }
 
@@ -649,7 +649,7 @@
           if( aValue < 0 || aValue > 1 ) {
             throw "Volume value must be between 0.0 and 1.0";
           }
-          setVolume( aValue );
+          setVolume( aValue * 100 );
         }
       },
 
