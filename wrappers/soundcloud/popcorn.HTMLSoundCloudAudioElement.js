@@ -61,7 +61,7 @@
         loop: false,
         poster: EMPTY_STRING,
         // SC Volume values are 0-100, we remap to 0-1 in volume getter/setter
-        volume: 100,
+        volume: 1,
         muted: 0,
         currentTime: 0,
         duration: NaN,
@@ -649,7 +649,7 @@
           if( aValue < 0 || aValue > 1 ) {
             throw "Volume value must be between 0.0 and 1.0";
           }
-          setVolume( aValue * 100 );
+          setVolume( aValue );
         }
       },
 
