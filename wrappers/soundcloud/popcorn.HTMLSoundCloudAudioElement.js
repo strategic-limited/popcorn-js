@@ -175,9 +175,11 @@
             player.unbind( SC.Widget.Events.PAUSE );
 
             // Play/Pause cycle is done, restore volume and continue loading.
-            player.setVolume( 1 );
+            player.setVolume( 100 );
             player.bind( SC.Widget.Events.SEEK, function() {
               player.unbind( SC.Widget.Events.SEEK );
+              // latest SC API doesn't pause on seek so need to force call .pause() again
+              player.pause();
               onLoaded();
             });
             // Re seek back to 0, then we're back to default, loaded, and ready to go.
@@ -495,7 +497,7 @@
         });
         return;
       }
-      player.setVolume( aValue );
+      player.setVolume( aValue * 100 );
       self.dispatchEvent( "volumechange" );
     }
 
