@@ -605,7 +605,8 @@
       Popcorn.forEach( methods.split( /\s+/g ), function( name ) {
 
         ret[ name ] = function( arg ) {
-          if (this.expectsUserInput) {
+          /* Detect if we're not in editor */
+          if (!(window.Butter && window.Butter.Editor) && this.expectsUserInput) {
             return;
           }
           var previous;
