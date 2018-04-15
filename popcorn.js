@@ -606,8 +606,10 @@
 
         ret[ name ] = function( arg ) {
           /* Detect if we're not in editor */
-          if (!(window.Butter && window.Butter.Editor) && this.expectsUserInput) {
-            return;
+          if (!(window.Butter && window.Butter.Editor)) {
+            if (/play|pause/.test(name) && this.expectsUserInput) {
+              return;
+            }
           }
           var previous;
 
