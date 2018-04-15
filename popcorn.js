@@ -605,6 +605,9 @@
       Popcorn.forEach( methods.split( /\s+/g ), function( name ) {
 
         ret[ name ] = function( arg ) {
+          if (name === 'play' && this.expectsUserInput) {
+            return;
+          }
           var previous;
 
           if ( typeof this.media[ name ] === "function" ) {
