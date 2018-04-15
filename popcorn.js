@@ -605,12 +605,6 @@
       Popcorn.forEach( methods.split( /\s+/g ), function( name ) {
 
         ret[ name ] = function( arg ) {
-          /* Detect if we're not in editor */
-          if (!(window.Butter && window.Butter.Editor)) {
-            if (/play|pause/.test(name) && this.expectsUserInput) {
-              return;
-            }
-          }
           var previous;
 
           if ( typeof this.media[ name ] === "function" ) {
