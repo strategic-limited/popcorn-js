@@ -122,13 +122,27 @@
     }
 
     function onPlayerReady( event ) {
+      player.loadVideoById({
+        videoId: regexYouTube.exec( impl.src )[ 1 ],
+        startSeconds: 0.1,
+        suggestedQuality: 'large',
+      });
+    }
 
+    function onVideoLoaded(event) {
       var onMuted = function() {
         if ( self.muted ) {
           // force an initial play on the video, to remove autostart on initial seekTo.
           addYouTubeEvent( "play", onFirstPlay );
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            player.playVideo();
+            var safePlay = function() {
+              if (player && typeof player.playVideo === 'function') {
+                player.playVideo();
+              } else {
+                setTimeout(safePlay, 100);
+              }
+            };
+            safePlay();
           } else {
             self.dispatchEvent( "loadedmetadata" );
             setTimeout(function() {
@@ -326,7 +340,11 @@
         case YT.PlayerState.BUFFERING:
           dispatchYouTubeEvent( "buffering" );
           break;
-
+        case YT.PlayerState.UNSTARTED:
+          if (playerState !== YT.PlayerState.UNSTARTED) {
+            onVideoLoaded();
+          }
+          break;
         // video cued
         case YT.PlayerState.CUED:
           // XXX: cued doesn't seem to fire reliably, bug in youtube api?
@@ -448,7 +466,6 @@
         width: "100%",
         height: "100%",
         wmode: playerVars.wmode,
-        videoId: aSrc,
         playerVars: playerVars,
         events: {
           'onReady': onPlayerReady,
