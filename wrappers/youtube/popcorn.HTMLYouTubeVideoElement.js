@@ -135,14 +135,7 @@
           // force an initial play on the video, to remove autostart on initial seekTo.
           addYouTubeEvent( "play", onFirstPlay );
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            var safePlay = function() {
-              if (player && typeof player.playVideo === 'function') {
-                player.playVideo();
-              } else {
-                setTimeout(safePlay, 100);
-              }
-            };
-            safePlay();
+            player.playVideo();
           } else {
             self.dispatchEvent( "loadedmetadata" );
             setTimeout(function() {
