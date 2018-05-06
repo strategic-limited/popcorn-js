@@ -455,7 +455,7 @@
       // Get video ID out of youtube url
       aSrc = regexYouTube.exec( aSrc )[ 1 ];
 
-      player = new YT.Player( elem, {
+      var playerOptions = {
         width: "100%",
         height: "100%",
         wmode: playerVars.wmode,
@@ -465,7 +465,11 @@
           'onError': onPlayerError,
           'onStateChange': onPlayerStateChange
         }
-      });
+      };
+      if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+        playerOptions.videoId = aSrc;
+      }
+      player = new YT.Player( elem, playerOptions );
 
       impl.networkState = self.NETWORK_LOADING;
       self.dispatchEvent( "loadstart" );
