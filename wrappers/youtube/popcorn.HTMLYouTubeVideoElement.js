@@ -122,6 +122,7 @@
     }
 
     function onPlayerReady( event ) {
+      addYouTubeEvent( "play", onFirstPlay );
       player.loadVideoById({
         videoId: regexYouTube.exec( impl.src )[ 1 ],
         startSeconds: 0.1,
@@ -132,7 +133,6 @@
     function onVideoLoaded(event) {
       var onMuted = function() {
         if ( self.muted ) {
-          addYouTubeEvent( "play", onFirstPlay );
           // force an initial play on the video, to remove autostart on initial seekTo.
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
             player.playVideo();
