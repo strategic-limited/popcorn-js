@@ -132,9 +132,9 @@
     function onVideoLoaded(event) {
       var onMuted = function() {
         if ( self.muted ) {
+          addYouTubeEvent( "play", onFirstPlay );
           // force an initial play on the video, to remove autostart on initial seekTo.
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            addYouTubeEvent( "play", onFirstPlay );
             player.playVideo();
           } else {
             self.dispatchEvent( "loadedmetadata" );
