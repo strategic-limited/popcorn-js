@@ -461,7 +461,7 @@
         wmode: playerVars.wmode,
         playerVars: playerVars,
         events: {
-          'onReady': onPlayerReady,
+          'onReady': navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g) ? onVideoLoaded : onPlayerReady,
           'onError': onPlayerError,
           'onStateChange': onPlayerStateChange
         }
