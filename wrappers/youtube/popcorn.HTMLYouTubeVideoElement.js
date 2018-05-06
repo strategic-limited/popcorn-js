@@ -461,7 +461,13 @@
         wmode: playerVars.wmode,
         playerVars: playerVars,
         events: {
-          'onReady': navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g) ? onVideoLoaded : onPlayerReady,
+          'onReady': function () {
+            if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+              return onVideoLoaded();
+            } else {
+              return onPlayerReady();
+            }
+          },
           'onError': onPlayerError,
           'onStateChange': onPlayerStateChange
         }
