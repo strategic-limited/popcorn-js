@@ -2,18 +2,18 @@
 
   var
 
-  CURRENT_TIME_MONITOR_MS = 10,
-  EMPTY_STRING = "",
+    CURRENT_TIME_MONITOR_MS = 10,
+    EMPTY_STRING = "",
 
-  // Example: http://www.youtube.com/watch?v=12345678901
-  regexYouTube = /^.*(?:\/|v=)(.{11})/,
+    // Example: http://www.youtube.com/watch?v=12345678901
+    regexYouTube = /^.*(?:\/|v=)(.{11})/,
 
-  ABS = Math.abs,
+    ABS = Math.abs,
 
-  // Setup for YouTube API
-  ytReady = false,
-  ytLoading = false,
-  ytCallbacks = [];
+    // Setup for YouTube API
+    ytReady = false,
+    ytLoading = false,
+    ytCallbacks = [];
 
   var videoElement;
   var initialZindex;
@@ -239,7 +239,7 @@
       impl.readyState = self.HAVE_METADATA;
       self.dispatchEvent( "loadedmetadata" );
       currentTimeInterval = setInterval( monitorCurrentTime,
-                                         CURRENT_TIME_MONITOR_MS );
+        CURRENT_TIME_MONITOR_MS );
 
       self.dispatchEvent( "loadeddata" );
 
@@ -350,7 +350,7 @@
       }
 
       if ( event.data !== YT.PlayerState.BUFFERING &&
-           playerState === YT.PlayerState.BUFFERING ) {
+        playerState === YT.PlayerState.BUFFERING ) {
         onProgress();
       }
 
@@ -442,7 +442,7 @@
 
       // Specify our domain as origin for iframe security
       var domain = window.location.protocol === "file:" ? "*" :
-      window.location.protocol + "//" + window.location.host;
+        window.location.protocol + "//" + window.location.host;
       playerVars.origin = playerVars.origin || domain;
 
       // Show/hide controls. Sync with impl.controls and prefer URL value.
@@ -555,7 +555,7 @@
         impl.ended = false;
       }
       timeUpdateInterval = setInterval( onTimeUpdate,
-                                        self._util.TIMEUPDATE_MS );
+        self._util.TIMEUPDATE_MS );
       impl.paused = false;
       if( playerPaused ) {
         playerPaused = false;
