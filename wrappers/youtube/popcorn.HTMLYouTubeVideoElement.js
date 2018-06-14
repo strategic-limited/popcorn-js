@@ -122,11 +122,23 @@
     }
 
     function onPlayerReady( event ) {
+      if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+        addYouTubeEvent( "play", onFirstPlay );
+      }
+      // player.loadVideoById({
+      //   videoId: regexYouTube.exec( impl.src )[ 1 ],
+      //   startSeconds: 0.1,
+      //   suggestedQuality: 'large',
+      // });
+    }
 
+    function onVideoLoaded(event) {
       var onMuted = function() {
         if ( self.muted ) {
+          if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+            addYouTubeEvent( "play", onFirstPlay );
+          }
           // force an initial play on the video, to remove autostart on initial seekTo.
-          addYouTubeEvent( "play", onFirstPlay );
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
             player.playVideo();
           } else {
@@ -277,8 +289,7 @@
       }
       addYouTubeEvent( "pause", onFirstPause );
       player.pauseVideo();
-      // Safari doesn't want to seek from initial position so doing such dirty hack
-      player.seekTo( navigator.userAgent.match(/(Safari)/g) ? 0.000001 : 0);
+      player.seekTo( 0 );
     }
 
     function addYouTubeEvent( event, listener ) {
@@ -300,6 +311,8 @@
     addYouTubeEvent( "ended", onEnded );
 
     function onPlayerStateChange( event ) {
+
+      console.log('youtube state change event: ', event);
 
       switch( event.data ) {
 
@@ -326,7 +339,11 @@
         case YT.PlayerState.BUFFERING:
           dispatchYouTubeEvent( "buffering" );
           break;
-
+        case YT.PlayerState.UNSTARTED:
+          if (playerState !== YT.PlayerState.UNSTARTED) {
+            onVideoLoaded();
+          }
+          break;
         // video cued
         case YT.PlayerState.CUED:
           // XXX: cued doesn't seem to fire reliably, bug in youtube api?
@@ -444,18 +461,28 @@
       // Get video ID out of youtube url
       aSrc = regexYouTube.exec( aSrc )[ 1 ];
 
-      player = new YT.Player( elem, {
+      var playerOptions = {
         width: "100%",
         height: "100%",
+        videoId: regexYouTube.exec( impl.src )[ 1 ],
         wmode: playerVars.wmode,
-        videoId: aSrc,
         playerVars: playerVars,
         events: {
-          'onReady': onPlayerReady,
+          'onReady': function () {
+            if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+              return onVideoLoaded();
+            } else {
+              return onPlayerReady();
+            }
+          },
           'onError': onPlayerError,
           'onStateChange': onPlayerStateChange
         }
-      });
+      };
+      if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+        playerOptions.videoId = aSrc;
+      }
+      player = new YT.Player( elem, playerOptions );
 
       impl.networkState = self.NETWORK_LOADING;
       self.dispatchEvent( "loadstart" );
