@@ -125,11 +125,11 @@
       if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
         addYouTubeEvent( "play", onFirstPlay );
       }
-      // player.loadVideoById({
-      //   videoId: regexYouTube.exec( impl.src )[ 1 ],
-      //   startSeconds: 0.1,
-      //   suggestedQuality: 'large',
-      // });
+      player.loadVideoById({
+        videoId: regexYouTube.exec( impl.src )[ 1 ],
+        startSeconds: 0.1,
+        suggestedQuality: 'large',
+      });
     }
 
     function onVideoLoaded(event) {
