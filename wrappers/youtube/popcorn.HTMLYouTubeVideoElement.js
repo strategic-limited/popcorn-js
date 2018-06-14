@@ -313,6 +313,8 @@
 
     function onPlayerStateChange( event ) {
 
+      console.log('youtube state change event: ', event);
+
       switch( event.data ) {
 
         // ended
