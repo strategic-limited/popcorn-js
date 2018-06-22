@@ -121,42 +121,30 @@
       removeYouTubeEvent( "pause", catchRoguePauseEvent );
     }
 
-    function onPlayerReady( event ) {
+    function onPlayerReady() {
       if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
         addYouTubeEvent( "play", onFirstPlay );
       }
-      player.loadVideoById({
-        videoId: regexYouTube.exec( impl.src )[ 1 ],
-        startSeconds: 0
-      });
-    }
-
-    function onVideoLoaded() {
       var onMuted = function() {
-        if ( self.muted ) {
-          if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            addYouTubeEvent( "play", onFirstPlay );
-          }
-          // force an initial play on the video, to remove autostart on initial seekTo.
-          if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            player.playVideo();
-          } else {
-            self.dispatchEvent( "loadedmetadata" );
-            setTimeout(function() {
-              var el = document.getElementById("controls-big-play-button");
-              if (el) {
-                el.click();
-              }
-            }, 10);
-            //remove loading image so we can click actual youtube play button
-            document.getElementsByClassName("loading-message")[0].style.display = "none";
-            if (videoElement) {
-              videoElement.style.zIndex = 99999999999;
-            }
-
-          }
+        if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+          addYouTubeEvent( "play", onFirstPlay );
+        }
+        // force an initial play on the video, to remove autostart on initial seekTo.
+        if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+          player.playVideo();
         } else {
-          setTimeout( onMuted, 0 );
+          self.dispatchEvent( "loadedmetadata" );
+          setTimeout(function() {
+            var el = document.getElementById("controls-big-play-button");
+            if (el) {
+              el.click();
+            }
+          }, 10);
+          //remove loading image so we can click actual youtube play button
+          document.getElementsByClassName("loading-message")[0].style.display = "none";
+          if (videoElement) {
+            videoElement.style.zIndex = 99999999999;
+          }
         }
       };
       playerReady = true;
@@ -338,11 +326,6 @@
         case YT.PlayerState.BUFFERING:
           dispatchYouTubeEvent( "buffering" );
           break;
-        case YT.PlayerState.UNSTARTED:
-          if (playerState !== YT.PlayerState.UNSTARTED) {
-            onVideoLoaded();
-          }
-          break;
         // video cued
         case YT.PlayerState.CUED:
           // XXX: cued doesn't seem to fire reliably, bug in youtube api?
@@ -467,13 +450,7 @@
         wmode: playerVars.wmode,
         playerVars: playerVars,
         events: {
-          'onReady': function () {
-            if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-              return onVideoLoaded();
-            } else {
-              return onPlayerReady();
-            }
-          },
+          'onReady': onPlayerReady,
           'onError': onPlayerError,
           'onStateChange': onPlayerStateChange
         }
