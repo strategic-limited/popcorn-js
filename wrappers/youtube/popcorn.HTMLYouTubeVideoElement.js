@@ -125,7 +125,13 @@
       if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
         addYouTubeEvent( "play", onFirstPlay );
       }
+      player.loadVideoById({
+        videoId: regexYouTube.exec( impl.src )[ 1 ],
+        startSeconds: 0
+      });
+    }
 
+    function onVideoLoaded() {
       var onMuted = function() {
         if ( self.muted ) {
           if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
@@ -332,6 +338,11 @@
         case YT.PlayerState.BUFFERING:
           dispatchYouTubeEvent( "buffering" );
           break;
+        case YT.PlayerState.UNSTARTED:
+          if (playerState !== YT.PlayerState.UNSTARTED) {
+            onVideoLoaded();
+          }
+          break;
         // video cued
         case YT.PlayerState.CUED:
           // XXX: cued doesn't seem to fire reliably, bug in youtube api?
@@ -415,7 +426,7 @@
       delete playerVars.loop;
 
       // Don't show related videos when ending
-      playerVars.rel = 0;
+      playerVars.rel = playerVars.rel || 0;
 
       // Don't show YouTube's branding
       playerVars.modestbranding = playerVars.modestbranding || 1;
@@ -428,8 +439,6 @@
 
       // Don't show video info before playing
       playerVars.showinfo = playerVars.showinfo || 0;
-
-      playerVars.start = 0.1;
 
       // Specify our domain as origin for iframe security
       var domain = window.location.protocol === "file:" ? "*" :
@@ -458,7 +467,13 @@
         wmode: playerVars.wmode,
         playerVars: playerVars,
         events: {
-          'onReady': onPlayerReady,
+          'onReady': function () {
+            if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+              return onVideoLoaded();
+            } else {
+              return onPlayerReady();
+            }
+          },
           'onError': onPlayerError,
           'onStateChange': onPlayerStateChange
         }
