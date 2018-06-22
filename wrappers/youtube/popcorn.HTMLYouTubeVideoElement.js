@@ -339,9 +339,9 @@
           dispatchYouTubeEvent( "buffering" );
           break;
         case YT.PlayerState.UNSTARTED:
-          if (playerState !== YT.PlayerState.UNSTARTED) {
-            onVideoLoaded();
-          }
+          // if (playerState !== YT.PlayerState.UNSTARTED) {
+          //   onVideoLoaded();
+          // }
           break;
         // video cued
         case YT.PlayerState.CUED:
