@@ -122,40 +122,10 @@
     }
 
     function onPlayerReady() {
-      if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-        addYouTubeEvent( "play", onFirstPlay );
-      }
-      var onMuted = function() {
-        if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-          addYouTubeEvent( "play", onFirstPlay );
-        }
-        // force an initial play on the video, to remove autostart on initial seekTo.
-        if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-          player.playVideo();
-        } else {
-          self.dispatchEvent( "loadedmetadata" );
-          setTimeout(function() {
-            var el = document.getElementById("controls-big-play-button");
-            if (el) {
-              el.click();
-            }
-          }, 10);
-          //remove loading image so we can click actual youtube play button
-          document.getElementsByClassName("loading-message")[0].style.display = "none";
-          if (videoElement) {
-            videoElement.style.zIndex = 99999999999;
-          }
-        }
-      };
       playerReady = true;
-      // XXX: this should really live in cued below, but doesn't work.
-
-      // Browsers using flash will have the pause() call take too long and cause some
-      // sound to leak out. Muting before to prevent this.
       self.muted = true;
-
-      // ensure we are muted.
-      onMuted();
+      addYouTubeEvent( "play", onFirstPlay );
+      player.playVideo();
     }
 
     function onPlayerError(event) {
