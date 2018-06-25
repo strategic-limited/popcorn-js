@@ -124,7 +124,7 @@
     function onPlayerReady() {
       playerReady = true;
       self.muted = true;
-      addYouTubeEvent( "play", onFirstPlay );
+      // addYouTubeEvent( "play", onFirstPlay );
       player.playVideo();
     }
 
