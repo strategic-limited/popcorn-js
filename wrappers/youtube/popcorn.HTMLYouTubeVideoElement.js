@@ -121,11 +121,11 @@
       removeYouTubeEvent( "pause", catchRoguePauseEvent );
     }
 
-    function onPlayerReady() {
+    function onPlayerReady(event) {
       playerReady = true;
       self.muted = true;
       // addYouTubeEvent( "play", onFirstPlay );
-      player.playVideo();
+      event.target.playVideo();
     }
 
     function onPlayerError(event) {
