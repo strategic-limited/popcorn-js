@@ -276,7 +276,7 @@
       }
       addYouTubeEvent( "pause", onFirstPause );
       player.pauseVideo();
-      player.seekTo( 0 );
+      player.seekTo( 0.01 );
     }
 
     function addYouTubeEvent( event, listener ) {
