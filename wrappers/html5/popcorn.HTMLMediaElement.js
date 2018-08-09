@@ -56,6 +56,22 @@
       console.log('error on metadata loading', error);
     });
 
+    Object.defineProperties( media, {
+
+      src: {
+        get: function() {
+          return media.getElementsByTagName('source')[0].src;
+        },
+        set: function( aSrc ) {
+          var sources = media.getElementsByTagName('source');
+          if( aSrc && aSrc !== sources[0].src ) {
+            sources[0].src = aSrc;
+            media.load();
+          }
+        }
+      }
+    });
+
     return media;
   }
 
