@@ -64,6 +64,12 @@
         },
         set: function( aSrc ) {
           var sources = media.getElementsByTagName('source');
+          if (!sources) {
+            var source = document.createElement('source');
+            source.type = 'video/mp4';
+            media.appendChild(source);
+            sources = [source];
+          }
           if( aSrc && aSrc !== sources[0].src ) {
             sources[0].src = aSrc;
             media.load();
