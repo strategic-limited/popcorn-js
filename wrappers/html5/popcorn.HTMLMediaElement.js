@@ -49,6 +49,13 @@
       media._pause();
     };
 
+    media.addEventListener('loadedmetadata', function () {
+      console.log('metadata loaded');
+    });
+    media.addEventListener('error', function (error) {
+      console.log('error on metadata loading', error);
+    });
+
     return media;
   }
 
