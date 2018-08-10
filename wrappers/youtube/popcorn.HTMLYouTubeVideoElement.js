@@ -121,11 +121,54 @@
       removeYouTubeEvent( "pause", catchRoguePauseEvent );
     }
 
-    function onPlayerReady(event) {
+    function onPlayerReady( event ) {
+      if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+        addYouTubeEvent( "play", onFirstPlay );
+      }
+      player.loadVideoById({
+        videoId: regexYouTube.exec( impl.src )[ 1 ],
+        startSeconds: 0.1,
+        suggestedQuality: 'large',
+      });
+    }
+
+    function onVideoLoaded(event) {
+      var onMuted = function() {
+        if ( self.muted ) {
+          if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+            addYouTubeEvent( "play", onFirstPlay );
+          }
+          // force an initial play on the video, to remove autostart on initial seekTo.
+          if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+            player.playVideo();
+          } else {
+            self.dispatchEvent( "loadedmetadata" );
+            setTimeout(function() {
+              var el = document.getElementById("controls-big-play-button");
+              if (el) {
+                el.click();
+              }
+            }, 10);
+            //remove loading image so we can click actual youtube play button
+            document.getElementsByClassName("loading-message")[0].style.display = "none";
+            if (videoElement) {
+              videoElement.style.zIndex = 99999999999;
+            }
+
+          }
+        } else {
+          setTimeout( onMuted, 0 );
+        }
+      };
       playerReady = true;
+      // XXX: this should really live in cued below, but doesn't work.
+
+      // Browsers using flash will have the pause() call take too long and cause some
+      // sound to leak out. Muting before to prevent this.
       self.muted = true;
-      // addYouTubeEvent( "play", onFirstPlay );
-      event.target.playVideo();
+
+      // ensure we are muted.
+      onMuted();
     }
 
     function onPlayerError(event) {
@@ -246,7 +289,8 @@
       }
       addYouTubeEvent( "pause", onFirstPause );
       player.pauseVideo();
-      player.seekTo( 0.01 );
+      // Safari doesn't want to seek from initial position so doing such dirty hack
+      player.seekTo( navigator.userAgent.match(/(Safari)/g) ? 0.000001 : 0);
     }
 
     function addYouTubeEvent( event, listener ) {
@@ -268,8 +312,6 @@
     addYouTubeEvent( "ended", onEnded );
 
     function onPlayerStateChange( event ) {
-
-      console.log('youtube state change event: ', event);
 
       switch( event.data ) {
 
@@ -295,6 +337,11 @@
         // buffering
         case YT.PlayerState.BUFFERING:
           dispatchYouTubeEvent( "buffering" );
+          break;
+        case YT.PlayerState.UNSTARTED:
+          if (playerState !== YT.PlayerState.UNSTARTED) {
+            onVideoLoaded();
+          }
           break;
         // video cued
         case YT.PlayerState.CUED:
@@ -416,11 +463,16 @@
       var playerOptions = {
         width: "100%",
         height: "100%",
-        videoId: regexYouTube.exec( impl.src )[ 1 ],
         wmode: playerVars.wmode,
         playerVars: playerVars,
         events: {
-          'onReady': onPlayerReady,
+          'onReady': function () {
+            if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+              return onVideoLoaded();
+            } else {
+              return onPlayerReady();
+            }
+          },
           'onError': onPlayerError,
           'onStateChange': onPlayerStateChange
         }
