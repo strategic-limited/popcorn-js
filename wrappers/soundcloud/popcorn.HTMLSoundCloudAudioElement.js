@@ -163,34 +163,32 @@
     function onPlayerReady( data ) {
 
       // Turn down the volume and kick-off a play to force load
-      player.load(self.directLink, function() {
-        player.bind( SC.Widget.Events.PLAY_PROGRESS, function( data ) {
-          // Turn down the volume.
-          // Loading has to be kicked off before volume can be changed.
-          player.setVolume( 0 );
-          // Wait for both flash and HTML5 to play something.
-          if( data.currentPosition > 0 ) {
-            player.unbind( SC.Widget.Events.PLAY_PROGRESS );
+      player.bind( SC.Widget.Events.PLAY_PROGRESS, function( data ) {
+        // Turn down the volume.
+        // Loading has to be kicked off before volume can be changed.
+        player.setVolume( 0 );
+        // Wait for both flash and HTML5 to play something.
+        if( data.currentPosition > 0 ) {
+          player.unbind( SC.Widget.Events.PLAY_PROGRESS );
 
-            player.bind( SC.Widget.Events.PAUSE, function() {
-              player.unbind( SC.Widget.Events.PAUSE );
+          player.bind( SC.Widget.Events.PAUSE, function() {
+            player.unbind( SC.Widget.Events.PAUSE );
 
-              // Play/Pause cycle is done, restore volume and continue loading.
-              player.setVolume( 100 );
-              player.bind( SC.Widget.Events.SEEK, function() {
-                player.unbind( SC.Widget.Events.SEEK );
-                // latest SC API doesn't pause on seek so need to force call .pause() again
-                player.pause();
-                onLoaded();
-              });
-              // Re seek back to 0, then we're back to default, loaded, and ready to go.
-              player.seekTo( 0 );
+            // Play/Pause cycle is done, restore volume and continue loading.
+            player.setVolume( 100 );
+            player.bind( SC.Widget.Events.SEEK, function() {
+              player.unbind( SC.Widget.Events.SEEK );
+              // latest SC API doesn't pause on seek so need to force call .pause() again
+              player.pause();
+              onLoaded();
             });
-            player.pause();
-          }
-        });
-        player.play();
+            // Re seek back to 0, then we're back to default, loaded, and ready to go.
+            player.seekTo( 0 );
+          });
+          player.pause();
+        }
       });
+      player.play();
     }
 
     function updateDuration( newDuration ) {
@@ -478,7 +476,6 @@
           self.dispatchEvent( "loadstart" );
           self.dispatchEvent( "progress" );
         };
-        self.directLink = data.uri;
         elem.src = "https://w.soundcloud.com/player/?url=" + data.uri +
           "&show_artwork=false" +
           "&buying=false" +
