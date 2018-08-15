@@ -163,7 +163,7 @@
     function onPlayerReady( data ) {
 
       // Turn down the volume and kick-off a play to force load
-      player.load(self.src, function() {
+      player.load(self.directLink, function() {
         player.bind( SC.Widget.Events.PLAY_PROGRESS, function( data ) {
           // Turn down the volume.
           // Loading has to be kicked off before volume can be changed.
@@ -478,6 +478,7 @@
           self.dispatchEvent( "loadstart" );
           self.dispatchEvent( "progress" );
         };
+        self.directLink = data.uri;
         elem.src = "https://w.soundcloud.com/player/?url=" + data.uri +
           "&show_artwork=false" +
           "&buying=false" +
