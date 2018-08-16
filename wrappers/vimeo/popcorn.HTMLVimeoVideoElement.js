@@ -300,6 +300,7 @@
 
       initVimeoAPI(function () {
         elem.id = playerUID;
+        elem.allow = 'autoplay; fullscreen';
         player = new Vimeo.Player(elem, {
           url: src,
           autoplay: impl.autoplay,
