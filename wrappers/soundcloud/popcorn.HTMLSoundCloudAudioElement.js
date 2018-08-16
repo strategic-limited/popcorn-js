@@ -454,6 +454,7 @@
           self.dispatchEvent( "error" );
         }
         elem.id = Popcorn.guid( "soundcloud-" );
+        elem.allow = 'autoplay; fullscreen';
         elem.width = impl.width;
         elem.height = impl.height;
         elem.frameBorder = 0;
