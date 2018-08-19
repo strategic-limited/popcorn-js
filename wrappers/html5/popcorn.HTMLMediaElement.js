@@ -62,7 +62,11 @@
                 hls.attachMedia(media);
               }
               else {
-                media.src = aSrc;
+                var sources = media.getElementsByTagName('source');
+                if( aSrc && aSrc !== sources[0].src ) {
+                  sources[0].src = aSrc;
+                  media.load();
+                }
               }
               break;
             default:
