@@ -33,9 +33,6 @@
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
-    var source = document.createElement('source');
-    media.appendChild(source);
-
     parent.appendChild(media);
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
@@ -71,6 +68,8 @@
               break;
             case 'mp4':
             case 'webm':
+              var source = document.createElement('source');
+              media.appendChild(source);
               var sources = media.getElementsByTagName('source');
               if( aSrc && aSrc !== sources[0].src ) {
                 sources[0].src = aSrc;
