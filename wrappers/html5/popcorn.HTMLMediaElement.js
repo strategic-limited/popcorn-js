@@ -61,7 +61,7 @@
                 hls.loadSource(aSrc);
                 hls.attachMedia(media);
               }
-              else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+              else {
                 media.src = aSrc;
               }
               break;
