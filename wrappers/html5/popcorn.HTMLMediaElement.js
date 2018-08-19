@@ -33,46 +33,47 @@
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
+    var source = document.createElement('source');
+    media.appendChild(source);
+
     parent.appendChild(media);
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
 
-    media.__defineGetter__('src', function() { return media._src; });
-    var originalSrcSetter = media.__lookupSetter__('src');
-    media.__defineSetter__('src', function(aSrc) {
-      media._src = aSrc;
-      var extension = aSrc.split('.').reverse()[0];
-      switch (extension) {
-        case 'mpd':
-          var player = dashjs.MediaPlayer().create();
-          player.initialize(media, aSrc, true);
+    Object.defineProperties( media, {
+
+      src: {
+        get: function() {
+          return media._src;
+        },
+        set: function( aSrc ) {
           media._src = aSrc;
-          break;
-        case 'm3u8':
-          if(Hls.isSupported()) {
-            var hls = new Hls();
-            hls.loadSource(aSrc);
-            hls.attachMedia(media);
+          var extension = media._src.split('.').reverse()[0];
+          switch (extension) {
+            case 'mpd':
+              var player = dashjs.MediaPlayer().create();
+              player.initialize(media, aSrc, true);
+              break;
+            case 'm3u8':
+              if(Hls.isSupported()) {
+                var hls = new Hls();
+                hls.loadSource(aSrc);
+                hls.attachMedia(media);
+              }
+              else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                media.src = aSrc;
+              }
+              break;
+            default:
+              var sources = media.getElementsByTagName('source');
+              if( aSrc && aSrc !== sources[0].src ) {
+                sources[0].src = aSrc;
+                media.load();
+              }
+              break;
           }
-          else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            media.src = aSrc;
-          }
-          media._src = aSrc;
-          break;
-        case 'mp4':
-        case 'webm':
-          var source = document.createElement('source');
-          media.appendChild(source);
-          var sources = media.getElementsByTagName('source');
-          if( aSrc && aSrc !== sources[0].src ) {
-            sources[0].src = aSrc;
-            media.load();
-          }
-          break;
-        default:
-          originalSrcSetter.call(media, aSrc);
-          break;
+        }
       }
     });
 
