@@ -53,7 +53,7 @@
           switch (extension) {
             case 'mpd':
               var player = dashjs.MediaPlayer().create();
-              player.initialize(media, aSrc, true);
+              player.initialize(media, aSrc);
               break;
             case 'm3u8':
               if(Hls.isSupported()) {
