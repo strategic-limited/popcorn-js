@@ -48,12 +48,12 @@
           return media._src;
         },
         set: function( aSrc ) {
-          media._src = aSrc;
-          var extension = media._src.split('.').reverse()[0];
+          var extension = aSrc.split('.').reverse()[0];
           switch (extension) {
             case 'mpd':
               var player = dashjs.MediaPlayer().create();
               player.initialize(media, aSrc, true);
+              media._src = aSrc;
               break;
             case 'm3u8':
               if(Hls.isSupported()) {
@@ -67,13 +67,16 @@
               else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 media.src = aSrc;
               }
+              media._src = aSrc;
               break;
-            default:
+            case 'mp4':
+            case 'webm':
               var sources = media.getElementsByTagName('source');
               if( aSrc && aSrc !== sources[0].src ) {
                 sources[0].src = aSrc;
                 media.load();
               }
+              media._src = aSrc;
               break;
           }
         }
