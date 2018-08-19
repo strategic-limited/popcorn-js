@@ -41,35 +41,40 @@
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
 
-    media._play = media.play;
-    media._pause = media.pause;
-    media.play = function () {
-      console.log('play');
-      media._play();
-    };
-    media.pause = function () {
-      console.log('pause');
-      media._pause();
-    };
-
-    media.addEventListener('loadedmetadata', function () {
-      console.log('metadata loaded');
-    });
-    media.addEventListener('error', function (error) {
-      console.log('error on metadata loading', error);
-    });
-
     Object.defineProperties( media, {
 
       src: {
         get: function() {
-          return media.getElementsByTagName('source')[0].src;
+          return media._src;
         },
         set: function( aSrc ) {
-          var sources = media.getElementsByTagName('source');
-          if( aSrc && aSrc !== sources[0].src ) {
-            sources[0].src = aSrc;
-            media.load();
+          media._src = aSrc;
+          var extension = media._src.split('.').reverse()[0];
+          switch (extension) {
+            case 'mpd':
+              var player = dashjs.MediaPlayer().create();
+              player.initialize(media, aSrc, true);
+              break;
+            case 'm3u8':
+              if(Hls.isSupported()) {
+                var hls = new Hls();
+                hls.loadSource(aSrc);
+                hls.attachMedia(media);
+                // hls.on(Hls.Events.MANIFEST_PARSED,function() {
+                //   media.play();
+                // });
+              }
+              else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                media.src = aSrc;
+              }
+              break;
+            default:
+              var sources = media.getElementsByTagName('source');
+              if( aSrc && aSrc !== sources[0].src ) {
+                sources[0].src = aSrc;
+                media.load();
+              }
+              break;
           }
         }
       }
