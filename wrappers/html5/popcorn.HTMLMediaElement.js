@@ -68,7 +68,6 @@
         set: function( aSrc ) {
           var sources = media.getElementsByTagName('source');
           if( aSrc && aSrc !== sources[0].src ) {
-            sources[0].type = 'video/mp4';
             sources[0].src = aSrc;
             media.load();
           }
