@@ -45,6 +45,7 @@
           return media._src;
         },
         set: function( aSrc ) {
+          media._src = aSrc;
           var extension = aSrc.split('.').reverse()[0];
           switch (extension) {
             case 'mpd':
@@ -75,7 +76,9 @@
                 sources[0].src = aSrc;
                 media.load();
               }
-              media._src = aSrc;
+              break;
+            default:
+              media.src = aSrc;
               break;
           }
         }
