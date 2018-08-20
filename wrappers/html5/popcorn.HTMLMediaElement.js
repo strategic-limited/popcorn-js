@@ -30,9 +30,15 @@
     if (window.dashjs) {
       callback();
     } else {
+      var requireDefine;
       var script = document.createElement('script');
-      script.addEventListener('load', callback);
+      script.addEventListener('load', function() {
+        window.define = requireDefine;
+        callback();
+      });
       script.src = '//cdn.dashjs.org/latest/dash.all.min.js';
+      requireDefine = window.define;
+      window.define = function() {};
       document.head.appendChild(script);
     }
   }
@@ -41,9 +47,15 @@
     if (window.Hls) {
       callback();
     } else {
+      var requireDefine;
       var script = document.createElement('script');
-      script.addEventListener('load', callback);
+      script.addEventListener('load', function() {
+        window.define = requireDefine;
+        callback();
+      });
       script.src = '//cdn.jsdelivr.net/npm/hls.js@latest';
+      requireDefine = window.define;
+      window.define = function() {};
       document.head.appendChild(script);
     }
   }
