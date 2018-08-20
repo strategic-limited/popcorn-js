@@ -30,7 +30,10 @@
     if (window.dashjs) {
       callback();
     } else {
-      Popcorn.getScript('//cdn.dashjs.org/latest/dash.all.min.js', callback);
+      var script = document.createElement('script');
+      script.addEventListener('load', callback);
+      script.src = '//cdn.dashjs.org/latest/dash.all.min.js';
+      document.head.appendChild(script);
     }
   }
   
@@ -38,7 +41,10 @@
     if (window.Hls) {
       callback();
     } else {
-      Popcorn.getScript('//cdn.jsdelivr.net/npm/hls.js@latest', callback);
+      var script = document.createElement('script');
+      script.addEventListener('load', callback);
+      script.src = '//cdn.jsdelivr.net/npm/hls.js@latest';
+      document.head.appendChild(script);
     }
   }
 
