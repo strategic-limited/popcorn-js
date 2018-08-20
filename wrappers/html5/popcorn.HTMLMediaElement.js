@@ -14,7 +14,7 @@
       /^\s*#t=(?:\d*(?:(?:\.|\:)?\d+)?),?(\d+(?:(?:\.|\:)\d+)?)\s*$/,
       /^https?:\/\/(www\.)?flickr\.com/,
       /^https?:\/\/(www\.)?(staging\.)?(?:clyp\.it|audiour\.com)/],
-    EMPTY_STRING = "";
+    EMPTY_STRING = '';
 
   function canPlaySrc(src) {
     // We can't really know based on URL.
@@ -23,11 +23,27 @@
         return EMPTY_STRING;
       }
     }
-    return "probably";
+    return 'probably';
+  }
+  
+  function loadDashJs(callback) {
+    if (window.dashjs) {
+      callback();
+    } else {
+      Popcorn.getScript('//cdn.dashjs.org/latest/dash.all.min.js', callback);
+    }
+  }
+  
+  function loadHlsJs(callback) {
+    if (window.Hls) {
+      callback();
+    } else {
+      Popcorn.getScript('//cdn.jsdelivr.net/npm/hls.js@latest', callback);
+    }
   }
 
   function wrapMedia(id, mediaType) {
-    var parent = typeof id === "string" ? document.querySelector(id) : id,
+    var parent = typeof id === 'string' ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
     media.setAttribute('playsinline', '');
@@ -52,22 +68,26 @@
           var extension = media._src.split('.').reverse()[0];
           switch (extension) {
             case 'mpd':
-              var player = dashjs.MediaPlayer().create();
-              player.initialize(media, aSrc);
+              loadDashJs(function() {
+                var player = dashjs.MediaPlayer().create();
+                player.initialize(media, aSrc);
+              });
               break;
             case 'm3u8':
-              if(Hls.isSupported()) {
-                var hls = new Hls();
-                hls.loadSource(aSrc);
-                hls.attachMedia(media);
-              }
-              else {
-                var sources = media.getElementsByTagName('source');
-                if( aSrc && aSrc !== sources[0].src ) {
-                  sources[0].src = aSrc;
-                  media.load();
+              loadHlsJs(function() {
+                if(Hls.isSupported()) {
+                  var hls = new Hls();
+                  hls.loadSource(aSrc);
+                  hls.attachMedia(media);
                 }
-              }
+                else {
+                  var sources = media.getElementsByTagName('source');
+                  if( aSrc && aSrc !== sources[0].src ) {
+                    sources[0].src = aSrc;
+                    media.load();
+                  }
+                }
+              });
               break;
             default:
               var sources = media.getElementsByTagName('source');
@@ -85,13 +105,13 @@
   }
 
   Popcorn.HTMLVideoElement = function (id) {
-    return wrapMedia(id, "video");
+    return wrapMedia(id, 'video');
   };
   Popcorn.HTMLVideoElement._canPlaySrc = canPlaySrc;
 
 
   Popcorn.HTMLAudioElement = function (id) {
-    return wrapMedia(id, "audio");
+    return wrapMedia(id, 'audio');
   };
   Popcorn.HTMLAudioElement._canPlaySrc = canPlaySrc;
 
