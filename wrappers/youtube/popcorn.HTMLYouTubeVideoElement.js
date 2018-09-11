@@ -409,6 +409,21 @@
         }
       }
 
+      var mobileTapFix = document.createElement('div');
+      mobileTapFix.style.position = 'absolute';
+      mobileTapFix.style.width = '100%';
+      mobileTapFix.style.height = '100%';
+      mobileTapFix.style.top = '0';
+      mobileTapFix.style.left = '0';
+      mobileTapFix.style.right = '0';
+      mobileTapFix.style.bottom = '0';
+      mobileTapFix.style.zIndex = '99999';
+      mobileTapFix.addEventListener('click', function (e) {
+        player[impl.paused ? 'play' : 'pause']();
+        e.preventDefault();
+      });
+      parent.appendChild(mobileTapFix);
+
       parent.appendChild( elem );
 
       // Use any player vars passed on the URL
