@@ -572,8 +572,10 @@
         changeCurrentTime( 0 );
         impl.ended = false;
       }
-      if (!parent.querySelector('.mobile-tap-fix')) {
-        parent.appendChild(mobileTapFix);
+      if (player.getSphericalProperties().yaw === undefined) {
+        if (!parent.querySelector('.mobile-tap-fix')) {
+          parent.appendChild(mobileTapFix);
+        }
       }
       timeUpdateInterval = setInterval( onTimeUpdate,
         self._util.TIMEUPDATE_MS );
