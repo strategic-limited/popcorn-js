@@ -419,7 +419,7 @@
       mobileTapFix.style.bottom = '0';
       mobileTapFix.style.zIndex = '99999';
       mobileTapFix.addEventListener('click', function (e) {
-        player[impl.paused ? 'playVideo' : 'pauseVideo']();
+        self[impl.paused ? 'play' : 'pause']();
         e.preventDefault();
       });
       parent.appendChild(mobileTapFix);
