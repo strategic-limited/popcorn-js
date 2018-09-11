@@ -419,7 +419,7 @@
       mobileTapFix.style.bottom = '0';
       mobileTapFix.style.zIndex = '99999';
       mobileTapFix.addEventListener('click', function (e) {
-        self[impl.paused ? 'play' : 'pause']();
+        player[player.getPlayerState() === YT.PlayerState.PAUSED ? 'play' : 'pause']();
         e.preventDefault();
       });
       parent.appendChild(mobileTapFix);
