@@ -426,7 +426,6 @@
           e.preventDefault();
         }
       });
-      parent.appendChild(mobileTapFix);
 
       parent.appendChild( elem );
 
