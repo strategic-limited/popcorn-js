@@ -68,6 +68,7 @@
     var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? document.querySelector( id ) : id,
       elem = document.createElement( "div" ),
+      mobileTapFix,
       impl = {
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
@@ -409,6 +410,23 @@
         }
       }
 
+      mobileTapFix = document.createElement('div');
+      mobileTapFix.classList.add('mobile-tap-fix');
+      mobileTapFix.style.position = 'absolute';
+      mobileTapFix.style.width = '100%';
+      mobileTapFix.style.height = '100%';
+      mobileTapFix.style.top = '0';
+      mobileTapFix.style.left = '0';
+      mobileTapFix.style.right = '0';
+      mobileTapFix.style.bottom = '0';
+      mobileTapFix.style.zIndex = '99999';
+      mobileTapFix.addEventListener('click', function (e) {
+        if ([YT.PlayerState.PAUSED, YT.PlayerState.PLAYING].indexOf(player.getPlayerState()) !== -1) {
+          player[player.getPlayerState() === YT.PlayerState.PAUSED ? 'playVideo' : 'pauseVideo']();
+          e.preventDefault();
+        }
+      });
+
       parent.appendChild( elem );
 
       // Use any player vars passed on the URL
@@ -553,6 +571,11 @@
       if( impl.ended ) {
         changeCurrentTime( 0 );
         impl.ended = false;
+      }
+      if (player.getSphericalProperties().yaw === undefined) {
+        if (!parent.querySelector('.mobile-tap-fix')) {
+          parent.appendChild(mobileTapFix);
+        }
       }
       timeUpdateInterval = setInterval( onTimeUpdate,
         self._util.TIMEUPDATE_MS );
