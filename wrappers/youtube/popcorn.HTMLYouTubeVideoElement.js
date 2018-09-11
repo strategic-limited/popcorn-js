@@ -68,6 +68,7 @@
     var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? document.querySelector( id ) : id,
       elem = document.createElement( "div" ),
+      mobileTapFix,
       impl = {
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
@@ -409,7 +410,8 @@
         }
       }
 
-      var mobileTapFix = document.createElement('div');
+      mobileTapFix = document.createElement('div');
+      mobileTapFix.classList.add('mobile-tap-fix');
       mobileTapFix.style.position = 'absolute';
       mobileTapFix.style.width = '100%';
       mobileTapFix.style.height = '100%';
@@ -570,6 +572,9 @@
       if( impl.ended ) {
         changeCurrentTime( 0 );
         impl.ended = false;
+      }
+      if (!parent.querySelector('.mobile-tap-fix')) {
+        parent.appendChild(mobileTapFix);
       }
       timeUpdateInterval = setInterval( onTimeUpdate,
         self._util.TIMEUPDATE_MS );
