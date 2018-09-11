@@ -14,7 +14,7 @@
       /^\s*#t=(?:\d*(?:(?:\.|\:)?\d+)?),?(\d+(?:(?:\.|\:)\d+)?)\s*$/,
       /^https?:\/\/(www\.)?flickr\.com/,
       /^https?:\/\/(www\.)?(staging\.)?(?:clyp\.it|audiour\.com)/],
-    EMPTY_STRING = "";
+    EMPTY_STRING = '';
 
   function canPlaySrc(src) {
     // We can't really know based on URL.
@@ -23,11 +23,45 @@
         return EMPTY_STRING;
       }
     }
-    return "probably";
+    return 'probably';
+  }
+  
+  function loadDashJs(callback) {
+    if (window.dashjs) {
+      callback();
+    } else {
+      var requireDefine;
+      var script = document.createElement('script');
+      script.addEventListener('load', function() {
+        window.define = requireDefine;
+        callback();
+      });
+      script.src = '//cdn.dashjs.org/latest/dash.all.min.js';
+      requireDefine = window.define;
+      window.define = function() {};
+      document.head.appendChild(script);
+    }
+  }
+  
+  function loadHlsJs(callback) {
+    if (window.Hls) {
+      callback();
+    } else {
+      var requireDefine;
+      var script = document.createElement('script');
+      script.addEventListener('load', function() {
+        window.define = requireDefine;
+        callback();
+      });
+      script.src = '//cdn.jsdelivr.net/npm/hls.js@latest';
+      requireDefine = window.define;
+      window.define = function() {};
+      document.head.appendChild(script);
+    }
   }
 
   function wrapMedia(id, mediaType) {
-    var parent = typeof id === "string" ? document.querySelector(id) : id,
+    var parent = typeof id === 'string' ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
     media.setAttribute('playsinline', '');
@@ -41,36 +75,45 @@
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
 
-    media._play = media.play;
-    media._pause = media.pause;
-    media.play = function () {
-      console.log('play');
-      media._play();
-    };
-    media.pause = function () {
-      console.log('pause');
-      media._pause();
-    };
-
-    media.addEventListener('loadedmetadata', function () {
-      console.log('metadata loaded');
-    });
-    media.addEventListener('error', function (error) {
-      console.log('error on metadata loading', error);
-    });
-
     Object.defineProperties( media, {
 
       src: {
         get: function() {
-          return media.getElementsByTagName('source')[0].src;
+          return media._src;
         },
         set: function( aSrc ) {
-          var sources = media.getElementsByTagName('source');
-          if( aSrc && aSrc !== sources[0].src ) {
-            sources[0].type = 'video/mp4';
-            sources[0].src = aSrc;
-            media.load();
+          media._src = aSrc;
+          var extension = media._src.split('.').reverse()[0];
+          switch (extension) {
+            case 'mpd':
+              loadDashJs(function() {
+                var player = dashjs.MediaPlayer().create();
+                player.initialize(media, aSrc);
+              });
+              break;
+            case 'm3u8':
+              loadHlsJs(function() {
+                if(Hls.isSupported()) {
+                  var hls = new Hls();
+                  hls.loadSource(aSrc);
+                  hls.attachMedia(media);
+                }
+                else {
+                  var sources = media.getElementsByTagName('source');
+                  if( aSrc && aSrc !== sources[0].src ) {
+                    sources[0].src = aSrc;
+                    media.load();
+                  }
+                }
+              });
+              break;
+            default:
+              var sources = media.getElementsByTagName('source');
+              if( aSrc && aSrc !== sources[0].src ) {
+                sources[0].src = aSrc;
+                media.load();
+              }
+              break;
           }
         }
       }
@@ -80,13 +123,13 @@
   }
 
   Popcorn.HTMLVideoElement = function (id) {
-    return wrapMedia(id, "video");
+    return wrapMedia(id, 'video');
   };
   Popcorn.HTMLVideoElement._canPlaySrc = canPlaySrc;
 
 
   Popcorn.HTMLAudioElement = function (id) {
-    return wrapMedia(id, "audio");
+    return wrapMedia(id, 'audio');
   };
   Popcorn.HTMLAudioElement._canPlaySrc = canPlaySrc;
 
