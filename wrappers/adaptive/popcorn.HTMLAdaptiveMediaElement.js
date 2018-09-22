@@ -9,7 +9,7 @@
   function canPlaySrc(src) {
     var sources = src.split('|');
     for (var i = 0; i < sources.length; i++) {
-      if (sources[i].test(/(.)*\.(mp4|m3u8|mpd)/)) {
+      if (/(.)*\.(mp4|m3u8|mpd)/.test(sources[i])) {
         return 'probably';
       }
     }
