@@ -7,7 +7,7 @@
   var EMPTY_STRING = '';
 
   function canPlaySrc(src) {
-    var sources = media._src.split('|');
+    var sources = src.split('|');
     for (var i = 0; i < sources.length; i++) {
       if (sources[i].test(/(.)*\.(mp4|m3u8|mpd)/)) {
         return 'probably';
