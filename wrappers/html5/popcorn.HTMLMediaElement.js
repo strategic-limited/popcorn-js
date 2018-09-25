@@ -59,16 +59,16 @@
       console.log('error on metadata loading', error);
     });
 
-    Object.defineProperties( media, {
+    Object.defineProperties(media, {
 
       src: {
-        get: function() {
+        get: function () {
           return media.getElementsByTagName('source')[0].src;
         },
-        set: function( aSrc ) {
+        set: function (aSrc) {
           var sources = media.getElementsByTagName('source');
-          if( aSrc && aSrc !== sources[0].src ) {
-            sources[0].type = 'video/mp4';
+          if (aSrc && aSrc !== sources[0].src) {
+            //sources[0].type = 'video/mp4';
             sources[0].src = aSrc;
             media.load();
           }
