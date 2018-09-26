@@ -16,12 +16,43 @@
       /^https?:\/\/(www\.)?(staging\.)?(?:clyp\.it|audiour\.com)/],
     EMPTY_STRING = "";
 
-  function canPlaySrc(src) {
+  var audioFormats = {
+    'mp3': 'audio/mpeg',
+    'aac': 'audio/mp4',
+    'wav': 'audio/vnd.wave',
+    'ogg': 'audio/ogg',
+    'oga': 'audio/ogg',
+  };
+
+  var videoFormats = {
+    'webm': 'video/webm',
+    'mp4': 'video/mp4',
+  };
+
+  function canPlayAudioSrc(src) {
     // We can't really know based on URL.
     for (var i = 0; i < existingTypes.length; i++) {
       if (existingTypes[i].test(src)) {
         return EMPTY_STRING;
       }
+    }
+    var extension = src.split('.').reverse()[0];
+    if (!audioFormats[extension]) {
+      return EMPTY_STRING;
+    }
+    return "probably";
+  }
+
+  function canPlayVideoSrc(src) {
+    // We can't really know based on URL.
+    for (var i = 0; i < existingTypes.length; i++) {
+      if (existingTypes[i].test(src)) {
+        return EMPTY_STRING;
+      }
+    }
+    var extension = src.split('.').reverse()[0];
+    if (!videoFormats[extension]) {
+      return EMPTY_STRING;
     }
     return "probably";
   }
@@ -39,25 +70,22 @@
     parent.appendChild(media);
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
-    media._canPlaySrc = canPlaySrc;
+    media._canPlaySrc = function (src) {
+      if (media.tagName === 'VIDEO') {
+        return canPlayVideoSrc(src);
+      } else {
+        return canPlayAudioSrc(src);
+      }
+    };
 
     media._play = media.play;
     media._pause = media.pause;
     media.play = function () {
-      console.log('play');
       media._play();
     };
     media.pause = function () {
-      console.log('pause');
       media._pause();
     };
-
-    media.addEventListener('loadedmetadata', function () {
-      console.log('metadata loaded');
-    });
-    media.addEventListener('error', function (error) {
-      console.log('error on metadata loading', error);
-    });
 
     Object.defineProperties(media, {
 
@@ -68,7 +96,9 @@
         set: function (aSrc) {
           var sources = media.getElementsByTagName('source');
           if (aSrc && aSrc !== sources[0].src) {
+            var extension = aSrc.split('.').reverse()[0];
             sources[0].src = aSrc;
+            sources[0].type = videoFormats[extension] || audioFormats[extension];
             media.load();
           }
         }
@@ -81,12 +111,12 @@
   Popcorn.HTMLVideoElement = function (id) {
     return wrapMedia(id, "video");
   };
-  Popcorn.HTMLVideoElement._canPlaySrc = canPlaySrc;
+  Popcorn.HTMLVideoElement._canPlaySrc = canPlayVideoSrc;
 
 
   Popcorn.HTMLAudioElement = function (id) {
     return wrapMedia(id, "audio");
   };
-  Popcorn.HTMLAudioElement._canPlaySrc = canPlaySrc;
+  Popcorn.HTMLAudioElement._canPlaySrc = canPlayAudioSrc;
 
 }(Popcorn, window.document));
