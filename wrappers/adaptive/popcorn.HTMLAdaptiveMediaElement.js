@@ -80,7 +80,7 @@
               case 'mpd':
                 loadDashJs(function() {
                   var player = dashjs.MediaPlayer().create();
-                  player.initialize(media, source);
+                  player.initialize(media, source, false);
                 });
                 break;
               case 'm3u8':
