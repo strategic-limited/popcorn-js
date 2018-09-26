@@ -89,11 +89,10 @@
                     var hls = new Hls();
                     hls.loadSource(source);
                     hls.attachMedia(media);
-                  }
-                  else {
+                  } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     var sources = media.getElementsByTagName('source');
-                    if(aSrc && aSrc !== sources[0].src) {
-                      sources[0].src = aSrc;
+                    if(source && source !== sources[0].src) {
+                      sources[0].src = source;
                       media.load();
                     }
                   }
