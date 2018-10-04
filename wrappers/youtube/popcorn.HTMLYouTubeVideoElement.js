@@ -123,23 +123,11 @@
     }
 
     function onPlayerReady( event ) {
-      if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-        addYouTubeEvent( "play", onFirstPlay );
-      }
-      player.loadVideoById({
-        videoId: regexYouTube.exec( impl.src )[ 1 ],
-        startSeconds: 0.1,
-        suggestedQuality: 'large',
-      });
-    }
 
-    function onVideoLoaded(event) {
       var onMuted = function() {
         if ( self.muted ) {
-          if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            addYouTubeEvent( "play", onFirstPlay );
-          }
           // force an initial play on the video, to remove autostart on initial seekTo.
+          addYouTubeEvent( "play", onFirstPlay );
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
             player.playVideo();
           } else {
@@ -339,11 +327,7 @@
         case YT.PlayerState.BUFFERING:
           dispatchYouTubeEvent( "buffering" );
           break;
-        case YT.PlayerState.UNSTARTED:
-          if (playerState !== YT.PlayerState.UNSTARTED) {
-            onVideoLoaded();
-          }
-          break;
+
         // video cued
         case YT.PlayerState.CUED:
           // XXX: cued doesn't seem to fire reliably, bug in youtube api?
@@ -478,27 +462,18 @@
       // Get video ID out of youtube url
       aSrc = regexYouTube.exec( aSrc )[ 1 ];
 
-      var playerOptions = {
+      player = new YT.Player( elem, {
         width: "100%",
         height: "100%",
         wmode: playerVars.wmode,
+        videoId: aSrc,
         playerVars: playerVars,
         events: {
-          'onReady': function () {
-            if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-              return onVideoLoaded();
-            } else {
-              return onPlayerReady();
-            }
-          },
+          'onReady': onPlayerReady,
           'onError': onPlayerError,
           'onStateChange': onPlayerStateChange
         }
-      };
-      if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-        playerOptions.videoId = aSrc;
-      }
-      player = new YT.Player( elem, playerOptions );
+      });
 
       impl.networkState = self.NETWORK_LOADING;
       self.dispatchEvent( "loadstart" );
