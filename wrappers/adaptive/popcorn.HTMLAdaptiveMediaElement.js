@@ -33,15 +33,28 @@
     }
   }
 
-  function loadHlsJs(callback) {
+  function loadHlsJs(media, callback) {
     if (window.Hls) {
-      callback();
+      if(Hls.isSupported() && window.Hls.instance) {
+        callback(window.Hls.instance);
+      } else {
+        callback();
+      }
     } else {
       var requireDefine;
       var script = document.createElement('script');
       script.addEventListener('load', function() {
         window.define = requireDefine;
-        callback();
+        if(Hls.isSupported()) {
+          var hls = new Hls({
+            capLevelToPlayerSize: true,
+          });
+          hls.attachMedia(media);
+          window.Hls.instance = hls;
+          callback(hls);
+        } else {
+          callback();
+        }
       });
       script.src = '//cdn.jsdelivr.net/npm/hls.js@latest';
       requireDefine = window.define;
@@ -84,11 +97,9 @@
                 });
                 break;
               case 'm3u8':
-                loadHlsJs(function() {
+                loadHlsJs(media, function(hls) {
                   if(Hls.isSupported()) {
-                    var hls = new Hls();
                     hls.loadSource(source);
-                    hls.attachMedia(media);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     var sources = media.getElementsByTagName('source');
                     if(source && source !== sources[0].src) {
