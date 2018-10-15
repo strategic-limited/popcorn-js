@@ -33,15 +33,28 @@
     }
   }
 
-  function loadHlsJs(callback) {
+  function loadHlsJs(media, callback) {
     if (window.Hls) {
-      callback();
+      if(Hls.isSupported() && window.Hls.instance) {
+        callback(window.Hls.instance);
+      } else {
+        callback();
+      }
     } else {
       var requireDefine;
       var script = document.createElement('script');
       script.addEventListener('load', function() {
         window.define = requireDefine;
-        callback();
+        if(Hls.isSupported()) {
+          var hls = new Hls({
+            capLevelToPlayerSize: true,
+          });
+          hls.attachMedia(media);
+          window.Hls.instance = hls;
+          callback(hls);
+        } else {
+          callback();
+        }
       });
       script.src = '//cdn.jsdelivr.net/npm/hls.js@latest';
       requireDefine = window.define;
@@ -54,6 +67,20 @@
     var parent = typeof id === 'string' ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
+    media.dispatchEvent = function (name, data) {
+      var customEvent = document.createEvent('CustomEvent'),
+        detail = {
+          type: name,
+          target: media.parentNode,
+          data: data
+        };
+
+      customEvent.initCustomEvent(media._eventNamespace + name, false, false, detail);
+      document.dispatchEvent(customEvent);
+    };
+
+    media._eventNamespace = Popcorn.guid( "HTMLAdaptiveMediaElement::" );
+
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
@@ -61,6 +88,16 @@
     media.appendChild(source);
 
     parent.appendChild(media);
+
+    [
+      'seeked', 'timeupdate', 'progress', 'play',
+      'pause', 'seeking', 'waiting', 'playing',
+      'error', 'volumechange', 'loadedmetadata'
+    ].forEach(function (event) {
+      media.addEventListener(event, function () {
+        media.dispatchEvent(event);
+      });
+    });
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
@@ -84,11 +121,9 @@
                 });
                 break;
               case 'm3u8':
-                loadHlsJs(function() {
+                loadHlsJs(media, function(hls) {
                   if(Hls.isSupported()) {
-                    var hls = new Hls();
                     hls.loadSource(source);
-                    hls.attachMedia(media);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     var sources = media.getElementsByTagName('source');
                     if(source && source !== sources[0].src) {
