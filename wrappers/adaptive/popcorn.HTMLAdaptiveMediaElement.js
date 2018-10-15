@@ -33,6 +33,10 @@
     }
   }
 
+  function isAttributeSet( value ) {
+    return ( typeof value === "string" || value === true );
+  };
+
   function loadHlsJs(media, callback) {
     if (window.Hls) {
       if(Hls.isSupported() && window.Hls.instance) {
@@ -67,6 +71,10 @@
     var parent = typeof id === 'string' ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
+    var impl = {
+      autoplay: EMPTY_STRING,
+    };
+
     media.dispatchEvent = function (name, data) {
       var customEvent = document.createEvent('CustomEvent'),
         detail = {
@@ -99,11 +107,24 @@
       });
     });
 
+    media.addEventListener('progress', function () {
+      if (impl.autoplay) {
+        media.play();
+      }
+    });
+
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
 
     Object.defineProperties( media, {
-
+      autoplay: {
+        get: function() {
+          return impl.autoplay;
+        },
+        set: function( aValue ) {
+          impl.autoplay = isAttributeSet( aValue );
+        }
+      },
       src: {
         get: function() {
           return media._src;
