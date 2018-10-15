@@ -73,6 +73,7 @@
 
     var impl = {
       autoplay: EMPTY_STRING,
+      firstRun: true,
     };
 
     media.dispatchEvent = function (name, data) {
@@ -108,7 +109,8 @@
     });
 
     media.addEventListener('progress', function () {
-      if (impl.autoplay) {
+      if (impl.autoplay && impl.firstRun) {
+        impl.firstRun = false;
         media.play();
       }
     });
