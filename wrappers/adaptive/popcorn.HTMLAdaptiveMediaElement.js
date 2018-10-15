@@ -133,7 +133,7 @@
         },
         set: function( aSrc ) {
           media._src = aSrc;
-          var sources = media._src.split('|');
+          var sources = media._src.split('|').reverse();
           sources.forEach(function(source) {
             var extension = source.split('.').reverse()[0];
             switch (extension) {
