@@ -108,7 +108,7 @@
       });
     });
 
-    media.addEventListener('progress', function () {
+    media.addEventListener('loadedmetadata', function () {
       if (impl.autoplay && impl.firstRun) {
         impl.firstRun = false;
         media.play();
