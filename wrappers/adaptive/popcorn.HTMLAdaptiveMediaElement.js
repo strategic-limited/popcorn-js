@@ -67,6 +67,20 @@
     var parent = typeof id === 'string' ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
+    media.dispatchEvent = function (name, data) {
+      var customEvent = document.createEvent('CustomEvent'),
+        detail = {
+          type: name,
+          target: media.parentNode,
+          data: data
+        };
+
+      customEvent.initCustomEvent(media._eventNamespace + name, false, false, detail);
+      document.dispatchEvent(customEvent);
+    };
+
+    media._eventNamespace = Popcorn.guid( "HTMLAdaptiveMediaElement::" );
+
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
@@ -74,6 +88,16 @@
     media.appendChild(source);
 
     parent.appendChild(media);
+
+    [
+      'seeked', 'timeupdate', 'progress', 'play',
+      'pause', 'seeking', 'waiting', 'playing',
+      'error', 'volumechange', 'loadedmetadata'
+    ].forEach(function (event) {
+      media.addEventListener(event, function () {
+        media.dispatchEvent(event);
+      });
+    });
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
