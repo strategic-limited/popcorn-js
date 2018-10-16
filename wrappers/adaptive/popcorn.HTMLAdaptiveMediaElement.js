@@ -135,6 +135,10 @@
           media._src = aSrc;
           // latest source is mp4 fallback media
           var sources = media._src.split('|').reverse();
+          var defaultMedia = sources.filter(function (source) {
+            var extension = source.split('.').reverse()[0];
+            return extension === 'mp4' || extension === 'webm';
+          })[0];
           sources.forEach(function(source) {
             var extension = source.split('.').reverse()[0];
             switch (extension) {
@@ -149,7 +153,7 @@
                   if(Hls.isSupported()) {
                     hls.on(Hls.Events.ERROR, function (error) {
                       // fallback to default media source
-                      media.src = sources[0];
+                      media.src = defaultMedia;
                     });
                     hls.loadSource(source);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
