@@ -157,7 +157,9 @@
                   if(Hls.isSupported()) {
                     hls.on(Hls.Events.ERROR, function (error, data) {
                       // fallback to default media source
-                      media.src = fallbackMedia;
+                      if (data.type === 'networkError') {
+                        media.src = fallbackMedia;
+                      }
                     });
                     hls.loadSource(source);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
