@@ -133,6 +133,7 @@
         },
         set: function( aSrc ) {
           media._src = aSrc;
+          // latest source is mp4 fallback media
           var sources = media._src.split('|').reverse();
           sources.forEach(function(source) {
             var extension = source.split('.').reverse()[0];
@@ -146,6 +147,10 @@
               case 'm3u8':
                 loadHlsJs(media, function(hls) {
                   if(Hls.isSupported()) {
+                    hls.on(Hls.Events.ERROR, function (error) {
+                      // fallback to default media source
+                      media.src = sources[0];
+                    });
                     hls.loadSource(source);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     var sources = media.getElementsByTagName('source');
