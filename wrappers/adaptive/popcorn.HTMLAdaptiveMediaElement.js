@@ -52,6 +52,7 @@
         if(Hls.isSupported()) {
           var hls = new Hls({
             capLevelToPlayerSize: true,
+            startLevel: -1,
           });
           hls.attachMedia(media);
           window.Hls.instance = hls;
