@@ -54,7 +54,6 @@
             capLevelToPlayerSize: true,
             startLevel: -1,
           });
-          hls.attachMedia(media);
           window.Hls.instance = hls;
           callback(hls);
         } else {
@@ -163,6 +162,7 @@
                       }
                     });
                     hls.loadSource(source);
+                    hls.attachMedia(media);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     var sources = media.getElementsByTagName('source');
                     if(source && source !== sources[0].src) {
