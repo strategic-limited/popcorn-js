@@ -54,6 +54,7 @@
             capLevelToPlayerSize: true,
             startLevel: -1,
           });
+          hls.startLevel = -1;
           window.Hls.instance = hls;
           callback(hls);
         } else {
