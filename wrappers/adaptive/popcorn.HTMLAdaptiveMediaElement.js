@@ -3,6 +3,7 @@
  * that are created within a DIV, and forward their properties and methods
  * to a wrapped object.
  */
+
 (function (Popcorn, document) {
   var EMPTY_STRING = '';
 
@@ -32,10 +33,6 @@
       document.head.appendChild(script);
     }
   }
-
-  function isAttributeSet( value ) {
-    return ( typeof value === "string" || value === true );
-  };
 
   function loadHlsJs(media, callback) {
     if (window.Hls) {
@@ -86,7 +83,7 @@
       document.dispatchEvent(customEvent);
     };
 
-    media._eventNamespace = Popcorn.guid( "HTMLAdaptiveMediaElement::" );
+    media._eventNamespace = Popcorn.guid('HTMLAdaptiveMediaElement::');
 
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
@@ -116,20 +113,20 @@
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
 
-    Object.defineProperties( media, {
+    Object.defineProperties(media, {
       autoplay: {
         get: function() {
           return impl.autoplay;
         },
-        set: function( aValue ) {
-          impl.autoplay = isAttributeSet( aValue );
+        set: function(aValue) {
+          impl.autoplay = (typeof aValue === 'string' || aValue === true);
         }
       },
       src: {
         get: function() {
           return media._src;
         },
-        set: function( aSrc ) {
+        set: function(aSrc) {
           media._src = aSrc;
           // latest source is mp4 fallback media
           var sources = media._src.split('|');
