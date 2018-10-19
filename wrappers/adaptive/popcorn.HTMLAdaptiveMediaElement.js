@@ -68,7 +68,6 @@
 
     var impl = {
       autoplay: EMPTY_STRING,
-      firstRun: true,
     };
 
     media.dispatchEvent = function (name, data) {
@@ -98,16 +97,9 @@
       'pause', 'seeking', 'waiting', 'playing',
       'error', 'volumechange', 'loadedmetadata'
     ].forEach(function (event) {
-      media.addEventListener(event, function () {
+      media.addEventListener(event, function() {
         media.dispatchEvent(event);
       });
-    });
-
-    media.addEventListener('progress', function () {
-      if (impl.autoplay && impl.firstRun) {
-        impl.firstRun = false;
-        media.play();
-      }
     });
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
