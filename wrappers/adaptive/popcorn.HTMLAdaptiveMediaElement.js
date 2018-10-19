@@ -50,10 +50,8 @@
       script.addEventListener('load', function() {
         window.define = requireDefine;
         if(Hls.isSupported()) {
-          var hls = new Hls({
-            capLevelToPlayerSize: true,
-          });
-          hls.attachMedia(media);
+          var hls = new Hls();
+          hls.startLevel = -1;
           window.Hls.instance = hls;
           callback(hls);
         } else {
@@ -162,6 +160,7 @@
                       }
                     });
                     hls.loadSource(source);
+                    hls.attachMedia(media);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     var sources = media.getElementsByTagName('source');
                     if(source && source !== sources[0].src) {
