@@ -50,10 +50,7 @@
       script.addEventListener('load', function() {
         window.define = requireDefine;
         if(Hls.isSupported()) {
-          var hls = new Hls({
-            capLevelToPlayerSize: true,
-            startLevel: -1,
-          });
+          var hls = new Hls();
           hls.startLevel = -1;
           window.Hls.instance = hls;
           callback(hls);
