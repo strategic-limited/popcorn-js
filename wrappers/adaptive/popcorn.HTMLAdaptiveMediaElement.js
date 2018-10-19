@@ -106,10 +106,7 @@
     media.addEventListener('progress', function() {
       if (impl.firstRun) {
         impl.firstRun = false;
-       media.dispatchEvent('loadedemetadata');
-        // if (impl.autoplay) {
-        //   media.play();
-        // }
+       media.dispatchEvent('loadedmetadata');
       }
     });
 
