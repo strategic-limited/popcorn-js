@@ -107,9 +107,9 @@
       if (impl.firstRun) {
         impl.firstRun = false;
        media.dispatchEvent('loadedemetadata');
-        if (impl.autoplay) {
-          media.play();
-        }
+        // if (impl.autoplay) {
+        //   media.play();
+        // }
       }
     });
 
