@@ -96,17 +96,20 @@
     [
       'seeked', 'timeupdate', 'progress', 'play',
       'pause', 'seeking', 'waiting', 'playing',
-      'error', 'volumechange', 'loadedmetadata'
+      'error', 'volumechange'
     ].forEach(function (event) {
-      media.addEventListener(event, function () {
+      media.addEventListener(event, function() {
         media.dispatchEvent(event);
       });
     });
 
-    media.addEventListener('progress', function () {
-      if (impl.autoplay && impl.firstRun) {
+    media.addEventListener('progress', function() {
+      if (impl.firstRun) {
         impl.firstRun = false;
-        media.play();
+       media.dispatchEvent('loadedemetadata');
+        if (impl.autoplay) {
+          media.play();
+        }
       }
     });
 
