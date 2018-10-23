@@ -95,7 +95,7 @@
     [
       'seeked', 'timeupdate', 'progress', 'play',
       'pause', 'seeking', 'waiting', 'playing',
-      'error', 'volumechange', 'loadedmetadata'
+      'error', 'volumechange'
     ].forEach(function (event) {
       media.addEventListener(event, function() {
         media.dispatchEvent(event);
