@@ -41,7 +41,7 @@
       video.ended();
     }
     if( video.currentTime < 0 ) {
-       video.pause(0);   
+       video.pause(0);
     }
   }
 
@@ -316,7 +316,7 @@
     }
 
     function getMuted() {
-      return impl.muted;
+      return impl.autoplay ? true : impl.muted;
     }
 
     Object.defineProperties( self, {
@@ -440,10 +440,10 @@
           setMuted( self._util.isAttributeSet( aValue ) );
         }
       },
-      
+
       playbackRate: {
         get: function() {
-          return player.playbackRate;   
+          return player.playbackRate;
         },
         set: function( aValue ) {
           player.playbackRate = aValue;
