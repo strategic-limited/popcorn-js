@@ -86,6 +86,7 @@
 
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
+    media.muted = true;
 
     var source = document.createElement('source');
     media.appendChild(source);
@@ -112,7 +113,6 @@
         },
         set: function(aValue) {
           impl.autoplay = (typeof aValue === 'string' || aValue === true);
-          media.muted = impl.autoplay;
         }
       },
       src: {
