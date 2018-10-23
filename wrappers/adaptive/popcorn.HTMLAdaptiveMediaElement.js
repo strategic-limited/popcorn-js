@@ -112,6 +112,7 @@
         },
         set: function(aValue) {
           impl.autoplay = (typeof aValue === 'string' || aValue === true);
+          media.muted = impl.autoplay;
         }
       },
       src: {
