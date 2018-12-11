@@ -7,6 +7,12 @@
 (function (Popcorn, document) {
   var EMPTY_STRING = '';
 
+  function isMicrosoftBrowser() {
+    return navigator.appName === 'Microsoft Internet Explorer' ||
+      (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
+      (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
+  }
+
   function canPlaySrc(src) {
     var sources = src.split('|');
     for (var i = 0; i < sources.length; i++) {
@@ -151,19 +157,35 @@
                     hls.loadSource(source);
                     hls.attachMedia(media);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
-                    var sources = media.getElementsByTagName('source');
-                    if(source && source !== sources[0].src) {
-                      sources[0].src = source;
-                      media.load();
+                    // IE and Edge do not understand source setting here for MSE BLOB
+                    if (isMicrosoftBrowser()) {
+                      if(source && source !== media.getAttribute('src')) {
+                        media.setAttribute('src', source);
+                        media.load();
+                      }
+                    } else {
+                      var sources = media.getElementsByTagName('source');
+                      if(source && source !== sources[0].src) {
+                        sources[0].src = source;
+                        media.load();
+                      }
                     }
                   }
                 });
                 break;
               default:
-                var sources = media.getElementsByTagName('source');
-                if(source && source !== sources[0].src) {
-                  sources[0].src = source;
-                  media.load();
+                // IE and Edge do not understand source setting here for MSE BLOB
+                if (isMicrosoftBrowser()) {
+                  if(source && source !== media.getAttribute('src')) {
+                    media.setAttribute('src', source);
+                    media.load();
+                  }
+                } else {
+                  var sources = media.getElementsByTagName('source');
+                  if(source && source !== sources[0].src) {
+                    sources[0].src = source;
+                    media.load();
+                  }
                 }
                 break;
             }
