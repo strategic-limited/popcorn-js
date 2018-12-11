@@ -124,7 +124,7 @@
           var sources = media._src.split('|');
           var adaptiveMedias = sources.filter(function (source) {
             var extension = source.split('.').reverse()[0];
-            return extension !== 'mp4' || extension !== 'webm';
+            return extension !== 'mp4' && extension !== 'webm';
           });
           var fallbackMedia = sources.filter(function (source) {
             var extension = source.split('.').reverse()[0];
