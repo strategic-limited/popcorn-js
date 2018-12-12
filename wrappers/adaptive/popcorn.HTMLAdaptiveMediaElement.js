@@ -183,7 +183,7 @@
               }
             });
           } else {
-            media.src = fallbackMedia;
+            setRawSource(fallbackMedia);
           }
         }
       }
