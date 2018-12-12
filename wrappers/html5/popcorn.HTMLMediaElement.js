@@ -29,6 +29,12 @@
     'mp4': 'video/mp4',
   };
 
+  function isMicrosoftBrowser() {
+    return navigator.appName === 'Microsoft Internet Explorer' ||
+      (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
+      (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
+  }
+
   function canPlayAudioSrc(src) {
     // We can't really know based on URL.
     for (var i = 0; i < existingTypes.length; i++) {
@@ -91,15 +97,23 @@
 
       src: {
         get: function () {
-          return media.getElementsByTagName('source')[0].src;
+          return isMicrosoftBrowser() ? media.getAttribute('src') : media.getElementsByTagName('source')[0].src;
         },
         set: function (aSrc) {
-          var sources = media.getElementsByTagName('source');
-          if (aSrc && aSrc !== sources[0].src) {
-            var extension = aSrc.split('.').reverse()[0];
-            sources[0].src = aSrc;
-            sources[0].type = videoFormats[extension] || audioFormats[extension];
-            media.load();
+          if (isMicrosoftBrowser()) {
+            if (aSrc && aSrc !== media.getAttribute('src')) {
+              media.setAttribute('src', aSrc);
+              media.setAttribute('type', videoFormats[extension] || audioFormats[extension]);
+              media.load();
+            }
+          } else {
+            var sources = media.getElementsByTagName('source');
+            if (aSrc && aSrc !== sources[0].src) {
+              var extension = aSrc.split('.').reverse()[0];
+              sources[0].src = aSrc;
+              sources[0].type = videoFormats[extension] || audioFormats[extension];
+              media.load();
+            }
           }
         }
       }
