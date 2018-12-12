@@ -151,36 +151,40 @@
             var extension = source.split('.').reverse()[0];
             return extension === 'mp4' || extension === 'webm';
           })[0];
-          adaptiveMedias.forEach(function(source) {
-            var extension = source.split('.').reverse()[0];
-            switch (extension) {
-              case 'mpd':
-                loadDashJs(function() {
-                  var player = dashjs.MediaPlayer().create();
-                  player.initialize(media, source, false);
-                });
-                break;
-              case 'm3u8':
-                loadHlsJs(media, function(hls) {
-                  if(Hls.isSupported()) {
-                    hls.on(Hls.Events.ERROR, function (error, data) {
-                      // fallback to default media source
-                      if (data.type === 'networkError') {
-                        media.src = fallbackMedia;
-                      }
-                    });
-                    hls.loadSource(source);
-                    hls.attachMedia(media);
-                  } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
-                    setRawSource(source);
-                  }
-                });
-                break;
-              default:
-                setRawSource(source);
-                break;
-            }
-          });
+          if (adaptiveMedias.length) {
+            adaptiveMedias.forEach(function(source) {
+              var extension = source.split('.').reverse()[0];
+              switch (extension) {
+                case 'mpd':
+                  loadDashJs(function() {
+                    var player = dashjs.MediaPlayer().create();
+                    player.initialize(media, source, false);
+                  });
+                  break;
+                case 'm3u8':
+                  loadHlsJs(media, function(hls) {
+                    if(Hls.isSupported()) {
+                      hls.on(Hls.Events.ERROR, function (error, data) {
+                        // fallback to default media source
+                        if (data.type === 'networkError') {
+                          media.src = fallbackMedia;
+                        }
+                      });
+                      hls.loadSource(source);
+                      hls.attachMedia(media);
+                    } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
+                      setRawSource(source);
+                    }
+                  });
+                  break;
+                default:
+                  setRawSource(source);
+                  break;
+              }
+            });
+          } else {
+            media.src = fallbackMedia;
+          }
         }
       }
     });
