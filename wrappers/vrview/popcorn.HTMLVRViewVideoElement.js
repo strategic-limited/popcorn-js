@@ -1,6 +1,6 @@
 (function (Popcorn, window, document) {
   var
-    EMPTY_STRING = "",
+    EMPTY_STRING = '',
     ABS = Math.abs,
     CURRENT_TIME_MONITOR_MS = 10;
 
@@ -9,11 +9,12 @@
   function resolveHttpRedirects(url, callback) {
 
     var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", function () {
-      if (oReq.readyState === XMLHttpRequest.DONE && oReq.status === 200)
+    oReq.addEventListener('load', function () {
+      if (oReq.readyState === XMLHttpRequest.DONE && oReq.status === 200) {
         callback(oReq.responseURL);
+      }
     });
-    oReq.open("HEAD", url);
+    oReq.open('HEAD', url);
     oReq.send();
   }
 
@@ -32,12 +33,12 @@
   function HTMLVRViewVideoElement(id) {
 
     if (!window.postMessage) {
-      throw "ERROR: HTMLVRViewVideoElement requires window.postMessage";
+      throw 'ERROR: HTMLVRViewVideoElement requires window.postMessage';
     }
 
     var self = new Popcorn._MediaElementProto(),
-      parent = typeof id === "string" ? document.querySelector(id) : id,
-      elem = document.createElement("div"),
+      parent = typeof id === 'string' ? document.querySelector(id) : id,
+      elem = document.createElement('div'),
       impl = {
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
@@ -66,12 +67,12 @@
       timeUpdateInterval;
 
     // Namespace all events we'll produce
-    self._eventNamespace = Popcorn.guid("HTMLVRViewVideoElement::");
+    self._eventNamespace = Popcorn.guid('HTMLVRViewVideoElement::');
 
     self.parentNode = parent;
 
     // Mark this as VRView
-    self._util.type = "VRView";
+    self._util.type = 'VRView';
 
     function onPlayerReady() {
 
@@ -80,11 +81,11 @@
       playerReady = true;
 
       if (isMobile()) {
-        self.dispatchEvent("loadedmetadata");
+        self.dispatchEvent('loadedmetadata');
         //remove loading image, thumbs and big play button so we can click actual VRView play button
-        document.getElementsByClassName("loading-message")[0].style.display = "none";
-        document.getElementById("thumbnail-container").style.display = "none";
-        document.getElementById("controls-big-play-button").style.display = "none";
+        document.getElementsByClassName('loading-message')[0].style.display = 'none';
+        document.getElementById('thumbnail-container').style.display = 'none';
+        document.getElementById('controls-big-play-button').style.display = 'none';
         if (videoElement) {
           videoElement.style.zIndex = 99999999999;
         }
@@ -100,7 +101,7 @@
       var newDuration = player.getDuration();
       if (impl.duration !== newDuration) {
         impl.duration = newDuration;
-        self.dispatchEvent("durationchange");
+        self.dispatchEvent('durationchange');
       }
 
       if (!isMobile()) {
@@ -117,20 +118,20 @@
       }
 
       impl.readyState = self.HAVE_METADATA;
-      self.dispatchEvent( "loadedmetadata" );
+      self.dispatchEvent('loadedmetadata');
       currentTimeInterval = setInterval(monitorCurrentTime,
         CURRENT_TIME_MONITOR_MS);
 
-      self.dispatchEvent("loadeddata");
+      self.dispatchEvent('loadeddata');
 
       impl.readyState = self.HAVE_FUTURE_DATA;
-      self.dispatchEvent("canplay");
+      self.dispatchEvent('canplay');
 
       mediaReady = true;
 
       // We can't easily determine canplaythrough, but will send anyway.
       impl.readyState = self.HAVE_ENOUGH_DATA;
-      self.dispatchEvent("canplaythrough");
+      self.dispatchEvent('canplaythrough');
       self.pause();
     }
 
@@ -169,7 +170,7 @@
     }
 
     function destroyPlayer() {
-      if (!( playerReady && player )) {
+      if (!(playerReady && player)) {
         return;
       }
 
@@ -191,17 +192,17 @@
       player.off('timeupdate');
       player.off('ended');
       player = null;
-      elem = document.createElement("div");
+      elem = document.createElement('div');
     }
 
     function changeSrc(aSrc) {
       if (!self._canPlaySrc(aSrc)) {
         impl.error = {
-          name: "MediaError",
-          message: "Media Source Not Supported",
+          name: 'MediaError',
+          message: 'Media Source Not Supported',
           code: MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
         };
-        self.dispatchEvent("error");
+        self.dispatchEvent('error');
         return;
       }
 
@@ -209,23 +210,23 @@
 
       elem.style.width = '100%';
       elem.style.height = '100%';
-      elem.id = Popcorn.guid("vrview_");
+      elem.id = Popcorn.guid('vrview_');
       parent.appendChild(elem);
 
       // Use any player vars passed on the URL
       var playerVars = self._util.parseUri(aSrc).queryKey;
 
       // Sync autoplay, but manage internally
-      impl.autoplay = playerVars.autoplay === "1" || impl.autoplay;
+      impl.autoplay = playerVars.autoplay === '1' || impl.autoplay;
       delete playerVars.autoplay;
 
       // Sync loop, but manage internally
-      impl.loop = playerVars.loop === "1" || impl.loop;
+      impl.loop = playerVars.loop === '1' || impl.loop;
       delete playerVars.loop;
 
       // Specify our domain as origin for iframe security
-      var domain = window.location.protocol === "file:" ? "*" :
-        window.location.protocol + "//" + window.location.host;
+      var domain = window.location.protocol === 'file:' ? '*' :
+        window.location.protocol + '//' + window.location.host;
       playerVars.origin = playerVars.origin || domain;
 
       // Show/hide controls. Sync with impl.controls and prefer URL value.
@@ -273,15 +274,15 @@
             console.warn('Unable to link touch events to 360 Player.');
           }
         };
-        setTimeout(function() {
+        setTimeout(function () {
           //initialization in Safari in that timeframe works but in other browser doesn't and vice versa
           //TODO: investigate for correct handling of this case (best is event-based)
-        }, isSafari () ? 300 : 1000);
+        }, isSafari() ? 300 : 1000);
       });
 
       impl.networkState = self.NETWORK_LOADING;
-      self.dispatchEvent("loadstart");
-      self.dispatchEvent("progress");
+      self.dispatchEvent('loadstart');
+      self.dispatchEvent('progress');
     }
 
     function monitorCurrentTime() {
@@ -310,32 +311,32 @@
     }
 
     function onTimeUpdate() {
-      self.dispatchEvent("timeupdate");
+      self.dispatchEvent('timeupdate');
     }
 
     function onSeeking() {
       // we don't want to listen for this, so this state catches the event.
       impl.seeking = true;
-      self.dispatchEvent("seeking");
+      self.dispatchEvent('seeking');
     }
 
     function onSeeked() {
       impl.ended = false;
       impl.seeking = false;
-      self.dispatchEvent("timeupdate");
-      self.dispatchEvent("seeked");
-      self.dispatchEvent("canplay");
-      self.dispatchEvent("canplaythrough");
+      self.dispatchEvent('timeupdate');
+      self.dispatchEvent('seeked');
+      self.dispatchEvent('canplay');
+      self.dispatchEvent('canplaythrough');
     }
 
     function onPlay() {
       if (!player.isRepeatingPlay) {
         player.isRepeatingPlay = true;
-        self.dispatchEvent("loadedmetadata");
+        self.dispatchEvent('loadedmetadata');
 
         if (isMobile()) {
           setTimeout(function () {
-            var el = document.getElementById("controls-big-play-button");
+            var el = document.getElementById('controls-big-play-button');
             if (el) {
               el.click();
             }
@@ -353,11 +354,11 @@
         playerPaused = false;
 
         // Only 1 play when video.loop=true
-        if (( impl.loop && !loopedPlay ) || !impl.loop) {
+        if ((impl.loop && !loopedPlay) || !impl.loop) {
           loopedPlay = true;
-          self.dispatchEvent("play");
+          self.dispatchEvent('play');
         }
-        self.dispatchEvent("playing");
+        self.dispatchEvent('playing');
         if (isMobile()) {
           Popcorn.current.play();
         }
@@ -374,7 +375,7 @@
       if (!playerPaused) {
         playerPaused = true;
         clearInterval(timeUpdateInterval);
-        self.dispatchEvent("pause");
+        self.dispatchEvent('pause');
         if (isMobile()) {
           Popcorn.current.pause();
         }
@@ -393,8 +394,8 @@
       } else {
         impl.ended = true;
         onPause();
-        self.dispatchEvent("timeupdate");
-        self.dispatchEvent("ended");
+        self.dispatchEvent('timeupdate');
+        self.dispatchEvent('ended');
       }
     }
 
@@ -402,7 +403,7 @@
       impl.muted = aValue;
       player.mute(aValue);
 
-      //self.dispatchEvent("volumechange");
+      //self.dispatchEvent('volumechange');
     }
 
     function getMuted() {
@@ -503,11 +504,11 @@
         },
         set: function (aValue) {
           if (aValue < 0 || aValue > 1) {
-            throw "Volume value must be between 0.0 and 1.0";
+            throw 'Volume value must be between 0.0 and 1.0';
           }
           impl.volume = aValue;
           player.setVolume(impl.volume);
-          self.dispatchEvent("volumechange");
+          self.dispatchEvent('volumechange');
         }
       },
 
@@ -535,7 +536,7 @@
               }
 
               //throw fake DOMException/INDEX_SIZE_ERR
-              throw "INDEX_SIZE_ERR: DOM Exception 1";
+              throw 'INDEX_SIZE_ERR: DOM Exception 1';
             },
             end: function (index) {
               if (index === 0) {
@@ -547,7 +548,7 @@
               }
 
               //throw fake DOMException/INDEX_SIZE_ERR
-              throw "INDEX_SIZE_ERR: DOM Exception 1";
+              throw 'INDEX_SIZE_ERR: DOM Exception 1';
             },
             length: 1
           };
@@ -570,13 +571,13 @@
 
   // Helper for identifying URLs we know how to play.
   Popcorn.HTMLVRViewVideoElement._canPlaySrc = function (url) {
-    return (/vr360:\/\/(.)*\.(mp4|m3u8|mpd)/).test( url ) ? "probably" : EMPTY_STRING;
+    return (/vr360:\/\/(.)*\.(mp4|m3u8|mpd)/).test(url) ? 'probably' : EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of video/x-vr360
   Popcorn.HTMLVRViewVideoElement.canPlayType = function (type) {
-    return "probably";
-    //return type === "video/x-vr360" ? "probably" : EMPTY_STRING;
+    return 'probably';
+    //return type === 'video/x-vr360' ? 'probably' : EMPTY_STRING;
   };
 
 }(Popcorn, window, document));
