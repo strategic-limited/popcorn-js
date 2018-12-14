@@ -7,15 +7,37 @@
   var videoElement;
 
   function resolveHttpRedirects(url, callback) {
-
     var oReq = new XMLHttpRequest();
     oReq.addEventListener('load', function () {
-      if (oReq.readyState === XMLHttpRequest.DONE && oReq.status === 200) {
-        callback(oReq.responseURL);
+      if (oReq.readyState !== XMLHttpRequest.DONE) {
+        return;
       }
+      if (Math.trunc(oReq.status / 100) === 2) {
+        return callback(null, oReq.responseURL);
+      }
+      return callback({
+        code: oReq.status,
+        message: oReq.responseText
+      });
     });
     oReq.open('HEAD', url);
     oReq.send();
+  }
+
+  function resolvePlaybackUrl(urls, callback) {
+    function processUrl(i) {
+      if (i >= urls.length) {
+        return callback({message: 'No sufficient URL found.'});
+      }
+      resolveHttpRedirects(urls[i], function(err, url) {
+        if (!err) {
+          return callback(null, url);
+        }
+        processUrl(i + 1);
+      });
+    }
+
+    processUrl(0);
   }
 
   function isMobile() {
@@ -238,7 +260,16 @@
       }
 
       // need to resolve redirects as it will fail on Safari
-      resolveHttpRedirects(aSrc.split('vr360://').reverse()[0], function (srcUrl) {
+      resolvePlaybackUrl(decodeURIComponent(aSrc.split('vr360://').reverse()[0]).split('|'), function (err, srcUrl) {
+        if (err) {
+          impl.error = {
+            name: 'MediaError',
+            message: err.message,
+            code: MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
+          };
+          self.dispatchEvent('error');
+          return;
+        }
         player = new VRView.Player('#' + elem.id, {
           width: '100%',
           height: '100%',
