@@ -182,7 +182,7 @@
                 break;
             }
           } else {
-            setRawSource(fallbackMedia);
+            setRawSource(fallbackMedia || aSrc);
           }
         }
       }
