@@ -6,6 +6,7 @@
 
 (function (Popcorn, document) {
   var EMPTY_STRING = '';
+  var ADAPTIVE_MEDIA_PREFERENCE = 'm3u8';
 
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
@@ -143,45 +144,43 @@
           media._src = aSrc;
           // latest source is mp4 fallback media
           var sources = media._src.split('|');
-          var adaptiveMedias = sources.filter(function (source) {
+          var adaptiveMedia = sources.filter(function (source) {
             var extension = source.split('.').reverse()[0];
-            return extension !== 'mp4' && extension !== 'webm';
-          });
+            return extension === ADAPTIVE_MEDIA_PREFERENCE;
+          })[0];
           var fallbackMedia = sources.filter(function (source) {
             var extension = source.split('.').reverse()[0];
             return extension === 'mp4' || extension === 'webm';
           })[0];
-          if (adaptiveMedias.length) {
-            adaptiveMedias.forEach(function(source) {
-              var extension = source.split('.').reverse()[0];
-              switch (extension) {
-                case 'mpd':
-                  loadDashJs(function() {
-                    var player = dashjs.MediaPlayer().create();
-                    player.initialize(media, source, false);
-                  });
-                  break;
-                case 'm3u8':
-                  loadHlsJs(media, function(hls) {
-                    if(Hls.isSupported()) {
-                      hls.on(Hls.Events.ERROR, function (error, data) {
-                        // fallback to default media source
-                        if (data.type === 'networkError') {
-                          media.src = fallbackMedia;
-                        }
-                      });
-                      hls.loadSource(source);
-                      hls.attachMedia(media);
-                    } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
-                      setRawSource(source);
-                    }
-                  });
-                  break;
-                default:
-                  setRawSource(source);
-                  break;
-              }
-            });
+          if (adaptiveMedia) {
+            var extension = adaptiveMedia.split('.').reverse()[0];
+            switch (extension) {
+              case 'mpd':
+                loadDashJs(function() {
+                  var player = dashjs.MediaPlayer().create();
+                  player.initialize(media, adaptiveMedia, false);
+                });
+                break;
+              case 'm3u8':
+                loadHlsJs(media, function(hls) {
+                  if(Hls.isSupported()) {
+                    hls.on(Hls.Events.ERROR, function (error, data) {
+                      // fallback to default media source
+                      if (data.type === 'networkError') {
+                        media.src = fallbackMedia;
+                      }
+                    });
+                    hls.loadSource(adaptiveMedia);
+                    hls.attachMedia(media);
+                  } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
+                    setRawSource(adaptiveMedia);
+                  }
+                });
+                break;
+              default:
+                setRawSource(adaptiveMedia);
+                break;
+            }
           } else {
             setRawSource(fallbackMedia);
           }
