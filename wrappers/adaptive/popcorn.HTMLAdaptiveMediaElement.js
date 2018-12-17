@@ -6,7 +6,6 @@
 
 (function (Popcorn, document) {
   var EMPTY_STRING = '';
-  var ADAPTIVE_MEDIA_PREFERENCE = 'm3u8';
 
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
@@ -142,22 +141,33 @@
             }
           }
           media._src = aSrc;
-          // latest source is mp4 fallback media
+          function findMediaSource(sources, acceptableSources) {
+            return sources.filter(function(source) {
+              var extension = source.split('.').reverse()[0];
+              return acceptableSources.indexOf(extension) !== -1;
+            })[0];
+          }
+
           var sources = media._src.split('|');
-          var adaptiveMedia = sources.filter(function (source) {
-            var extension = source.split('.').reverse()[0];
-            return extension === ADAPTIVE_MEDIA_PREFERENCE;
-          })[0];
-          var fallbackMedia = sources.filter(function (source) {
-            var extension = source.split('.').reverse()[0];
-            return extension === 'mp4' || extension === 'webm';
-          })[0];
-          if (adaptiveMedia) {
+          var hlsMedia = findMediaSource(sources, ['m3u8']);
+          var dashMedia = findMediaSource(sources, ['mpd']);
+          var fallbackMedia = findMediaSource(sources, ['mp4', 'webm']);
+
+
+          if (dashMedia || hlsMedia) {
+            var adaptiveMedia = dashMedia || hlsMedia;
             var extension = adaptiveMedia.split('.').reverse()[0];
             switch (extension) {
               case 'mpd':
                 loadDashJs(function() {
                   var player = dashjs.MediaPlayer().create();
+                  player.on('error', (event) => {
+                    if (event.error.code === 23) {
+                      // 23 says `message: "mediasource is not supported"`, so fallback to HLS
+                      // as it happens mainly on Safari iOS
+                      media.src = hlsMedia || fallbackMedia;
+                    }
+                  });
                   player.initialize(media, adaptiveMedia, false);
                 });
                 break;
