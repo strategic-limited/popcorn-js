@@ -6,6 +6,13 @@
 
   var videoElement;
 
+  function findMediaSource(sources, acceptableSources) {
+    return sources.filter(function(source) {
+      var extension = source.split('.').reverse()[0];
+      return acceptableSources.indexOf(extension) !== -1;
+    })[0];
+  }
+
   function resolveHttpRedirects(url, callback) {
     var oReq = new XMLHttpRequest();
     oReq.addEventListener('load', function () {
@@ -264,7 +271,7 @@
       }
 
       // need to resolve redirects as it will fail on Safari
-      resolvePlaybackUrl([decodeURIComponent(encodeURI(aSrc.split('vr360://')[1])).split('|').reverse()[0]], function (err, srcUrl) {
+      resolvePlaybackUrl(findMediaSource(decodeURIComponent(encodeURI(aSrc.split('vr360://')[1])).split('|'), ['mp4', 'webm']), function (err, srcUrl) {
         if (err) {
           impl.error = {
             name: 'MediaError',
