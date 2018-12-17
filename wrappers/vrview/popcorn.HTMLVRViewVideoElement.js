@@ -264,7 +264,7 @@
       }
 
       // need to resolve redirects as it will fail on Safari
-      resolvePlaybackUrl(decodeURIComponent(encodeURI(aSrc.split('vr360://')[1])).split('|').reverse()[0], function (err, srcUrl) {
+      resolvePlaybackUrl([decodeURIComponent(encodeURI(aSrc.split('vr360://')[1])).split('|').reverse()[0]], function (err, srcUrl) {
         if (err) {
           impl.error = {
             name: 'MediaError',
