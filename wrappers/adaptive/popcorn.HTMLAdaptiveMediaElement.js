@@ -6,7 +6,7 @@
 
 (function (Popcorn, document) {
   var EMPTY_STRING = '';
-  var ADAPTIVE_MEDIA_PREFERENCE = 'm3u8';
+  var ADAPTIVE_MEDIA_PREFERENCE = 'mpd';
 
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
