@@ -158,6 +158,9 @@
               case 'mpd':
                 loadDashJs(function() {
                   var player = dashjs.MediaPlayer().create();
+                  player.on('error', (event) => {
+                    console.log('error happened on dash call', event);
+                  });
                   player.initialize(media, adaptiveMedia, false);
                 });
                 break;
