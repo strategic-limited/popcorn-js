@@ -165,7 +165,7 @@
                     if (event.error.code === 23) {
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
-                      media.src = dashMedia;
+                      media.src = hlsMedia;
                     }
                   });
                   player.initialize(media, adaptiveMedia, false);
