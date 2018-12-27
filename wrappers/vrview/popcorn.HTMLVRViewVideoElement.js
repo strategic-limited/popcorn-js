@@ -32,10 +32,12 @@
   }
 
   function resolvePlaybackUrl(urls, callback) {
-    urls = urls.filter(function(item) {
-      var extension = item.split('.').reverse()[0];
-      return extension === 'mp4' || extension === 'webm' || extension === 'mpd';
-    });
+    if (urls.length > 1) {
+      urls = urls.filter(function(item) {
+        var extension = item.split('.').reverse()[0];
+        return extension === 'mp4' || extension === 'webm' || extension === 'mpd';
+      });
+    }
     function processUrl(i) {
       if (i >= urls.length) {
         return callback({message: 'No sufficient URL found.'});
