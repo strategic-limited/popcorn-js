@@ -419,9 +419,7 @@
       // Remove the video id, since we don't want to pass it
       delete playerVars.v;
 
-      // Sync autoplay, but manage internally
       impl.autoplay = playerVars.autoplay === "1" || impl.autoplay;
-      delete playerVars.autoplay;
 
       // Sync loop, but manage internally
       impl.loop = playerVars.loop === "1" || impl.loop;
