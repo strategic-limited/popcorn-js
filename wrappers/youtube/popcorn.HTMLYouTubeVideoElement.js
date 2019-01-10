@@ -420,7 +420,6 @@
       delete playerVars.v;
 
       impl.autoplay = playerVars.autoplay === "1" || impl.autoplay;
-      playerVars.autoplay = impl.autoplay || "0";
 
       // Sync loop, but manage internally
       impl.loop = playerVars.loop === "1" || impl.loop;
