@@ -421,6 +421,7 @@
 
       playerVars.autoplay = "1";
       impl.autoplay = playerVars.autoplay === "1" || impl.autoplay;
+      playerVars.mute = "1";
 
       // Sync loop, but manage internally
       impl.loop = playerVars.loop === "1" || impl.loop;
