@@ -63,7 +63,7 @@
     return "probably";
   }
 
-  function wrapMedia(id, mediaType, options) {
+  function wrapMedia(id, mediaType, options = {}) {
     var parent = typeof id === "string" ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 

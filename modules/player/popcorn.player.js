@@ -383,7 +383,7 @@
         if ( Popcorn.player.registry.hasOwnProperty( key ) ) {
           if ( Popcorn.player.registry[ key ].canPlayType( node.nodeName, srci ) ) {
             // Popcorn.smart( player, src, /* popcornOptions */ )
-            return Popcorn[ key ]( node, srci, popcornOptions );
+            return Popcorn[ key ]( node, srci, popcornOptions, options );
           }
         }
       }
