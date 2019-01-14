@@ -343,7 +343,7 @@
 
   // Popcorn.smart will attempt to find you a wrapper or player. If it can't do that,
   // it will default to using an HTML5 video in the target.
-  Popcorn.smart = function( target, src, options ) {
+  Popcorn.smart = function( target, src, popcornOptions, options ) {
     var node = typeof target === "string" ? Popcorn.dom.find( target ) : target,
         i, srci, j, media, mediaWrapper, popcorn, srcLength,
         // We leave HTMLVideoElement and HTMLAudioElement wrappers out
@@ -367,8 +367,8 @@
       for ( j = 0; j < wrappers.length; j++ ) {
         mediaWrapper = Popcorn[ wrappers[ j ] ];
         if ( mediaWrapper && mediaWrapper._canPlaySrc( srci ) === "probably" ) {
-          media = mediaWrapper( node );
-          popcorn = Popcorn( media, options );
+          media = mediaWrapper( node, options );
+          popcorn = Popcorn( media, popcornOptions );
           // Set src, but not until after we return the media so the caller
           // can get error events, if any.
           setTimeout( function() {
@@ -382,8 +382,8 @@
       for ( var key in Popcorn.player.registry ) {
         if ( Popcorn.player.registry.hasOwnProperty( key ) ) {
           if ( Popcorn.player.registry[ key ].canPlayType( node.nodeName, srci ) ) {
-            // Popcorn.smart( player, src, /* options */ )
-            return Popcorn[ key ]( node, srci, options );
+            // Popcorn.smart( player, src, /* popcornOptions */ )
+            return Popcorn[ key ]( node, srci, popcornOptions );
           }
         }
       }
@@ -392,7 +392,7 @@
     // If we don't have any players or wrappers that can handle this,
     // Default to using HTML5 video.  Similar to the HTMLVideoElement
     // wrapper, we put a video in the div passed to us via:
-    // Popcorn.smart( div, src, options )
+    // Popcorn.smart( div, src, popcornOptions )
     var videoHTML,
         videoElement,
         videoID = Popcorn.guid( "popcorn-video-" ),
@@ -419,22 +419,22 @@
 
         videoElement.src = decodeDiv.firstChild.nodeValue;
       }, 0 );
-      return Popcorn( '#' + videoID, options );
+      return Popcorn( '#' + videoID, popcornOptions );
     }
 
     node.appendChild( videoHTMLContainer );
     // IE9 doesn't like dynamic creation of source elements on <video>
     // so we do it in one shot via innerHTML.
-    videoHTML = '<video id="' +  videoID + '" preload=auto muted autobuffer webkit-playsinline playsinline>';
+    videoHTML = '<video id="' +  videoID + '" preload=auto autobuffer webkit-playsinline playsinline>';
     for ( i = 0, srcLength = src.length; i < srcLength; i++ ) {
       videoHTML += '<source src="' + src[ i ] + '">';
     }
     videoHTML += "</video>";
     videoHTMLContainer.innerHTML = videoHTML;
 
-    if ( options && options.events && options.events.error ) {
-      node.addEventListener( "error", options.events.error, false );
+    if ( popcornOptions && popcornOptions.events && popcornOptions.events.error ) {
+      node.addEventListener( "error", popcornOptions.events.error, false );
     }
-    return Popcorn( '#' + videoID, options );
+    return Popcorn( '#' + videoID, popcornOptions );
   };
 })( Popcorn );

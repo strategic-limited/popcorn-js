@@ -65,7 +65,7 @@
     return false;
   }
 
-  function HTMLVRViewVideoElement(id) {
+  function HTMLVRViewVideoElement(id, options = {}) {
 
     if (!window.postMessage) {
       throw 'ERROR: HTMLVRViewVideoElement requires window.postMessage';
@@ -79,13 +79,13 @@
         networkState: self.NETWORK_EMPTY,
         readyState: self.HAVE_NOTHING,
         seeking: false,
-        autoplay: EMPTY_STRING,
+        autoplay: options.autoplay || EMPTY_STRING,
         preload: EMPTY_STRING,
         controls: false,
         loop: false,
         poster: EMPTY_STRING,
         volume: 1,
-        muted: false,
+        muted: options.muted || false,
         currentTime: 0,
         duration: NaN,
         ended: false,
@@ -610,8 +610,8 @@
     return self;
   }
 
-  Popcorn.HTMLVRViewVideoElement = function (id) {
-    return new HTMLVRViewVideoElement(id);
+  Popcorn.HTMLVRViewVideoElement = function (id, options) {
+    return new HTMLVRViewVideoElement(id, options);
   };
 
   // Helper for identifying URLs we know how to play.

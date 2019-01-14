@@ -63,12 +63,14 @@
     return "probably";
   }
 
-  function wrapMedia(id, mediaType) {
+  function wrapMedia(id, mediaType, options) {
     var parent = typeof id === "string" ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
+    media.setAttribute('autoplay', options.autoplay || '');
+    media.setAttribute('muted', options.muted || false);
 
     var source = document.createElement('source');
     media.appendChild(source);
@@ -122,14 +124,14 @@
     return media;
   }
 
-  Popcorn.HTMLVideoElement = function (id) {
-    return wrapMedia(id, "video");
+  Popcorn.HTMLVideoElement = function (id, options) {
+    return wrapMedia(id, "video", options);
   };
   Popcorn.HTMLVideoElement._canPlaySrc = canPlayVideoSrc;
 
 
-  Popcorn.HTMLAudioElement = function (id) {
-    return wrapMedia(id, "audio");
+  Popcorn.HTMLAudioElement = function (id, options) {
+    return wrapMedia(id, "audio", options);
   };
   Popcorn.HTMLAudioElement._canPlaySrc = canPlayAudioSrc;
 
