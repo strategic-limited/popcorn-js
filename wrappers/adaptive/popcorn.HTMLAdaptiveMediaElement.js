@@ -74,7 +74,7 @@
 
     var impl = {
       autoplay: 1,
-      muted: 1,
+      muted: true,
     };
 
     media.dispatchEvent = function (name, data) {
