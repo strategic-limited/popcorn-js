@@ -73,8 +73,8 @@
       media = document.createElement(mediaType);
 
     var impl = {
-      autoplay: options.autoplay || EMPTY_STRING,
-      muted: options.muted || false,
+      autoplay: 1,
+      muted: true,
     };
 
     media.dispatchEvent = function (name, data) {
