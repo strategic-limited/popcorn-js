@@ -166,6 +166,9 @@
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
                       media.src = hlsMedia || fallbackMedia;
+                    } else {
+                      // otherwise MPD manifest is not available so fallback to regular media file
+                      media.src = fallbackMedia;
                     }
                   });
                   player.initialize(media, adaptiveMedia, false);
