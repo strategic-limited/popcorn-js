@@ -69,8 +69,8 @@
 
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
-    media.setAttribute('autoplay', options.autoplay || '');
-    media.setAttribute('muted', options.muted || false);
+    media.setAttribute('autoplay', '1');
+    media.setAttribute('muted', true);
 
     var source = document.createElement('source');
     media.appendChild(source);
