@@ -72,6 +72,8 @@
     media.setAttribute('autoplay', '1');
     media.setAttribute('muted', true);
 
+    media.muted = true;
+
     var source = document.createElement('source');
     media.appendChild(source);
 
