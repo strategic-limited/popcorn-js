@@ -83,7 +83,7 @@
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
         readyState: self.HAVE_NOTHING,
-        autoplay: EMPTY_STRING,
+        autoplay: 1,
         preload: EMPTY_STRING,
         controls: EMPTY_STRING,
         loop: false,
