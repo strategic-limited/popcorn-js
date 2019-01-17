@@ -73,7 +73,7 @@
       media = document.createElement(mediaType);
 
     var impl = {
-      autoplay: EMPTY_STRING,
+      autoplay: 1,
       muted: true,
     };
 
