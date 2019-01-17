@@ -73,7 +73,7 @@
       media = document.createElement(mediaType);
 
     var impl = {
-      autoplay: 1,
+      autoplay: EMPTY_STRING,
       muted: true,
     };
 
@@ -104,7 +104,7 @@
     [
       'seeked', 'timeupdate', 'progress', 'play',
       'pause', 'seeking', 'waiting', 'playing',
-      'error', 'volumechange', 'loadedmetadata'
+      'error', 'volumechange', 'loadedmetadata', 'mute', 'unmute'
     ].forEach(function (event) {
       media.addEventListener(event, function() {
         media.dispatchEvent(event);

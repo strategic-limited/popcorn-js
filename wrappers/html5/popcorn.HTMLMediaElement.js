@@ -67,7 +67,7 @@
     var parent = typeof id === "string" ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
-    media.setAttribute('muted', 'muted');
+    media.setAttribute('muted', true);
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
