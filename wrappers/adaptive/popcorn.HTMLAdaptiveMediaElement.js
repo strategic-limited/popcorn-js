@@ -73,8 +73,8 @@
       media = document.createElement(mediaType);
 
     var impl = {
-      autoplay: 1,
-      muted: true,
+      autoplay: EMPTY_STRING,
+      muted: options.muted,
     };
 
     media.dispatchEvent = function (name, data) {
@@ -93,7 +93,6 @@
 
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
-    media.setAttribute('autoplay', impl.autoplay);
     media.setAttribute('muted', impl.muted);
 
     var source = document.createElement('source');
