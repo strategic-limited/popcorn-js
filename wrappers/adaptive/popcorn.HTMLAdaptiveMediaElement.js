@@ -93,7 +93,7 @@
 
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
-    media.setAttribute('muted', impl.muted);
+    media.setAttribute('muted', true);
 
     var source = document.createElement('source');
     media.appendChild(source);
