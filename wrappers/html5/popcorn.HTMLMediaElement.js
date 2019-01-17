@@ -89,7 +89,9 @@
     media._play = media.play;
     media._pause = media.pause;
     media.play = function () {
-      media._play();
+      media._play().catch(err => {
+        console.error(error.message);
+      });
     };
     media.pause = function () {
       media._pause();
