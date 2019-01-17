@@ -70,7 +70,7 @@
     media.setAttribute('muted', true);
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
-    media.mute(true);
+    media.muted = true;
 
     var source = document.createElement('source');
     media.appendChild(source);
