@@ -68,12 +68,13 @@
     }
   }
 
-  function wrapMedia(id, mediaType) {
+  function wrapMedia(id, mediaType, options = {}) {
     var parent = typeof id === 'string' ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
     var impl = {
       autoplay: EMPTY_STRING,
+      muted: options.muted,
     };
 
     media.dispatchEvent = function (name, data) {
@@ -92,6 +93,8 @@
 
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
+    media.setAttribute('muted', true);
+    media.muted = true;
 
     var source = document.createElement('source');
     media.appendChild(source);
@@ -101,7 +104,7 @@
     [
       'seeked', 'timeupdate', 'progress', 'play',
       'pause', 'seeking', 'waiting', 'playing',
-      'error', 'volumechange', 'loadedmetadata'
+      'error', 'volumechange', 'loadedmetadata', 'mute', 'unmute'
     ].forEach(function (event) {
       media.addEventListener(event, function() {
         media.dispatchEvent(event);
@@ -204,8 +207,8 @@
     return media;
   }
 
-  Popcorn.HTMLAdaptiveMediaElement = function (id) {
-    return wrapMedia(id, 'video');
+  Popcorn.HTMLAdaptiveMediaElement = function (id, options) {
+    return wrapMedia(id, 'video', options);
   };
   Popcorn.HTMLAdaptiveMediaElement._canPlaySrc = canPlaySrc;
 

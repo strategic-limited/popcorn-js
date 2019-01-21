@@ -72,7 +72,7 @@
 
   };
 
-  function HTMLNullVideoElement( id ) {
+  function HTMLNullVideoElement( id, options = {} ) {
 
     var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? document.querySelector( id ) : id,
@@ -83,13 +83,13 @@
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
         readyState: self.HAVE_NOTHING,
-        autoplay: EMPTY_STRING,
+        autoplay: 1,
         preload: EMPTY_STRING,
         controls: EMPTY_STRING,
         loop: false,
         poster: EMPTY_STRING,
         volume: 1,
-        muted: false,
+        muted: true,
         width: parent.width|0   ? parent.width  : self._util.MIN_WIDTH,
         height: parent.height|0 ? parent.height : self._util.MIN_HEIGHT,
         seeking: false,

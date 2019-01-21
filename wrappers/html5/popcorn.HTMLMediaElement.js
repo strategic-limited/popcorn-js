@@ -63,12 +63,14 @@
     return "probably";
   }
 
-  function wrapMedia(id, mediaType) {
+  function wrapMedia(id, mediaType, options = {}) {
     var parent = typeof id === "string" ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
+    media.setAttribute('muted', true);
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
+    media.muted = true;
 
     var source = document.createElement('source');
     media.appendChild(source);
@@ -87,7 +89,9 @@
     media._play = media.play;
     media._pause = media.pause;
     media.play = function () {
-      media._play();
+      media._play().catch(err => {
+        console.error(err.message);
+      });
     };
     media.pause = function () {
       media._pause();
@@ -122,14 +126,14 @@
     return media;
   }
 
-  Popcorn.HTMLVideoElement = function (id) {
-    return wrapMedia(id, "video");
+  Popcorn.HTMLVideoElement = function (id, options) {
+    return wrapMedia(id, "video", options);
   };
   Popcorn.HTMLVideoElement._canPlaySrc = canPlayVideoSrc;
 
 
-  Popcorn.HTMLAudioElement = function (id) {
-    return wrapMedia(id, "audio");
+  Popcorn.HTMLAudioElement = function (id, options) {
+    return wrapMedia(id, "audio", options);
   };
   Popcorn.HTMLAudioElement._canPlaySrc = canPlayAudioSrc;
 

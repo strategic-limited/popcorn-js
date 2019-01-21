@@ -58,7 +58,7 @@
     ytCallbacks.push( callback );
   }
 
-  function HTMLYouTubeVideoElement( id ) {
+  function HTMLYouTubeVideoElement( id, options = {} ) {
 
     // YouTube iframe API requires postMessage
     if( !window.postMessage ) {
@@ -74,13 +74,13 @@
         networkState: self.NETWORK_EMPTY,
         readyState: self.HAVE_NOTHING,
         seeking: false,
-        autoplay: EMPTY_STRING,
+        autoplay: options.autoplay || EMPTY_STRING,
         preload: EMPTY_STRING,
         controls: false,
         loop: false,
         poster: EMPTY_STRING,
         volume: 1,
-        muted: false,
+        muted: options.muted || false,
         currentTime: 0,
         duration: NaN,
         ended: false,
@@ -797,8 +797,8 @@
     return self;
   }
 
-  Popcorn.HTMLYouTubeVideoElement = function( id ) {
-    return new HTMLYouTubeVideoElement( id );
+  Popcorn.HTMLYouTubeVideoElement = function( id, options ) {
+    return new HTMLYouTubeVideoElement( id, options );
   };
 
   // Helper for identifying URLs we know how to play.
