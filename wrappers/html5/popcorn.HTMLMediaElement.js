@@ -90,6 +90,9 @@
     media._play = media.play;
     media._pause = media.pause;
     media.play = function () {
+      if (!media.muted) {
+        media.muted = true;
+      }
       media._play().catch(err => {
         console.error(err.message);
       });
