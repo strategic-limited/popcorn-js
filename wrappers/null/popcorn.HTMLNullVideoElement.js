@@ -94,7 +94,7 @@
         height: parent.height|0 ? parent.height : self._util.MIN_HEIGHT,
         seeking: false,
         ended: false,
-        paused: 0, // 1 vs. true to differentiate first time access
+        paused: 1, // 1 vs. true to differentiate first time access
         error: null
       },
       playerReadyCallbacks = [],
