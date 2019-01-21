@@ -410,6 +410,8 @@
       // setting playsinline to play it on mobiles correctly
       videoElement.setAttribute('playsinline', '');
       videoElement.setAttribute('webkit-playsinline', '');
+      videoElement.setAttribute('autoplay', 'true');
+      videoElement.setAttribute('muted', 'true');
       videoElement.id = videoID;
       node.appendChild( videoElement );
       setTimeout( function() {
@@ -425,7 +427,7 @@
     node.appendChild( videoHTMLContainer );
     // IE9 doesn't like dynamic creation of source elements on <video>
     // so we do it in one shot via innerHTML.
-    videoHTML = '<video id="' +  videoID + '" preload=auto autobuffer webkit-playsinline playsinline>';
+    videoHTML = '<video id="' +  videoID + '" preload=auto autobuffer muted autoplay webkit-playsinline playsinline>';
     for ( i = 0, srcLength = src.length; i < srcLength; i++ ) {
       videoHTML += '<source src="' + src[ i ] + '">';
     }
