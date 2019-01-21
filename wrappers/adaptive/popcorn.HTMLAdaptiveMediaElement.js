@@ -94,7 +94,6 @@
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
     media.setAttribute('muted', true);
-    media.setAttribute('autoplay', true);
     media.muted = true;
 
     var source = document.createElement('source');
