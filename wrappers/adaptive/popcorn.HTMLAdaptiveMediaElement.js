@@ -171,6 +171,7 @@
                       media.src = fallbackMedia;
                     }
                   });
+
                   // ABR strategy to throughput
                   player.setABRStrategy('abrThroughput');
 
