@@ -172,7 +172,7 @@
                     }
                   });
 
-                  player.addEventListener("initialized", function(){
+                  player.on("initialized", function() {
                     var bitrates = player.getBitrateInfoListFor("video"),
                         // bitrates are sorted from lowest to the best values
                         // so the last one has the best quality
