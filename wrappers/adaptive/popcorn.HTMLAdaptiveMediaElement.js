@@ -172,19 +172,15 @@
                     }
                   });
 
-                  // ABR strategy to throughput
-                  player.setABRStrategy('abrThroughput');
+                  player.addEventListener("initialized", function(){
+                    var bitrates = player.getBitrateInfoListFor("video"),
+                        // bitrates are sorted from lowest to the best values
+                        // so the last one has the best quality
+                        maxQuality = bitrates[bitrates.length-1].qualityIndex;
+                    // set max quality
+                    player.setQualityFor("video", maxQuality);
 
-                  // set buffer to 5 seconds
-                  player.setBufferToKeep(5);
-                  player.setBufferAheadToKeep(5);
-                  player.setStableBufferTime(5);
-
-                  // descrease quality slowdown
-                  player.setCatchUpPlaybackRate(0.25);
-
-                  // optimize switch-up
-                  player.setFastSwitchEnabled(true);
+                  });
 
                   player.initialize(media, adaptiveMedia, false);
                 });
