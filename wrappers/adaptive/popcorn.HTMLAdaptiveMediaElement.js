@@ -161,7 +161,7 @@
               case 'mpd':
                 loadDashJs(function() {
                   var player = dashjs.MediaPlayer().create();
-                  player.on('error', function(event) {
+                  player.on(MediaPlayer.events.ERROR, function(event) {
                     if (event.error.code === 23) {
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
@@ -172,7 +172,7 @@
                     }
                   });
 
-                  player.on("initialized", function() {
+                  player.on(MediaPlayer.events.SOURCE_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor("video"),
                         // bitrates are sorted from lowest to the best values
                         // so the last one has the best quality
