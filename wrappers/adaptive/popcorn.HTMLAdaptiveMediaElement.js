@@ -177,20 +177,10 @@
                                     });
 
                                     player.on(dashjs.MediaPlayer.events.PLAYBACK_METADATA_LOADED, function () {
-                                        var bitrates = player.getBitrateInfoListFor("video"),
-                                            // bitrates are sorted from lowest to the best values
-                                            // so the last one has the best quality
-                                            maxQuality = bitrates[bitrates.length - 1].qualityIndex;
-                                        // set max quality
-                                        player.setQualityFor("video", maxQuality);
-                                        setTimeout(function() {
-                                            player.setAutoSwitchQualityFor('video', true);
-                                            player.setABRStrategy('abrThroughput');
-                                        }, 1000);
-
+                                        player.setAutoSwitchQualityFor('video', true);
+                                        player.setABRStrategy('abrThroughput');
                                     });
 
-                                    player.setAutoSwitchQualityFor('video', false);
                                     player.initialize(media, adaptiveMedia, false);
                                 });
                                 break;
