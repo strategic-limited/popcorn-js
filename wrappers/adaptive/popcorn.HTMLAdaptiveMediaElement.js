@@ -172,7 +172,7 @@
                     }
                   });
 
-                  player.on(dashjs.MediaPlayer.events.SOURCE_INITIALIZED, function() {
+                  player.on(dashjs.MediaPlayer.events.PLAYBACK_METADATA_LOADED, function() {
                     var bitrates = player.getBitrateInfoListFor("video"),
                         // bitrates are sorted from lowest to the best values
                         // so the last one has the best quality
