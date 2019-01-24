@@ -181,11 +181,11 @@
                                             // bitrates are sorted from lowest to the best values
                                             // so the last one has the best quality
                                             maxQuality = bitrates[bitrates.length - 1].qualityIndex;
-                                        player.setAutoSwitchQuality(false);
+                                        player.setAutoSwitchQualityFor('video', false);
                                         // set max quality
                                         player.setQualityFor("video", maxQuality);
                                         setTimeout(function() {
-                                            player.setAutoSwitchQuality(true);
+                                            player.setAutoSwitchQualityFor('video', true);
                                         }, 1000);
 
                                     });
