@@ -9,8 +9,8 @@
 
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
-      (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
-      (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
+        (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
+        (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
   }
 
   function canPlaySrc(src) {
@@ -70,7 +70,7 @@
 
   function wrapMedia(id, mediaType) {
     var parent = typeof id === 'string' ? document.querySelector(id) : id,
-      media = document.createElement(mediaType);
+        media = document.createElement(mediaType);
 
     var impl = {
       autoplay: EMPTY_STRING,
@@ -78,11 +78,11 @@
 
     media.dispatchEvent = function (name, data) {
       var customEvent = document.createEvent('CustomEvent'),
-        detail = {
-          type: name,
-          target: media.parentNode,
-          data: data
-        };
+          detail = {
+            type: name,
+            target: media.parentNode,
+            data: data
+          };
 
       customEvent.initCustomEvent(media._eventNamespace + name, false, false, detail);
       document.dispatchEvent(customEvent);
@@ -171,6 +171,21 @@
                       media.src = fallbackMedia;
                     }
                   });
+
+                  // ABR strategy to throughput
+                  player.setABRStrategy('abrThroughput');
+
+                  // set buffer to 5 seconds
+                  player.setBufferToKeep(5);
+                  player.setBufferAheadToKeep(5);
+                  player.setStableBufferTime(5);
+
+                  // descrease quality slowdown
+                  player.setCatchUpPlaybackRate(0.25);
+
+                  // optimize switch-up
+                  player.setFastSwitchEnabled(true);
+
                   player.initialize(media, adaptiveMedia, false);
                 });
                 break;
