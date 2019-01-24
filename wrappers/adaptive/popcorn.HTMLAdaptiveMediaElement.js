@@ -9,8 +9,8 @@
 
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
-      (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
-      (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
+        (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
+        (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
   }
 
   function canPlaySrc(src) {
@@ -70,7 +70,7 @@
 
   function wrapMedia(id, mediaType) {
     var parent = typeof id === 'string' ? document.querySelector(id) : id,
-      media = document.createElement(mediaType);
+        media = document.createElement(mediaType);
 
     var impl = {
       autoplay: EMPTY_STRING,
@@ -78,11 +78,11 @@
 
     media.dispatchEvent = function (name, data) {
       var customEvent = document.createEvent('CustomEvent'),
-        detail = {
-          type: name,
-          target: media.parentNode,
-          data: data
-        };
+          detail = {
+            type: name,
+            target: media.parentNode,
+            data: data
+          };
 
       customEvent.initCustomEvent(media._eventNamespace + name, false, false, detail);
       document.dispatchEvent(customEvent);
@@ -171,6 +171,17 @@
                       media.src = fallbackMedia;
                     }
                   });
+
+                  player.addEventListener("initialized", function(){
+                    var bitrates = player.getBitrateInfoListFor("video"),
+                        // bitrates are sorted from lowest to the best values
+                        // so the last one has the best quality
+                        maxQuality = bitrates[bitrates.length-1].qualityIndex;
+                    // set max quality
+                    player.setQualityFor("video", maxQuality);
+
+                  });
+
                   player.initialize(media, adaptiveMedia, false);
                 });
                 break;
