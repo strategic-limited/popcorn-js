@@ -171,6 +171,20 @@
                       media.src = fallbackMedia;
                     }
                   });
+                  // ABR strategy to throughput
+                  player.setABRStrategy('abrThroughput');
+
+                  // set buffer to 5 seconds
+                  player.setBufferToKeep(5);
+                  player.setBufferAheadToKeep(5);
+                  player.setStableBufferTime(5);
+
+                  // descrease quality slowdown
+                  player.setCatchUpPlaybackRate(0.25);
+
+                  // optimize switch-up
+                  player.setFastSwitchEnabled(true);
+
                   player.initialize(media, adaptiveMedia, false);
                 });
                 break;
