@@ -2348,6 +2348,11 @@
     find: function( selector, context ) {
       var node = null;
 
+      // already passed a node
+      if (selector instanceof Element || selector instanceof HTMLDocument) {
+        return selector;
+      }
+
       //  Default context is the `document`
       context = context || document;
 
