@@ -7,6 +7,19 @@
 (function (Popcorn, document) {
   var EMPTY_STRING = '';
 
+  var audioFormats = {
+    'mp3': 'audio/mpeg',
+    'aac': 'audio/mp4',
+    'wav': 'audio/vnd.wave',
+    'ogg': 'audio/ogg',
+    'oga': 'audio/ogg',
+  };
+
+  var videoFormats = {
+    'webm': 'video/webm',
+    'mp4': 'video/mp4',
+  };
+
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
       (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
@@ -93,9 +106,6 @@
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
-    var source = document.createElement('source');
-    media.appendChild(source);
-
     parent.appendChild(media);
 
     [
@@ -126,16 +136,22 @@
         },
         set: function(aSrc) {
           function setRawSource(source) {
+            var extension = source.split('.').reverse()[0];
             // IE and Edge do not understand source setting here for MSE BLOB
             if (isMicrosoftBrowser()) {
-              if(source && source !== media.getAttribute('src')) {
+              if (source && source !== media.getAttribute('src')) {
+                media.setAttribute('type', videoFormats[extension] || audioFormats[extension]);
                 media.setAttribute('src', source);
                 media.load();
               }
             } else {
               var sources = media.getElementsByTagName('source');
-              if(source && source !== sources[0].src) {
-                sources[0].src = source;
+              if (!sources[0] || (source && source !== sources[0].src)) {
+                media.removeChild(media.firstChild);
+                var mediaSource = document.createElement('source');
+                mediaSource.type = videoFormats[extension] || audioFormats[extension];
+                mediaSource.src = source;
+                media.appendChild(mediaSource);
                 media.load();
               }
             }
