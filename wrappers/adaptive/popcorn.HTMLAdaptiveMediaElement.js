@@ -147,7 +147,9 @@
             } else {
               var sources = media.getElementsByTagName('source');
               if (!sources[0] || (source && source !== sources[0].src)) {
-                media.removeChild(media.firstChild);
+                if (media.firstChild) {
+                  media.removeChild(media.firstChild);
+                }
                 var mediaSource = document.createElement('source');
                 mediaSource.type = videoFormats[extension] || audioFormats[extension];
                 mediaSource.src = source;
