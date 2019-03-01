@@ -140,7 +140,9 @@
             // IE and Edge do not understand source setting here for MSE BLOB
             if (isMicrosoftBrowser()) {
               if (source && source !== media.getAttribute('src')) {
-                media.setAttribute('type', videoFormats[extension] || audioFormats[extension]);
+                if (videoFormats[extension] || audioFormats[extension]) {
+                  media.setAttribute('type', videoFormats[extension] || audioFormats[extension]);
+                }
                 media.setAttribute('src', source);
                 media.load();
               }
@@ -151,7 +153,9 @@
                   media.removeChild(media.firstChild);
                 }
                 var mediaSource = document.createElement('source');
-                mediaSource.type = videoFormats[extension] || audioFormats[extension];
+                if (videoFormats[extension] || audioFormats[extension]) {
+                  mediaSource.type = videoFormats[extension] || audioFormats[extension];
+                }
                 mediaSource.src = source;
                 media.appendChild(mediaSource);
                 media.load();
