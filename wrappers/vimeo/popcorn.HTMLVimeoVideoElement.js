@@ -311,6 +311,7 @@
           responsive: true
         });
 
+        elem.style.pointerEvents = 'none';
         parent.appendChild(elem);
 
         player.ready().then(function () {
