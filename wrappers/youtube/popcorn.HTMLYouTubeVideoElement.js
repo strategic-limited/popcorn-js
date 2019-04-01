@@ -18,6 +18,10 @@
   var videoElement;
   var initialZindex;
 
+  function isMobile() {
+    return navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g);
+  }
+
   function onYouTubeIframeAPIReady() {
     videoElement = document.querySelector('.popcorn-sequencer');
     if (videoElement) {
@@ -546,7 +550,7 @@
         changeCurrentTime( 0 );
         impl.ended = false;
       }
-      if (player.getSphericalProperties().yaw === undefined) {
+      if (player.getSphericalProperties().yaw === undefined && isMobile()) {
         if (!parent.querySelector('.mobile-tap-fix')) {
           parent.appendChild(mobileTapFix);
         }
