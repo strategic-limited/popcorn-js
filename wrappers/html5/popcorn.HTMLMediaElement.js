@@ -19,7 +19,6 @@
   var audioFormats = {
     'mp3': 'audio/mpeg',
     'aac': 'audio/mp4',
-    'wav': 'audio/vnd.wave',
     'ogg': 'audio/ogg',
     'oga': 'audio/ogg',
   };
