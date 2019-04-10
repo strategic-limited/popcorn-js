@@ -415,8 +415,10 @@
         }
       });
 
-      elem.style.pointerEvents = 'none';
-      parent.appendChild( elem );
+      if (!isMobile()) {
+        elem.style.pointerEvents = 'none';
+        parent.appendChild( elem );
+      }
 
       // Use any player vars passed on the URL
       var playerVars = self._util.parseUri( aSrc ).queryKey;
@@ -550,7 +552,7 @@
         changeCurrentTime( 0 );
         impl.ended = false;
       }
-      if (player.getSphericalProperties().yaw === undefined && !isMobile()) {
+      if (player.getSphericalProperties().yaw === undefined && isMobile()) {
         if (!parent.querySelector('.mobile-tap-fix')) {
           parent.appendChild(mobileTapFix);
         }
