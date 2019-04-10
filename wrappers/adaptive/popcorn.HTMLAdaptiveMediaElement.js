@@ -196,7 +196,7 @@
                     player.initialize(media, adaptiveMedia, false);
                     player.setTrackSwitchModeFor('video', 'alwaysReplace');
                     player.setTrackSwitchModeFor('audio', 'alwaysReplace');
-                  }, 3000);
+                  }, 10000);
                 });
                 break;
               case 'm3u8':
