@@ -194,8 +194,6 @@
                   });
                   setTimeout(function() {
                     player.initialize(media, adaptiveMedia, false);
-                    player.setTrackSwitchModeFor('video', 'alwaysReplace');
-                    player.setTrackSwitchModeFor('audio', 'alwaysReplace');
                   }, 10000);
                 });
                 break;
