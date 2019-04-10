@@ -193,7 +193,6 @@
                     }
                   });
                   setTimeout(function() {
-                    player.setAutoSwitchQuality(false);
                     player.initialize(media, adaptiveMedia, false);
                   }, 10000);
                 });
