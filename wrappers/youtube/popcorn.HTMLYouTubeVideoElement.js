@@ -550,7 +550,7 @@
         changeCurrentTime( 0 );
         impl.ended = false;
       }
-      if (player.getSphericalProperties().yaw === undefined && isMobile()) {
+      if (player.getSphericalProperties().yaw === undefined && !isMobile()) {
         if (!parent.querySelector('.mobile-tap-fix')) {
           parent.appendChild(mobileTapFix);
         }
