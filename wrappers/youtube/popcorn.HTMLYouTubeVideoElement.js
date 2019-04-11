@@ -417,8 +417,8 @@
 
       if (!isMobile()) {
         elem.style.pointerEvents = 'none';
-        parent.appendChild( elem );
       }
+      parent.appendChild( elem );
 
       // Use any player vars passed on the URL
       var playerVars = self._util.parseUri( aSrc ).queryKey;
