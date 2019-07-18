@@ -186,7 +186,7 @@
                     if (event.error.code === 23) {
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
-                      media.src = hlsMedia || fallbackMedia;
+                      media.src = fallbackMedia;
                     } else {
                       // otherwise MPD manifest is not available so fallback to regular media file
                       media.src = fallbackMedia;
