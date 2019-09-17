@@ -194,7 +194,6 @@
                   });
                   player.initialize(media, adaptiveMedia, false);
                   player.setTrackSwitchModeFor('video', 'alwaysReplace');
-                  player.setTrackSwitchModeFor('audio', 'alwaysReplace');
                   player.setAutoSwitchQualityFor('video', true);
                   player.setAutoSwitchQualityFor('audio', true);
                   player.setInitialBitrateFor('video',99999999);
