@@ -45,7 +45,7 @@
         window.define = requireDefine;
         callback();
       });
-      script.src = '//cdn.dashjs.org/latest/dash.all.min.js';
+      script.src = '//cdn.dashjs.org/v2.9.0/dash.all.min.js';
       requireDefine = window.define;
       window.define = function() {};
       document.head.appendChild(script);
@@ -195,6 +195,10 @@
                   player.initialize(media, adaptiveMedia, false);
                   player.setTrackSwitchModeFor('video', 'alwaysReplace');
                   player.setTrackSwitchModeFor('audio', 'alwaysReplace');
+                  player.setAutoSwitchQualityFor('video', true);
+                  player.setAutoSwitchQualityFor('audio', true);
+                  player.setInitialBitrateFor('video',99999999);
+                  player.setInitialBitrateFor('audio',99999999);
                 });
                 break;
               case 'm3u8':
