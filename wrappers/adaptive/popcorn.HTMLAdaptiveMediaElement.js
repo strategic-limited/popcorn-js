@@ -45,7 +45,7 @@
         window.define = requireDefine;
         callback();
       });
-      script.src = '//cdn.dashjs.org/latest/dash.all.min.js';
+      script.src = '//cdn.dashjs.org/v2.9.0/dash.all.min.js';
       requireDefine = window.define;
       window.define = function() {};
       document.head.appendChild(script);
@@ -187,7 +187,7 @@
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
                       media.src = hlsMedia || fallbackMedia;
-                    } else {
+                    } else if (event.error === 'download' && event.event.id === 'manifest') {
                       // otherwise MPD manifest is not available so fallback to regular media file
                       media.src = fallbackMedia;
                     }
