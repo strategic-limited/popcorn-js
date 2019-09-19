@@ -45,7 +45,7 @@
         window.define = requireDefine;
         callback();
       });
-      script.src = '//cdn.dashjs.org/v2.9.0/dash.all.min.js';
+      script.src = '//cdn.dashjs.org/latest/dash.all.min.js';
       requireDefine = window.define;
       window.define = function() {};
       document.head.appendChild(script);
@@ -187,13 +187,14 @@
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
                       media.src = hlsMedia || fallbackMedia;
+                    } else {
+                      // otherwise MPD manifest is not available so fallback to regular media file
+                      media.src = fallbackMedia;
                     }
-                    // else {
-                    //   // otherwise MPD manifest is not available so fallback to regular media file
-                    //   media.src = fallbackMedia;
-                    // }
                   });
                   player.initialize(media, adaptiveMedia, false);
+                  player.setTrackSwitchModeFor('video', 'alwaysReplace');
+                  player.setTrackSwitchModeFor('audio', 'alwaysReplace');
                   player.setAutoSwitchQualityFor('video', true);
                   player.setAutoSwitchQualityFor('audio', true);
                   player.setInitialBitrateFor('video',99999999);
