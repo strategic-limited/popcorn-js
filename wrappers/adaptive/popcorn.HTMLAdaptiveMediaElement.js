@@ -193,10 +193,10 @@
                     }
                   });
                   player.initialize(media, adaptiveMedia, false);
-                  player.setAutoSwitchQualityFor('video', true);
-                  player.setAutoSwitchQualityFor('audio', true);
-                  player.setInitialBitrateFor('video',99999999);
-                  player.setInitialBitrateFor('audio',99999999);
+                  // player.setAutoSwitchQualityFor('video', true);
+                  // player.setAutoSwitchQualityFor('audio', true);
+                  // player.setInitialBitrateFor('video',99999999);
+                  // player.setInitialBitrateFor('audio',99999999);
                 });
                 break;
               case 'm3u8':
