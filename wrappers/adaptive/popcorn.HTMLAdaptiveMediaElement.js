@@ -183,7 +183,7 @@
                 loadDashJs(function() {
                   var player = dashjs.MediaPlayer().create();
                   player.on(dashjs.MediaPlayer.events.ERROR, function(event) {
-                    if (event.error.code === 23) {
+                    if (event.error === 'capability') {
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
                       media.src = hlsMedia || fallbackMedia;
