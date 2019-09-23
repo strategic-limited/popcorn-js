@@ -197,8 +197,8 @@
                     player.setTrackSwitchModeFor('audio', 'alwaysReplace');
                     player.setAutoSwitchQualityFor('video', true);
                     player.setAutoSwitchQualityFor('audio', true);
-                    player.setInitialBitrateFor('video',99999999);
-                    player.setInitialBitrateFor('audio',99999999);
+                    player.setInitialBitrateFor('video', 99999999);
+                    player.setInitialBitrateFor('audio', 99999999);
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
