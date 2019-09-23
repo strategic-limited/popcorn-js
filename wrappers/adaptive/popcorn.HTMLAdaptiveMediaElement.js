@@ -182,7 +182,7 @@
               case 'mpd':
                 loadDashJs(function() {
                   var player = dashjs.MediaPlayer().create();
-                  player.on('error', function(event) {
+                  player.on(dashjs.MediaPlayer.events.ERROR, function(event) {
                     if (event.error.code === 23) {
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
@@ -192,13 +192,15 @@
                       media.src = fallbackMedia;
                     }
                   });
+                  player.on(dashjs.MediaPlayer.events.SOURCE_INITIALIZED, function() {
+                    player.setTrackSwitchModeFor('video', 'alwaysReplace');
+                    player.setTrackSwitchModeFor('audio', 'alwaysReplace');
+                    player.setAutoSwitchQualityFor('video', true);
+                    player.setAutoSwitchQualityFor('audio', true);
+                    player.setInitialBitrateFor('video',99999999);
+                    player.setInitialBitrateFor('audio',99999999);
+                  });
                   player.initialize(media, adaptiveMedia, false);
-                  player.setTrackSwitchModeFor('video', 'alwaysReplace');
-                  player.setTrackSwitchModeFor('audio', 'alwaysReplace');
-                  player.setAutoSwitchQualityFor('video', true);
-                  player.setAutoSwitchQualityFor('audio', true);
-                  player.setInitialBitrateFor('video',99999999);
-                  player.setInitialBitrateFor('audio',99999999);
                 });
                 break;
               case 'm3u8':
