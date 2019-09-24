@@ -111,7 +111,7 @@
     },
 
     set interactive(val) {
-      this.data.interactive  = val;
+      this.data.interactive = val;
     },
 
     init: function( entity, options ) {
