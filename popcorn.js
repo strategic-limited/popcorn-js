@@ -106,6 +106,14 @@
   //  the new prototype for our Popcorn constructor
   Popcorn.p = Popcorn.prototype = {
 
+    get interactive() {
+      return this.data.interactive;
+    },
+
+    set interactive(val) {
+      this.data.interactive = val;
+    },
+
     init: function( entity, options ) {
 
       var matches, nodeName,
@@ -189,6 +197,9 @@
       this.isDestroyed = false;
 
       this.data = {
+
+        // to allow user interact with popcorn instance with play/pause
+        interactive: true,
 
         // data structure of all
         running: {
@@ -605,7 +616,7 @@
       Popcorn.forEach( methods.split( /\s+/g ), function( name ) {
 
         ret[ name ] = function( arg ) {
-          if (name === 'play' && this.expectsUserInput) {
+          if (name === 'play' && !this.interactive) {
             return;
           }
           var previous;
