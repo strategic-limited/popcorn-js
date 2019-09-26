@@ -86,6 +86,7 @@
 
     var impl = {
       autoplay: EMPTY_STRING,
+      qualities: [],
     };
 
     media.dispatchEvent = function (name, data) {
@@ -199,6 +200,8 @@
                     player.setAutoSwitchQualityFor('audio', true);
                     // player.setInitialBitrateFor('video', 99999999);
                     player.setInitialBitrateFor('audio', 99999999);
+                  });
+                  player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
                     media.qualities = bitrates;
                     media.dispatchEvent('loadedBitrate', bitrates);

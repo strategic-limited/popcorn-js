@@ -159,7 +159,9 @@
       // Browsers using flash will have the pause() call take too long and cause some
       // sound to leak out. Muting before to prevent this.
       self.muted = true;
-
+      var qualities = player.getPlaybackQuality();
+      self.qualities = qualities;
+      media.dispatchEvent('loadedBitrate', qualities);
       // ensure we are muted.
       onMuted();
     }
