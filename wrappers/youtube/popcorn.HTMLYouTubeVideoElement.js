@@ -159,9 +159,6 @@
       // Browsers using flash will have the pause() call take too long and cause some
       // sound to leak out. Muting before to prevent this.
       self.muted = true;
-      var qualities = player.getAvailableQualityLevels();
-      self.qualities = qualities;
-      self.dispatchEvent('loadedbitrate', qualities);
       // ensure we are muted.
       onMuted();
     }
@@ -316,9 +313,13 @@
           break;
 
         // playing
-        case YT.PlayerState.PLAYING:
+        case YT.PlayerState.PLAYING: {
+          var qualities = player.getAvailableQualityLevels();
+          self.qualities = qualities;
+          self.media.dispatchEvent('loadedbitrate', qualities);
           dispatchYouTubeEvent( "play" );
           break;
+        }
 
         // paused
         case YT.PlayerState.PAUSED:
