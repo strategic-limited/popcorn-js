@@ -111,7 +111,7 @@
     [
       'seeked', 'timeupdate', 'progress', 'play',
       'pause', 'seeking', 'waiting', 'playing',
-      'error', 'volumechange', 'loadedmetadata'
+      'error', 'volumechange', 'loadedmetadata', 'loadedbitrate',
     ].forEach(function (event) {
       media.addEventListener(event, function() {
         media.dispatchEvent(event);
@@ -204,7 +204,7 @@
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
                     media.qualities = bitrates;
-                    media.dispatchEvent('loadedBitrate', bitrates);
+                    media.dispatchEvent('loadedbitrate', bitrates);
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
