@@ -74,6 +74,7 @@
   function MediaElementProto() {
     var protoElement = {},
         events = {},
+        qualities = [],
         parentNode;
     if ( !Object.prototype.__defineGetter__ ) {
       protoElement = document.createElement( "div" );
@@ -226,6 +227,18 @@
       defaultPlaybackRate: {
         get: function() {
           return 1.0;
+        },
+        configurable: true
+      },
+
+      qualities: {
+        get: function() {
+          return qualities;
+        },
+        set: function(val) {
+          if (val) {
+            qualities = val;
+          }
         },
         configurable: true
       },
