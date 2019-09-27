@@ -220,6 +220,9 @@
                     });
                     hls.loadSource(adaptiveMedia);
                     hls.attachMedia(media);
+                    var bitrates = hls.levels;
+                    media.qualities = bitrates;
+                    media.dispatchEvent('loadedbitrate', bitrates);
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     setRawSource(adaptiveMedia);
                   }
