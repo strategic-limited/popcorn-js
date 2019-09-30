@@ -607,8 +607,9 @@
   //  an object with defined methods
   Popcorn.extend(Popcorn.p, (function() {
 
-      var methods = "load play pause currentTime playbackRate volume duration preload playbackRate " +
-                    "autoplay loop controls muted buffered readyState seeking paused played seekable ended",
+      var methods = "load play pause currentTime playbackRate volume duration preload "
+        + "loadedbitrate playbackRate autoplay loop controls muted buffered readyState seeking " +
+        "paused played seekable ended ",
           ret = {};
 
 
