@@ -223,9 +223,7 @@
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
                     media.qualities = bitrates;
-                    media.dispatchEvent(new CustomEvent("loadedbitrate", {
-                      detail: { name: "Вася" }
-                    }));
+                    media.dispatchEvent( "loadedbitrate" );
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
