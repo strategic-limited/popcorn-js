@@ -130,6 +130,26 @@
           impl.autoplay = (typeof aValue === 'string' || aValue === true);
         }
       },
+      qualities: {
+        get: function() {
+          return media.qualities;
+        },
+        set: function(val) {
+          if (val) {
+            media.qualities = val;
+          }
+        },
+        configurable: true
+      },
+      quality: {
+        get: function() {
+          return media.quality;
+        },
+        set: function(val) {
+          media.quality = val || 'auto';
+        },
+        configurable: true
+      },
       src: {
         get: function() {
           return media._src;
@@ -203,7 +223,7 @@
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
                     media.qualities = bitrates;
-                    media.emit( "loadedbitrate" );
+                    media.dispatchEvent( "loadedbitrate" );
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
@@ -221,7 +241,7 @@
                     hls.attachMedia(media);
                     var bitrates = hls.levels;
                     media.qualities = bitrates;
-                    media.dispatchEvent('loadedbitrate', bitrates);
+                    media.dispatchEvent('loadedbitrate');
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     setRawSource(adaptiveMedia);
                   }

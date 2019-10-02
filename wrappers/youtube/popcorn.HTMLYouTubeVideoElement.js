@@ -316,7 +316,7 @@
         case YT.PlayerState.PLAYING: {
           var qualities = player.getAvailableQualityLevels();
           self.qualities = qualities;
-          self.emit( "loadedbitrate" );
+          self.dispatchEvent('loadedbitrate');
           dispatchYouTubeEvent( "play" );
           break;
         }

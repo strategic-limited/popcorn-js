@@ -75,6 +75,7 @@
     var protoElement = {},
         events = {},
         qualities = [],
+        quality = 'auto',
         parentNode;
     if ( !Object.prototype.__defineGetter__ ) {
       protoElement = document.createElement( "div" );
@@ -239,6 +240,15 @@
           if (val) {
             qualities = val;
           }
+        },
+        configurable: true
+      },
+      quality: {
+        get: function() {
+          return quality;
+        },
+        set: function(val) {
+            quality = val || 'auto';
         },
         configurable: true
       },
