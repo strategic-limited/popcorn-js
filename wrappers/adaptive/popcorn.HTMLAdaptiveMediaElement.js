@@ -132,11 +132,11 @@
       },
       qualities: {
         get: function() {
-          return media.qualities;
+          return impl.qualities;
         },
         set: function(val) {
           if (val) {
-            media.qualities = val;
+            impl.qualities = val;
           }
         },
         configurable: true
