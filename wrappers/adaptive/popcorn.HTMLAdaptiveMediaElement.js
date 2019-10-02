@@ -203,11 +203,7 @@
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
                     media.qualities = bitrates;
-                    media.dispatchEvent('loadedbitrate', bitrates);
-                    media.addEventListener('changedbitrate', function (e) {
-                      player.setInitialBitrateFor('video', 99999999);
-                    });
-
+                    media.emit( "loadedbitrate" );
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
