@@ -142,6 +142,7 @@
             val = val.map(function (q, idx) {
               q.resolution = q.width + "x" + q.height;
               q.value = idx;
+              return q;
             });
             impl.qualities = val;
           } else {
@@ -228,6 +229,7 @@
                   player.on(dashjs.MediaPlayer.events.SOURCE_INITIALIZED, function() {
                     player.setTrackSwitchModeFor('video', 'alwaysReplace');
                     player.setTrackSwitchModeFor('audio', 'alwaysReplace');
+                    player.setAutoSwitchQualityFor('video', true);
                     player.setAutoSwitchQualityFor('audio', true);
                     player.setInitialBitrateFor('audio', 99999999);
                   });
@@ -242,9 +244,9 @@
                     }));
                     updateQuality = function (quality) {
                       if (quality === "auto") {
-                        player.setAutoSwitchQualityFor('video', false);
-                      } else {
                         player.setAutoSwitchQualityFor('video', true);
+                      } else {
+                        player.setAutoSwitchQualityFor('video', false);
                         player.setQualityFor('video', quality);
                       }
                     }

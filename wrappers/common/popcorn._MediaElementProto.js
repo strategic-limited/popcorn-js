@@ -232,27 +232,6 @@
         configurable: true
       },
 
-      qualities: {
-        get: function() {
-          return qualities;
-        },
-        set: function(val) {
-          if (val) {
-            qualities = val;
-          }
-        },
-        configurable: true
-      },
-      quality: {
-        get: function() {
-          return quality;
-        },
-        set: function(val) {
-            quality = val || 'auto';
-        },
-        configurable: true
-      },
-
       style: {
         get: function() {
           return this.parentNode.style;
