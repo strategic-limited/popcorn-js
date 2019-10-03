@@ -135,8 +135,14 @@
           return impl.qualities;
         },
         set: function(val) {
-          if (val) {
+          if (val && val.length) {
+            val = val.map(function (q) {
+              q.resolution = q.width + "x" + q.height;
+              q.value = q.bitrate;
+            });
             impl.qualities = val;
+          } else {
+            impl.qualities = [];
           }
         },
         configurable: true
@@ -226,7 +232,7 @@
                     media.dispatchEvent( "loadedbitrate" );
                     parent.dispatchEvent(new CustomEvent("loadedbitrate", {
                       detail: { bitrates }
-                    }));;
+                    }));
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
