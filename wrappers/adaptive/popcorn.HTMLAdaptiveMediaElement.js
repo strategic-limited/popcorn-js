@@ -88,8 +88,6 @@
 
     var impl = {
       autoplay: EMPTY_STRING,
-      qualities: [],
-      quality: "auto",
     };
 
     media.dispatchEvent = function (name, data) {
@@ -135,30 +133,30 @@
       },
       qualities: {
         get: function() {
-          return impl.qualities;
+          return media._qualities;
         },
         set: function(val) {
           if (val && val.length) {
-            val = val.map(function (q, idx) {
+            val = val.map(function (q) {
               q.resolution = q.width + "x" + q.height;
-              q.value = idx;
+              q.value = q.qualityIndex;
               return q;
             });
-            impl.qualities = val;
+            media._qualities = val;
           } else {
-            impl.qualities = [];
+            media._qualities = [];
           }
         },
         configurable: true
       },
       quality: {
         get: function() {
-          return impl.quality;
+          return media._quality;
         },
         set: function(val) {
-          impl.quality = val || 'auto';
+          media._quality = val || 'auto';
           if (updateQuality) {
-            updateQuality(impl.quality);
+            updateQuality(media._quality);
           }
         },
         configurable: true
