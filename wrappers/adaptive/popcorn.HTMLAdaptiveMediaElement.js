@@ -18,6 +18,8 @@
     'webm': 'video/webm',
     'mp4': 'video/mp4',
   };
+  
+  var updateQuality;
 
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
@@ -87,6 +89,7 @@
     var impl = {
       autoplay: EMPTY_STRING,
       qualities: [],
+      quality: "auto",
     };
 
     media.dispatchEvent = function (name, data) {
@@ -136,9 +139,9 @@
         },
         set: function(val) {
           if (val && val.length) {
-            val = val.map(function (q) {
+            val = val.map(function (q, idx) {
               q.resolution = q.width + "x" + q.height;
-              q.value = q.bitrate;
+              q.value = q.idx;
             });
             impl.qualities = val;
           } else {
@@ -149,10 +152,13 @@
       },
       quality: {
         get: function() {
-          return media.quality;
+          return impl.quality;
         },
         set: function(val) {
-          media.quality = val || 'auto';
+          impl.quality = val || 'auto';
+          if (updateQuality) {
+            updateQuality(impl.quality);
+          }
         },
         configurable: true
       },
@@ -222,17 +228,26 @@
                   player.on(dashjs.MediaPlayer.events.SOURCE_INITIALIZED, function() {
                     player.setTrackSwitchModeFor('video', 'alwaysReplace');
                     player.setTrackSwitchModeFor('audio', 'alwaysReplace');
-                    player.setAutoSwitchQualityFor('video', true);
                     player.setAutoSwitchQualityFor('audio', true);
                     player.setInitialBitrateFor('audio', 99999999);
                   });
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
+                    var r = player.getQualityFor('video');
                     media.qualities = bitrates;
+                    media.r = r;
                     media.dispatchEvent( "loadedbitrate" );
                     parent.dispatchEvent(new CustomEvent("loadedbitrate", {
                       detail: { bitrates }
                     }));
+                    updateQuality = function (quality) {
+                      if (quality === "auto") {
+                        player.setAutoSwitchQualityFor('video', false);
+                      } else {
+                        player.setAutoSwitchQualityFor('video', true);
+                        player.setQualityFor('video', quality);
+                      }
+                    }
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
