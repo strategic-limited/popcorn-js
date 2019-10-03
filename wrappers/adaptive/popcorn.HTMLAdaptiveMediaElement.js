@@ -224,6 +224,7 @@
                     var bitrates = player.getBitrateInfoListFor('video');
                     media.qualities = bitrates;
                     media.dispatchEvent( "loadedbitrate" );
+                    parent.dispatchEvent( "loadedbitrate" );
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
