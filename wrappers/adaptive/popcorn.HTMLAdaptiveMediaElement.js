@@ -141,7 +141,7 @@
           if (val && val.length) {
             val = val.map(function (q, idx) {
               q.resolution = q.width + "x" + q.height;
-              q.value = q.idx;
+              q.value = idx;
             });
             impl.qualities = val;
           } else {
