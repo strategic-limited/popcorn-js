@@ -207,8 +207,16 @@
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
                     var r = player.getQualityFor('video');
-                    media.qualities = bitrates;
-                    media.r = r;
+                    if (bitrates && bitrates.length) {
+                      bitrates = bitrates.map(function (q, idx) {
+                        q.resolution = q.width + "x" + q.height;
+                        q.value = idx;
+                        return q;
+                      });
+                      qualities = bitrates;
+                    } else {
+                      qualities = [];
+                    }
                     media.dispatchEvent( "loadedbitrate" );
                     parent.dispatchEvent(new CustomEvent("loadedbitrate", {
                       detail: { bitrates }
@@ -259,18 +267,6 @@
       qualities: {
         get: function() {
           return qualities;
-        },
-        set: function(val) {
-          if (val && val.length) {
-            val = val.map(function (q, idx) {
-              q.resolution = q.width + "x" + q.height;
-              q.value = idx;
-              return q;
-            });
-            qualities = val;
-          } else {
-            qualities = [];
-          }
         },
         configurable: true
       },
