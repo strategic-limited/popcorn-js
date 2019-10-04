@@ -83,14 +83,16 @@
   }
 
   function wrapMedia(id, mediaType) {
+    var self = Popcorn.current || {};
     var parent = typeof id === 'string' ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
     var impl = {
       autoplay: EMPTY_STRING,
-      _qualities: [],
-      _quality: "auto",
     };
+
+    var qualities: [],
+      quality: "auto";
 
     media.dispatchEvent = function (name, data) {
       var customEvent = document.createEvent('CustomEvent'),
@@ -132,38 +134,6 @@
         set: function(aValue) {
           impl.autoplay = (typeof aValue === 'string' || aValue === true);
         }
-      },
-      _qualities: {
-        get: function() {
-          return impl._qualities;
-        },
-        set: function(val) {
-          if (val && val.length) {
-            val = val.map(function (q) {
-              q.resolution = q.width + "x" + q.height;
-              q.value = q.qualityIndex;
-              return q;
-            });
-            impl._qualities = val;
-          } else {
-            impl._qualities = [];
-          }
-          media.qualities = impl._qualities;
-        },
-        configurable: true
-      },
-      _quality: {
-        get: function() {
-          return impl.quality;
-        },
-        set: function(val) {
-          impl._quality = val || 'auto';
-          if (updateQuality) {
-            updateQuality(impl._quality);
-          }
-          media.quality = impl._quality;
-        },
-        configurable: true
       },
       src: {
         get: function() {
@@ -238,7 +208,7 @@
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
                     var r = player.getQualityFor('video');
-                    media._qualities = bitrates;
+                    media.qualities = bitrates;
                     media.r = r;
                     media.dispatchEvent( "loadedbitrate" );
                     parent.dispatchEvent(new CustomEvent("loadedbitrate", {
@@ -284,6 +254,39 @@
           }
         }
       }
+    });
+
+    Object.defineProperties(self, {
+      qualities: {
+        get: function() {
+          return qualities;
+        },
+        set: function(val) {
+          if (val && val.length) {
+            val = val.map(function (q, idx) {
+              q.resolution = q.width + "x" + q.height;
+              q.value = idx;
+              return q;
+            });
+            qualities = val;
+          } else {
+            qualities = [];
+          }
+        },
+        configurable: true
+      },
+      quality: {
+        get: function() {
+          return quality;
+        },
+        set: function(val) {
+          quality = val || 'auto';
+          if (updateQuality) {
+            updateQuality(quality);
+          }
+        },
+        configurable: true
+      },
     });
 
     return media;
