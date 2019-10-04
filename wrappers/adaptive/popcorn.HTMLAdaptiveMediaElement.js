@@ -83,7 +83,6 @@
   }
 
   function wrapMedia(id, mediaType) {
-    var self = Popcorn.current || {};
     var parent = typeof id === 'string' ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
@@ -256,7 +255,7 @@
       }
     });
 
-    Object.defineProperties(self, {
+    Object.defineProperties(Popcorn.current || {}, {
       qualities: {
         get: function() {
           return qualities;
