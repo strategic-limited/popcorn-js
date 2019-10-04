@@ -255,7 +255,7 @@
       }
     });
 
-    Object.defineProperties(Popcorn.current || {}, {
+    Object.defineProperties((Popcorn.current && Popcorn.current.media) || {}, {
       qualities: {
         get: function() {
           return qualities;
