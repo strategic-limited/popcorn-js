@@ -88,6 +88,8 @@
 
     var impl = {
       autoplay: EMPTY_STRING,
+      _qualities,
+      _quality,
     };
 
     media.dispatchEvent = function (name, data) {
@@ -131,9 +133,9 @@
           impl.autoplay = (typeof aValue === 'string' || aValue === true);
         }
       },
-      qualities: {
+      _qualities: {
         get: function() {
-          return media._qualities;
+          return impl._qualities;
         },
         set: function(val) {
           if (val && val.length) {
@@ -142,22 +144,24 @@
               q.value = q.qualityIndex;
               return q;
             });
-            media._qualities = val;
+            impl._qualities = val;
           } else {
-            media._qualities = [];
+            impl._qualities = [];
           }
+          media.qualities = impl._qualities;
         },
         configurable: true
       },
-      quality: {
+      _quality: {
         get: function() {
-          return media._quality;
+          return impl.quality;
         },
         set: function(val) {
-          media._quality = val || 'auto';
+          impl._quality = val || 'auto';
           if (updateQuality) {
-            updateQuality(media._quality);
+            updateQuality(impl._quality);
           }
+          media.quality = impl._quality;
         },
         configurable: true
       },
@@ -234,7 +238,7 @@
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
                     var r = player.getQualityFor('video');
-                    media.qualities = bitrates;
+                    media._qualities = bitrates;
                     media.r = r;
                     media.dispatchEvent( "loadedbitrate" );
                     parent.dispatchEvent(new CustomEvent("loadedbitrate", {
