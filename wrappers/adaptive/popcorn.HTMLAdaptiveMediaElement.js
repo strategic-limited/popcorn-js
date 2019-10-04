@@ -88,8 +88,8 @@
 
     var impl = {
       autoplay: EMPTY_STRING,
-      _qualities,
-      _quality,
+      _qualities: [],
+      _quality: "auto",
     };
 
     media.dispatchEvent = function (name, data) {
