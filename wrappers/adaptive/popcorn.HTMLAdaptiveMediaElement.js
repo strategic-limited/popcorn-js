@@ -91,8 +91,8 @@
       autoplay: EMPTY_STRING,
     };
 
-    var qualities: [],
-      quality: "auto";
+    var qualities = [],
+      quality = "auto";
 
     media.dispatchEvent = function (name, data) {
       var customEvent = document.createEvent('CustomEvent'),
