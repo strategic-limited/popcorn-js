@@ -206,7 +206,6 @@
                   });
                   player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
                     var bitrates = player.getBitrateInfoListFor('video');
-                    var r = player.getQualityFor('video');
                     if (bitrates && bitrates.length) {
                       bitrates = bitrates.map(function (q, idx) {
                         q.resolution = q.width + "x" + q.height;
@@ -230,6 +229,9 @@
                         player.setAutoSwitchQualityFor('video', false);
                         player.setQualityFor('video', quality);
                       }
+                      //todo remove it
+                      var r = player.getQualityFor('video');
+                      console.info('quality = ' + r);
                     }
                   });
                   player.initialize(media, adaptiveMedia, false);
