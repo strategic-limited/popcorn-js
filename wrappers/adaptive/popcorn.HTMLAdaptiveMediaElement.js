@@ -244,21 +244,23 @@
                         media.src = fallbackMedia;
                       }
                     });
+                    hls.on(Hls.Events.MEDIA_ATTACHED, function (error, data) {
+                      var bitrates = hls.levels;
+                      qualities = bitrates;
+                      if (Popcorn.current && Popcorn.current.media) {
+                        Popcorn.current.media.dispatchEvent( "loadedbitrate" );
+                      } else {
+                        media.dispatchEvent( "loadedbitrate" );
+                      }
+                      updateQuality = function (quality) {
+                        hls.currentLevel = quality === "auto" ? -1 : quality;
+                        //todo remove it
+                        var r = hls.currentLevel;
+                        console.info('quality = ' + r);
+                      }
+                    });
                     hls.loadSource(adaptiveMedia);
                     hls.attachMedia(media);
-                    var bitrates = hls.levels;
-                    qualities = bitrates;
-                    if (Popcorn.current && Popcorn.current.media) {
-                      Popcorn.current.media.dispatchEvent( "loadedbitrate" );
-                    } else {
-                      media.dispatchEvent( "loadedbitrate" );
-                    }
-                    updateQuality = function (quality) {
-                        player.currentLevel = quality === "auto" ? -1 : quality;
-                      //todo remove it
-                      var r = player.currentLevel;
-                      console.info('quality = ' + r);
-                    }
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     setRawSource(adaptiveMedia);
                   }
