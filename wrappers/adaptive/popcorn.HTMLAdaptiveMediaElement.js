@@ -244,9 +244,19 @@
                         media.src = fallbackMedia;
                       }
                     });
-                    hls.on(Hls.Events.MEDIA_ATTACHED, function (error, data) {
+                    hls.on(Hls.Events.MEDIA_ATTACHED, function () {
                       var bitrates = hls.levels;
-                      qualities = bitrates;
+                      if (bitrates && bitrates.length) {
+                        bitrates = bitrates.map(function (q) {
+                          q.resolution = q.width + "x" + q.height;
+                          q.value = q.level;
+                          return q;
+                        });
+                        bitrates.push({ resolution: "auto", value: "auto" });
+                        qualities = bitrates;
+                      } else {
+                        qualities = [];
+                      }
                       if (Popcorn.current && Popcorn.current.media) {
                         Popcorn.current.media.dispatchEvent( "loadedbitrate" );
                       } else {
