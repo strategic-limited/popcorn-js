@@ -181,7 +181,8 @@
 
 
           if (dashMedia || hlsMedia) {
-            var adaptiveMedia = dashMedia || hlsMedia;
+            // var adaptiveMedia = dashMedia || hlsMedia;
+            var adaptiveMedia = hlsMedia || dashMedia;
             var extension = adaptiveMedia.split('.').reverse()[0];
             switch (extension) {
               case 'mpd':
@@ -229,9 +230,6 @@
                         player.setAutoSwitchQualityFor('video', false);
                         player.setQualityFor('video', quality);
                       }
-                      //todo remove it
-                      var r = player.getQualityFor('video');
-                      console.info('quality = ' + r);
                     }
                   });
                   player.initialize(media, adaptiveMedia, false);
@@ -249,8 +247,18 @@
                     hls.loadSource(adaptiveMedia);
                     hls.attachMedia(media);
                     var bitrates = hls.levels;
-                    media.qualities = bitrates;
-                    media.dispatchEvent('loadedbitrate');
+                    qualities = bitrates;
+                    if (Popcorn.current && Popcorn.current.media) {
+                      Popcorn.current.media.dispatchEvent( "loadedbitrate" );
+                    } else {
+                      media.dispatchEvent( "loadedbitrate" );
+                    }
+                    updateQuality = function (quality) {
+                        player.currentLevel = quality === "auto" ? -1 : quality;
+                      //todo remove it
+                      var r = player.currentLevel;
+                      console.info('quality = ' + r);
+                    }
                   } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
                     setRawSource(adaptiveMedia);
                   }
@@ -279,7 +287,7 @@
           return quality;
         },
         set: function(val) {
-          quality = val || 'auto';
+          quality = val;
           if (updateQuality) {
             updateQuality(quality);
           }
