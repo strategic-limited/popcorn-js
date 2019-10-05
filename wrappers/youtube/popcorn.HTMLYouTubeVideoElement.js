@@ -290,6 +290,7 @@
         var item = {};
         item.value = q;
         item.resolution = qualityNames[q];
+        return item;
       });
       self.qualities = qualities;
       if (Popcorn.current && Popcorn.current.media) {
