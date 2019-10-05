@@ -213,14 +213,16 @@
                         q.value = idx;
                         return q;
                       });
+                      bitrates.push({ resolution: "auto", value: "auto" });
                       qualities = bitrates;
                     } else {
                       qualities = [];
                     }
-                    media.dispatchEvent( "loadedbitrate" );
-                    parent.dispatchEvent(new CustomEvent("loadedbitrate", {
-                      detail: { bitrates }
-                    }));
+                    if (Popcorn.current && Popcorn.current.media) {
+                      Popcorn.current.media.dispatchEvent( "loadedbitrate" );
+                    } else {
+                      media.dispatchEvent( "loadedbitrate" );
+                    }
                     updateQuality = function (quality) {
                       if (quality === "auto") {
                         player.setAutoSwitchQualityFor('video', true);
