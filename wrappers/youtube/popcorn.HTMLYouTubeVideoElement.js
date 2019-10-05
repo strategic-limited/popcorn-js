@@ -18,6 +18,17 @@
   var videoElement;
   var initialZindex;
 
+  var qualityNames = {
+    highres: "highres",
+    hd1080: 1080,
+    hd720: 720,
+    large: 480,
+    medium: 360,
+    small: 240,
+    tiny: "tiny",
+    auto: "auto",
+  };
+
   function isMobile() {
     return navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g);
   }
@@ -273,8 +284,19 @@
       if (videoElement) {
         videoElement.style.zIndex = initialZindex;
       }
-      self.qualities = player.getAvailableQualityLevels();
-      self.dispatchEvent('loadedbitrate');
+
+      var qualities = player.getAvailableQualityLevels();
+      qualities  = qualities.map(function (q) {
+        var item = {};
+        item.value = q;
+        item.resolution = qualityNames[q];
+      });
+      if (Popcorn.current && Popcorn.current.media) {
+        Popcorn.current.media.dispatchEvent('loadedbitrate');
+      } else {
+        self.dispatchEvent('loadedbitrate');
+      }
+
 
       removeYouTubeEvent( "play", onFirstPlay );
       if ( player.getCurrentTime() === 0 ) {
