@@ -247,7 +247,7 @@
           return quality;
         },
         set: function(val) {
-            quality = val || 'auto';
+            quality = val;
         },
         configurable: true
       },

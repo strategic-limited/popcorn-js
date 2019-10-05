@@ -273,6 +273,8 @@
       if (videoElement) {
         videoElement.style.zIndex = initialZindex;
       }
+      self.qualities = player.getAvailableQualityLevels();
+      self.dispatchEvent('loadedbitrate');
 
       removeYouTubeEvent( "play", onFirstPlay );
       if ( player.getCurrentTime() === 0 ) {
@@ -314,9 +316,6 @@
 
         // playing
         case YT.PlayerState.PLAYING: {
-          var qualities = player.getAvailableQualityLevels();
-          self.qualities = qualities;
-          self.dispatchEvent('loadedbitrate');
           dispatchYouTubeEvent( "play" );
           break;
         }
