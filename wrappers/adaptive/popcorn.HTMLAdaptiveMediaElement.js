@@ -181,8 +181,7 @@
 
 
           if (dashMedia || hlsMedia) {
-            // var adaptiveMedia = dashMedia || hlsMedia;
-            var adaptiveMedia = hlsMedia || dashMedia;
+            var adaptiveMedia = dashMedia || hlsMedia;
             var extension = adaptiveMedia.split('.').reverse()[0];
             switch (extension) {
               case 'mpd':
@@ -264,9 +263,6 @@
                       }
                       updateQuality = function (quality) {
                         hls.currentLevel = quality === "auto" ? -1 : quality;
-                        //todo remove it
-                        var r = hls.currentLevel;
-                        console.info('quality = ' + r);
                       }
                     });
                     hls.loadSource(adaptiveMedia);
