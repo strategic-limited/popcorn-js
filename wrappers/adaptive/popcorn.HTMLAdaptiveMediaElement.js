@@ -247,9 +247,9 @@
                     hls.on(Hls.Events.MEDIA_ATTACHED, function () {
                       var bitrates = hls.levels;
                       if (bitrates && bitrates.length) {
-                        bitrates = bitrates.map(function (q) {
+                        bitrates = bitrates.map(function (q, idx) {
                           q.resolution = q.width + "x" + q.height;
-                          q.value = q.level;
+                          q.value = idx;
                           return q;
                         });
                         bitrates.push({ resolution: "auto", value: "auto" });
