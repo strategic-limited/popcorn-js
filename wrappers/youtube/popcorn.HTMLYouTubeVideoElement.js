@@ -291,6 +291,7 @@
         item.value = q;
         item.resolution = qualityNames[q];
       });
+      self.qualities = qualities;
       if (Popcorn.current && Popcorn.current.media) {
         Popcorn.current.media.dispatchEvent('loadedbitrate');
       } else {
