@@ -5,7 +5,7 @@
  *   - parentNode: the element owning the media div/iframe
  *   - _eventNamespace: the unique namespace for all events
  */
-(function( Popcorn, document ) {
+(function (Popcorn, document) {
 
   /*********************************************************************************
    * parseUri 1.2.2
@@ -56,7 +56,7 @@
   };
 
   // Make sure the browser has MediaError
-  window.MediaError = window.MediaError || (function() {
+  window.MediaError = window.MediaError || (function () {
     function MediaError(code, msg) {
       this.code = code || null;
       this.message = msg || "";
@@ -77,8 +77,8 @@
         qualities = [],
         quality = 'auto',
         parentNode;
-    if ( !Object.prototype.__defineGetter__ ) {
-      protoElement = document.createElement( "div" );
+    if (!Object.prototype.__defineGetter__) {
+      protoElement = document.createElement("div");
     }
     protoElement._util = {
       // Each wrapper stamps a type.
@@ -95,8 +95,8 @@
       //   autoplay
       //   autoplay="true"
       //   v.autoplay=true;
-      isAttributeSet: function( value ) {
-        return ( typeof value === "string" || value === true );
+      isAttributeSet: function (value) {
+        return (typeof value === "string" || value === true);
       },
 
       parseUri: parseUri
@@ -104,34 +104,34 @@
     // Mimic DOM events with custom, namespaced events on the document.
     // Each media element using this prototype needs to provide a unique
     // namespace for all its events via _eventNamespace.
-    protoElement.addEventListener = function( type, listener, useCapture ) {
-      document.addEventListener( this._eventNamespace + type, listener, useCapture );
+    protoElement.addEventListener = function (type, listener, useCapture) {
+      document.addEventListener(this._eventNamespace + type, listener, useCapture);
     };
 
-    protoElement.removeEventListener = function( type, listener, useCapture ) {
-      document.removeEventListener( this._eventNamespace + type, listener, useCapture );
+    protoElement.removeEventListener = function (type, listener, useCapture) {
+      document.removeEventListener(this._eventNamespace + type, listener, useCapture);
     };
 
-    protoElement.dispatchEvent = function( name, data ) {
-      var customEvent = document.createEvent( "CustomEvent" ),
+    protoElement.dispatchEvent = function (name, data) {
+      var customEvent = document.createEvent("CustomEvent"),
         detail = {
           type: name,
           target: this.parentNode,
           data: data
         };
 
-      customEvent.initCustomEvent( this._eventNamespace + name, false, false, detail );
-      document.dispatchEvent( customEvent );
+      customEvent.initCustomEvent(this._eventNamespace + name, false, false, detail);
+      document.dispatchEvent(customEvent);
     };
 
     protoElement.load = Popcorn.nop;
 
-    protoElement.canPlayType = function( url ) {
+    protoElement.canPlayType = function (url) {
       return "";
     };
 
     // Popcorn expects getBoundingClientRect to exist, forward to parent node.
-    protoElement.getBoundingClientRect = function() {
+    protoElement.getBoundingClientRect = function () {
       return parentNode.getBoundingClientRect();
     };
 
@@ -145,20 +145,20 @@
     protoElement.HAVE_CURRENT_DATA = 2;
     protoElement.HAVE_FUTURE_DATA = 3;
     protoElement.HAVE_ENOUGH_DATA = 4;
-    Object.defineProperties( protoElement, {
+    Object.defineProperties(protoElement, {
 
       currentSrc: {
-        get: function() {
+        get: function () {
           return this.src !== undefined ? this.src : "";
         },
         configurable: true
       },
 
       parentNode: {
-        get: function() {
+        get: function () {
           return parentNode;
         },
-        set: function( val ) {
+        set: function (val) {
           parentNode = val;
         },
         configurable: true
@@ -166,7 +166,7 @@
       
       // We really can't do much more than "auto" with most of these.
       preload: {
-        get: function() {
+        get: function () {
           return "auto";
         },
         set: Popcorn.nop,
@@ -174,7 +174,7 @@
       },
 
       controls: {
-        get: function() {
+        get: function () {
           return true;
         },
         set: Popcorn.nop,
@@ -183,7 +183,7 @@
 
       // TODO: it would be good to overlay an <img> using this URL
       poster: {
-        get: function() {
+        get: function () {
           return "";
         },
         set: Popcorn.nop,
@@ -191,51 +191,51 @@
       },
 
       crossorigin: {
-        get: function() {
+        get: function () {
           return "";
         },
         configurable: true
       },
 
       played: {
-        get: function() {
+        get: function () {
           return _fakeTimeRanges;
         },
         configurable: true
       },
 
       seekable: {
-        get: function() {
+        get: function () {
           return _fakeTimeRanges;
         },
         configurable: true
       },
 
       buffered: {
-        get: function() {
+        get: function () {
           return _fakeTimeRanges;
         },
         configurable: true
       },
 
       defaultMuted: {
-        get: function() {
+        get: function () {
           return false;
         },
         configurable: true
       },
 
       defaultPlaybackRate: {
-        get: function() {
+        get: function () {
           return 1.0;
         },
         configurable: true
       },
       qualities: {
-        get: function() {
+        get: function () {
           return qualities;
         },
-        set: function(val) {
+        set: function (val) {
           if (val) {
             qualities = val;
           }
@@ -243,24 +243,24 @@
         configurable: true
       },
       quality: {
-        get: function() {
+        get: function () {
           return quality;
         },
-        set: function(val) {
+        set: function (val) {
             quality = val;
         },
         configurable: true
       },
 
       style: {
-        get: function() {
+        get: function () {
           return this.parentNode.style;
         },
         configurable: true
       },
 
       id: {
-        get: function() {
+        get: function () {
           return this.parentNode.id;
         },
         configurable: true
@@ -277,4 +277,4 @@
 
   Popcorn._MediaElementProto = MediaElementProto;
 
-}( Popcorn, window.document ));
+}(Popcorn, window.document));

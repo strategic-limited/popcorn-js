@@ -1,4 +1,4 @@
-(function( Popcorn, window, document ) {
+(function (Popcorn, window, document) {
 
   var
 
@@ -40,49 +40,49 @@
     }
 
     var callback;
-    if ( YT.loaded ) {
+    if (YT.loaded) {
       ytReady = true;
-      while( ytCallbacks.length ) {
+      while(ytCallbacks.length) {
         callback = ytCallbacks.shift();
         callback();
       }
     } else {
-      setTimeout( onYouTubeIframeAPIReady, 250 );
+      setTimeout(onYouTubeIframeAPIReady, 250);
     }
   }
 
   function isYouTubeReady() {
     var script;
     // If we area already waiting, do nothing.
-    if( !ytLoading ) {
+    if(!ytLoading) {
       // If script is already there, check if it is loaded.
-      if ( window.YT ) {
+      if (window.YT) {
         onYouTubeIframeAPIReady();
       } else {
-        script = document.createElement( "script" );
-        script.addEventListener( "load", onYouTubeIframeAPIReady, false);
+        script = document.createElement("script");
+        script.addEventListener("load", onYouTubeIframeAPIReady, false);
         script.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild( script );
+        document.head.appendChild(script);
       }
       ytLoading = true;
     }
     return ytReady;
   }
 
-  function addYouTubeCallback( callback ) {
-    ytCallbacks.push( callback );
+  function addYouTubeCallback(callback) {
+    ytCallbacks.push(callback);
   }
 
-  function HTMLYouTubeVideoElement( id ) {
+  function HTMLYouTubeVideoElement(id) {
 
     // YouTube iframe API requires postMessage
-    if( !window.postMessage ) {
+    if(!window.postMessage) {
       throw "ERROR: HTMLYouTubeVideoElement requires window.postMessage";
     }
 
     var self = new Popcorn._MediaElementProto(),
-      parent = typeof id === "string" ? document.querySelector( id ) : id,
-      elem = document.createElement( "div" ),
+      parent = typeof id === "string" ? document.querySelector(id) : id,
+      elem = document.createElement("div"),
       mobileTapFix,
       impl = {
         src: EMPTY_STRING,
@@ -117,39 +117,39 @@
       timeUpdateInterval;
 
     // Namespace all events we'll produce
-    self._eventNamespace = Popcorn.guid( "HTMLYouTubeVideoElement::" );
+    self._eventNamespace = Popcorn.guid("HTMLYouTubeVideoElement::");
 
     self.parentNode = parent;
 
     // Mark this as YouTube
     self._util.type = "YouTube";
 
-    function addMediaReadyCallback( callback ) {
-      mediaReadyCallbacks.push( callback );
+    function addMediaReadyCallback(callback) {
+      mediaReadyCallbacks.push(callback);
     }
 
     function catchRoguePlayEvent() {
       player.pauseVideo();
-      removeYouTubeEvent( "play", catchRoguePlayEvent );
-      addYouTubeEvent( "play", onPlay );
+      removeYouTubeEvent("play", catchRoguePlayEvent);
+      addYouTubeEvent("play", onPlay);
     }
 
     function catchRoguePauseEvent() {
-      addYouTubeEvent( "pause", onPause );
-      removeYouTubeEvent( "pause", catchRoguePauseEvent );
+      addYouTubeEvent("pause", onPause);
+      removeYouTubeEvent("pause", catchRoguePauseEvent);
     }
 
-    function onPlayerReady( event ) {
+    function onPlayerReady(event) {
 
-      var onMuted = function() {
-        if ( self.muted ) {
+      var onMuted = function () {
+        if (self.muted) {
           // force an initial play on the video, to remove autostart on initial seekTo.
-          addYouTubeEvent( "play", onFirstPlay );
+          addYouTubeEvent("play", onFirstPlay);
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
             player.playVideo();
           } else {
-            self.dispatchEvent( "loadedmetadata" );
-            setTimeout(function() {
+            self.dispatchEvent("loadedmetadata");
+            setTimeout(function () {
               var el = document.getElementById("controls-big-play-button");
               if (el) {
                 el.click();
@@ -163,7 +163,7 @@
 
           }
         } else {
-          setTimeout( onMuted, 0 );
+          setTimeout(onMuted, 0);
         }
       };
       playerReady = true;
@@ -180,7 +180,7 @@
       // There's no perfect mapping to HTML5 errors from YouTube errors.
       var err = { name: "MediaError" };
 
-      switch( event.data ) {
+      switch(event.data) {
 
         // invalid parameter
         case 2:
@@ -212,7 +212,7 @@
       }
 
       impl.error = err;
-      self.dispatchEvent( "error" );
+      self.dispatchEvent("error");
     }
 
     function onReady() {
@@ -220,61 +220,61 @@
       var newDuration = player.getDuration();
       if (impl.duration !== newDuration) {
         impl.duration = newDuration;
-        self.dispatchEvent( "durationchange" );
+        self.dispatchEvent("durationchange");
       }
 
-      addYouTubeEvent( "play", onPlay );
-      addYouTubeEvent( "pause", onPause );
+      addYouTubeEvent("play", onPlay);
+      addYouTubeEvent("pause", onPause);
       // Set initial paused state
-      if( impl.autoplay || !impl.paused ) {
-        removeYouTubeEvent( "play", onReady );
+      if(impl.autoplay || !impl.paused) {
+        removeYouTubeEvent("play", onReady);
         impl.paused = false;
-        addMediaReadyCallback(function() {
-          if ( !impl.paused ) {
+        addMediaReadyCallback(function () {
+          if (!impl.paused) {
             onPlay();
           }
         });
       }
 
       // Ensure video will now be unmuted when playing due to the mute on initial load.
-      if( !impl.muted ) {
+      if(!impl.muted) {
         self.muted = false;
       }
 
       impl.readyState = self.HAVE_METADATA;
-      self.dispatchEvent( "loadedmetadata" );
-      currentTimeInterval = setInterval( monitorCurrentTime,
-        CURRENT_TIME_MONITOR_MS );
+      self.dispatchEvent("loadedmetadata");
+      currentTimeInterval = setInterval(monitorCurrentTime,
+        CURRENT_TIME_MONITOR_MS);
 
-      self.dispatchEvent( "loadeddata" );
+      self.dispatchEvent("loadeddata");
 
       impl.readyState = self.HAVE_FUTURE_DATA;
-      self.dispatchEvent( "canplay" );
+      self.dispatchEvent("canplay");
 
       mediaReady = true;
-      bufferedInterval = setInterval( monitorBuffered, 50 );
+      bufferedInterval = setInterval(monitorBuffered, 50);
 
-      while( mediaReadyCallbacks.length ) {
+      while(mediaReadyCallbacks.length) {
         mediaReadyCallbacks[ 0 ]();
         mediaReadyCallbacks.shift();
       }
 
       // We can't easily determine canplaythrough, but will send anyway.
       impl.readyState = self.HAVE_ENOUGH_DATA;
-      self.dispatchEvent( "canplaythrough" );
+      self.dispatchEvent("canplaythrough");
     }
 
     function onFirstPause() {
-      removeYouTubeEvent( "pause", onFirstPause );
+      removeYouTubeEvent("pause", onFirstPause);
       // IE sometimes refuses to seek to exactly 0.
       var playerTime = player.getCurrentTime();
-      if ( playerTime > 0 && !( playerTime < 0.2 && !impl.seeking && playerState === YT.PlayerState.PAUSED ) ) {
-        setTimeout( onFirstPause, 0 );
+      if (playerTime > 0 && !(playerTime < 0.2 && !impl.seeking && playerState === YT.PlayerState.PAUSED)) {
+        setTimeout(onFirstPause, 0);
         return;
       }
 
-      if( impl.autoplay || !impl.paused ) {
-        addYouTubeEvent( "play", onReady );
+      if(impl.autoplay || !impl.paused) {
+        addYouTubeEvent("play", onReady);
         player.playVideo();
       } else {
         onReady();
@@ -293,62 +293,61 @@
         self.dispatchEvent('loadedbitrate');
       }
 
-      removeYouTubeEvent( "play", onFirstPlay );
-      if ( player.getCurrentTime() === 0 ) {
-        setTimeout( onFirstPlay, 0 );
+      removeYouTubeEvent("play", onFirstPlay);
+      if (player.getCurrentTime() === 0) {
+        setTimeout(onFirstPlay, 0);
         return;
       }
-      addYouTubeEvent( "pause", onFirstPause );
+      addYouTubeEvent("pause", onFirstPause);
       player.pauseVideo();
       // Safari doesn't want to seek from initial position so doing such dirty hack
-      player.seekTo( navigator.userAgent.match(/(Safari)/g) ? 0.000001 : 0);
+      player.seekTo(navigator.userAgent.match(/(Safari)/g) ? 0.000001 : 0);
     }
 
-    function addYouTubeEvent( event, listener ) {
-      self.addEventListener( "youtube-" + event, listener, false );
+    function addYouTubeEvent(event, listener) {
+      self.addEventListener("youtube-" + event, listener, false);
     }
-    function removeYouTubeEvent( event, listener ) {
-      self.removeEventListener( "youtube-" + event, listener, false );
+    function removeYouTubeEvent(event, listener) {
+      self.removeEventListener("youtube-" + event, listener, false);
     }
-    function dispatchYouTubeEvent( event ) {
-      self.dispatchEvent( "youtube-" + event );
+    function dispatchYouTubeEvent(event) {
+      self.dispatchEvent("youtube-" + event);
     }
 
     function onBuffering() {
       impl.networkState = self.NETWORK_LOADING;
-      self.dispatchEvent( "waiting" );
+      self.dispatchEvent("waiting");
     }
 
-    addYouTubeEvent( "buffering", onBuffering );
-    addYouTubeEvent( "ended", onEnded );
+    addYouTubeEvent("buffering", onBuffering);
+    addYouTubeEvent("ended", onEnded);
 
-    function onPlayerStateChange( event ) {
+    function onPlayerStateChange(event) {
 
-      switch( event.data ) {
+      switch(event.data) {
 
         // ended
         case YT.PlayerState.ENDED:
-          dispatchYouTubeEvent( "ended" );
+          dispatchYouTubeEvent("ended");
           break;
 
         // playing
-        case YT.PlayerState.PLAYING: {
-          dispatchYouTubeEvent( "play" );
+        case YT.PlayerState.PLAYING:
+          dispatchYouTubeEvent("play");
           break;
-        }
 
         // paused
         case YT.PlayerState.PAUSED:
           // Youtube fires a paused event before an ended event.
           // We have no need for this.
-          if ( player.getDuration() !== player.getCurrentTime() ) {
-            dispatchYouTubeEvent( "pause" );
+          if (player.getDuration() !== player.getCurrentTime()) {
+            dispatchYouTubeEvent("pause");
           }
           break;
 
         // buffering
         case YT.PlayerState.BUFFERING:
-          dispatchYouTubeEvent( "buffering" );
+          dispatchYouTubeEvent("buffering");
           break;
 
         // video cued
@@ -357,8 +356,8 @@
           break;
       }
 
-      if ( event.data !== YT.PlayerState.BUFFERING &&
-        playerState === YT.PlayerState.BUFFERING ) {
+      if (event.data !== YT.PlayerState.BUFFERING &&
+        playerState === YT.PlayerState.BUFFERING) {
         onProgress();
       }
 
@@ -366,52 +365,52 @@
     }
 
     function destroyPlayer() {
-      if( !( playerReady && player ) ) {
+      if(!(playerReady && player)) {
         return;
       }
 
-      removeYouTubeEvent( "buffering", onBuffering );
-      removeYouTubeEvent( "ended", onEnded );
-      removeYouTubeEvent( "play", onPlay );
-      removeYouTubeEvent( "pause", onPause );
+      removeYouTubeEvent("buffering", onBuffering);
+      removeYouTubeEvent("ended", onEnded);
+      removeYouTubeEvent("play", onPlay);
+      removeYouTubeEvent("pause", onPause);
       onPause();
       mediaReady = false;
       loopedPlay = false;
       impl.currentTime = 0;
       mediaReadyCallbacks = [];
-      clearInterval( currentTimeInterval );
-      clearInterval( bufferedInterval );
+      clearInterval(currentTimeInterval);
+      clearInterval(bufferedInterval);
       player.stopVideo();
       player.clearVideo();
       player.destroy();
-      elem = document.createElement( "div" );
+      elem = document.createElement("div");
     }
 
-    function changeSrc( aSrc ) {
-      if( !self._canPlaySrc( aSrc ) ) {
+    function changeSrc(aSrc) {
+      if(!self._canPlaySrc(aSrc)) {
         impl.error = {
           name: "MediaError",
           message: "Media Source Not Supported",
           code: MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
         };
-        self.dispatchEvent( "error" );
+        self.dispatchEvent("error");
         return;
       }
 
       impl.src = aSrc;
 
       // Make sure YouTube is ready, and if not, register a callback
-      if( !isYouTubeReady() ) {
-        addYouTubeCallback( function() { changeSrc( aSrc ); } );
+      if(!isYouTubeReady()) {
+        addYouTubeCallback(function () { changeSrc(aSrc); });
         return;
       }
 
-      if( playerReady ) {
-        if( mediaReady ) {
+      if(playerReady) {
+        if(mediaReady) {
           destroyPlayer();
         } else {
-          addMediaReadyCallback( function() {
-            changeSrc( aSrc );
+          addMediaReadyCallback(function () {
+            changeSrc(aSrc);
           });
           return;
         }
@@ -434,10 +433,10 @@
         }
       });
 
-      parent.appendChild( elem );
+      parent.appendChild(elem);
 
       // Use any player vars passed on the URL
-      var playerVars = self._util.parseUri( aSrc ).queryKey;
+      var playerVars = self._util.parseUri(aSrc).queryKey;
 
       // Remove the video id, since we don't want to pass it
       delete playerVars.v;
@@ -475,15 +474,15 @@
       // Set wmode to transparent to show video overlays
       playerVars.wmode = playerVars.wmode || "opaque";
 
-      if ( playerVars.html5 !== 0 ) {
+      if (playerVars.html5 !== 0) {
         playerVars.html5 = 1;
       }
 
       playerVars.playsinline = 1;
       // Get video ID out of youtube url
-      aSrc = regexYouTube.exec( aSrc )[ 1 ];
+      aSrc = regexYouTube.exec(aSrc)[ 1 ];
 
-      player = new YT.Player( elem, {
+      player = new YT.Player(elem, {
         width: "100%",
         height: "100%",
         wmode: playerVars.wmode,
@@ -497,19 +496,19 @@
       });
 
       impl.networkState = self.NETWORK_LOADING;
-      self.dispatchEvent( "loadstart" );
-      self.dispatchEvent( "progress" );
+      self.dispatchEvent("loadstart");
+      self.dispatchEvent("progress");
     }
 
     function monitorCurrentTime() {
       var playerTime = player.getCurrentTime();
-      if ( !impl.seeking ) {
-        if ( ABS( impl.currentTime - playerTime ) > CURRENT_TIME_MONITOR_MS ) {
+      if (!impl.seeking) {
+        if (ABS(impl.currentTime - playerTime) > CURRENT_TIME_MONITOR_MS) {
           onSeeking();
           onSeeked();
         }
         impl.currentTime = playerTime;
-      } else if ( ABS( playerTime - impl.currentTime ) < 1 ) {
+      } else if (ABS(playerTime - impl.currentTime) < 1) {
         onSeeked();
       }
     }
@@ -517,55 +516,55 @@
     function monitorBuffered() {
       var fraction = player.getVideoLoadedFraction();
 
-      if ( fraction && lastLoadedFraction !== fraction ) {
+      if (fraction && lastLoadedFraction !== fraction) {
         lastLoadedFraction = fraction;
         onProgress();
       }
     }
 
-    function changeCurrentTime( aTime ) {
-      if ( aTime === impl.currentTime ) {
+    function changeCurrentTime(aTime) {
+      if (aTime === impl.currentTime) {
         return;
       }
       impl.currentTime = aTime;
-      if( !mediaReady ) {
-        addMediaReadyCallback( function() {
+      if(!mediaReady) {
+        addMediaReadyCallback(function () {
 
           onSeeking();
-          player.seekTo( aTime );
+          player.seekTo(aTime);
         });
         return;
       }
 
       onSeeking();
-      player.seekTo( aTime );
+      player.seekTo(aTime);
     }
 
     function onTimeUpdate() {
-      self.dispatchEvent( "timeupdate" );
+      self.dispatchEvent("timeupdate");
     }
 
     function onSeeking() {
       // a seek in youtube fires a paused event.
       // we don't want to listen for this, so this state catches the event.
-      addYouTubeEvent( "pause", catchRoguePauseEvent );
-      removeYouTubeEvent( "pause", onPause );
+      addYouTubeEvent("pause", catchRoguePauseEvent);
+      removeYouTubeEvent("pause", onPause);
       impl.seeking = true;
-      self.dispatchEvent( "seeking" );
+      self.dispatchEvent("seeking");
     }
 
     function onSeeked() {
       impl.ended = false;
       impl.seeking = false;
-      self.dispatchEvent( "timeupdate" );
-      self.dispatchEvent( "seeked" );
-      self.dispatchEvent( "canplay" );
-      self.dispatchEvent( "canplaythrough" );
+      self.dispatchEvent("timeupdate");
+      self.dispatchEvent("seeked");
+      self.dispatchEvent("canplay");
+      self.dispatchEvent("canplaythrough");
     }
 
     function onPlay() {
-      if( impl.ended ) {
-        changeCurrentTime( 0 );
+      if(impl.ended) {
+        changeCurrentTime(0);
         impl.ended = false;
       }
       if (player.getSphericalProperties().yaw === undefined && isMobile()) {
@@ -573,29 +572,29 @@
           parent.appendChild(mobileTapFix);
         }
       }
-      timeUpdateInterval = setInterval( onTimeUpdate,
-        self._util.TIMEUPDATE_MS );
+      timeUpdateInterval = setInterval(onTimeUpdate,
+        self._util.TIMEUPDATE_MS);
       impl.paused = false;
-      if( playerPaused ) {
+      if(playerPaused) {
         playerPaused = false;
 
         // Only 1 play when video.loop=true
-        if ( ( impl.loop && !loopedPlay ) || !impl.loop ) {
+        if ((impl.loop && !loopedPlay) || !impl.loop) {
           loopedPlay = true;
-          self.dispatchEvent( "play" );
+          self.dispatchEvent("play");
         }
-        self.dispatchEvent( "playing" );
+        self.dispatchEvent("playing");
       }
     }
 
     function onProgress() {
-      self.dispatchEvent( "progress" );
+      self.dispatchEvent("progress");
     }
 
-    self.play = function() {
+    self.play = function () {
       impl.paused = false;
-      if( !mediaReady ) {
-        addMediaReadyCallback( function() {
+      if(!mediaReady) {
+        addMediaReadyCallback(function () {
           self.play();
         });
         return;
@@ -605,17 +604,17 @@
 
     function onPause() {
       impl.paused = true;
-      if ( !playerPaused ) {
+      if (!playerPaused) {
         playerPaused = true;
-        clearInterval( timeUpdateInterval );
-        self.dispatchEvent( "pause" );
+        clearInterval(timeUpdateInterval);
+        self.dispatchEvent("pause");
       }
     }
 
-    self.pause = function() {
+    self.pause = function () {
       impl.paused = true;
-      if( !mediaReady ) {
-        addMediaReadyCallback( function() {
+      if(!mediaReady) {
+        addMediaReadyCallback(function () {
           self.pause();
         });
         return;
@@ -628,30 +627,30 @@
     };
 
     function onEnded() {
-      if( impl.loop ) {
-        changeCurrentTime( 0 );
+      if(impl.loop) {
+        changeCurrentTime(0);
         self.play();
       } else {
         impl.ended = true;
         onPause();
         // YouTube will fire a Playing State change after the video has ended, causing it to loop.
-        addYouTubeEvent( "play", catchRoguePlayEvent );
-        removeYouTubeEvent( "play", onPlay );
-        self.dispatchEvent( "timeupdate" );
-        self.dispatchEvent( "ended" );
+        addYouTubeEvent("play", catchRoguePlayEvent);
+        removeYouTubeEvent("play", onPlay);
+        self.dispatchEvent("timeupdate");
+        self.dispatchEvent("ended");
       }
     }
 
-    function setMuted( aValue ) {
+    function setMuted(aValue) {
       impl.muted = aValue;
-      if( !mediaReady ) {
-        addMediaReadyCallback( function() {
-          setMuted( impl.muted );
+      if(!mediaReady) {
+        addMediaReadyCallback(function () {
+          setMuted(impl.muted);
         });
         return;
       }
       player[ aValue ? "mute" : "unMute" ]();
-      self.dispatchEvent( "volumechange" );
+      self.dispatchEvent("volumechange");
     }
 
     function getMuted() {
@@ -659,12 +658,12 @@
       return impl.muted;
     }
 
-    Object.defineProperties( self, {
+    Object.defineProperties(self, {
       qualities: {
-        get: function() {
+        get: function () {
           return impl.qualities;
         },
-        set: function(val) {
+        set: function (val) {
           impl.qualities = val.map(function (q) {
             var item = {};
             item.value = q;
@@ -675,132 +674,132 @@
         configurable: true
       },
       quality: {
-        get: function() {
+        get: function () {
           return impl.quality;
         },
-        set: function(val) {
+        set: function (val) {
           impl.quality = val;
           player.setPlaybackQuality(val);
         },
         configurable: true
       },
       src: {
-        get: function() {
+        get: function () {
           return impl.src;
         },
-        set: function( aSrc ) {
-          if( aSrc && aSrc !== impl.src ) {
-            changeSrc( aSrc );
+        set: function (aSrc) {
+          if(aSrc && aSrc !== impl.src) {
+            changeSrc(aSrc);
           }
         }
       },
 
       autoplay: {
-        get: function() {
+        get: function () {
           return impl.autoplay;
         },
-        set: function( aValue ) {
-          impl.autoplay = self._util.isAttributeSet( aValue );
+        set: function (aValue) {
+          impl.autoplay = self._util.isAttributeSet(aValue);
         }
       },
 
       loop: {
-        get: function() {
+        get: function () {
           return impl.loop;
         },
-        set: function( aValue ) {
-          impl.loop = self._util.isAttributeSet( aValue );
+        set: function (aValue) {
+          impl.loop = self._util.isAttributeSet(aValue);
         }
       },
 
       width: {
-        get: function() {
+        get: function () {
           return self.parentNode.offsetWidth;
         }
       },
 
       height: {
-        get: function() {
+        get: function () {
           return self.parentNode.offsetHeight;
         }
       },
 
       currentTime: {
-        get: function() {
+        get: function () {
           return impl.currentTime;
         },
-        set: function( aValue ) {
-          changeCurrentTime( aValue );
+        set: function (aValue) {
+          changeCurrentTime(aValue);
         }
       },
 
       duration: {
-        get: function() {
+        get: function () {
           return impl.duration;
         }
       },
 
       ended: {
-        get: function() {
+        get: function () {
           return impl.ended;
         }
       },
 
       paused: {
-        get: function() {
+        get: function () {
           return impl.paused;
         }
       },
 
       seeking: {
-        get: function() {
+        get: function () {
           return impl.seeking;
         }
       },
 
       readyState: {
-        get: function() {
+        get: function () {
           return impl.readyState;
         }
       },
 
       networkState: {
-        get: function() {
+        get: function () {
           return impl.networkState;
         }
       },
 
       volume: {
-        get: function() {
+        get: function () {
           return impl.volume;
         },
-        set: function( aValue ) {
-          if( aValue < 0 || aValue > 1 ) {
+        set: function (aValue) {
+          if(aValue < 0 || aValue > 1) {
             throw "Volume value must be between 0.0 and 1.0";
           }
           impl.volume = aValue;
-          if( !mediaReady ) {
-            addMediaReadyCallback( function() {
+          if(!mediaReady) {
+            addMediaReadyCallback(function () {
               self.volume = aValue;
             });
             return;
           }
-          player.setVolume( impl.volume * 100 );
-          self.dispatchEvent( "volumechange" );
+          player.setVolume(impl.volume * 100);
+          self.dispatchEvent("volumechange");
         }
       },
 
       muted: {
-        get: function() {
+        get: function () {
           return getMuted();
         },
-        set: function( aValue ) {
-          setMuted( self._util.isAttributeSet( aValue ) );
+        set: function (aValue) {
+          setMuted(self._util.isAttributeSet(aValue));
         }
       },
 
       error: {
-        get: function() {
+        get: function () {
           return impl.error;
         }
       },
@@ -808,17 +807,17 @@
       buffered: {
         get: function () {
           var timeRanges = {
-            start: function( index ) {
-              if ( index === 0 ) {
+            start: function (index) {
+              if (index === 0) {
                 return 0;
               }
 
               //throw fake DOMException/INDEX_SIZE_ERR
               throw "INDEX_SIZE_ERR: DOM Exception 1";
             },
-            end: function( index ) {
-              if ( index === 0 ) {
-                if ( !impl.duration ) {
+            end: function (index) {
+              if (index === 0) {
+                if (!impl.duration) {
                   return 0;
                 }
 
@@ -843,20 +842,20 @@
     return self;
   }
 
-  Popcorn.HTMLYouTubeVideoElement = function( id ) {
-    return new HTMLYouTubeVideoElement( id );
+  Popcorn.HTMLYouTubeVideoElement = function (id) {
+    return new HTMLYouTubeVideoElement(id);
   };
 
   // Helper for identifying URLs we know how to play.
-  Popcorn.HTMLYouTubeVideoElement._canPlaySrc = function( url ) {
-    return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu).*(?:\/|v=)(.{11})/).test( url ) ?
+  Popcorn.HTMLYouTubeVideoElement._canPlaySrc = function (url) {
+    return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu).*(?:\/|v=)(.{11})/).test(url) ?
       "probably" :
       EMPTY_STRING;
   };
 
   // We'll attempt to support a mime type of video/x-youtube
-  Popcorn.HTMLYouTubeVideoElement.canPlayType = function( type ) {
+  Popcorn.HTMLYouTubeVideoElement.canPlayType = function (type) {
     return type === "video/x-youtube" ? "probably" : EMPTY_STRING;
   };
 
-}( Popcorn, window, document ));
+}(Popcorn, window, document));

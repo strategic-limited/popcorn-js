@@ -43,13 +43,13 @@
     } else {
       var requireDefine;
       var script = document.createElement('script');
-      script.addEventListener('load', function() {
+      script.addEventListener('load', function () {
         window.define = requireDefine;
         callback();
       });
       script.src = '//cdn.dashjs.org/v2.9.0/dash.all.min.js';
       requireDefine = window.define;
-      window.define = function() {};
+      window.define = function () {};
       document.head.appendChild(script);
     }
   }
@@ -64,7 +64,7 @@
     } else {
       var requireDefine;
       var script = document.createElement('script');
-      script.addEventListener('load', function() {
+      script.addEventListener('load', function () {
         window.define = requireDefine;
         if(Hls.isSupported()) {
           var hls = new Hls();
@@ -77,7 +77,7 @@
       });
       script.src = '//cdn.jsdelivr.net/npm/hls.js@latest';
       requireDefine = window.define;
-      window.define = function() {};
+      window.define = function () {};
       document.head.appendChild(script);
     }
   }
@@ -109,10 +109,6 @@
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
-    // Mimic DOM events with custom, namespaced events on the document.
-    // Each media element using this prototype needs to provide a unique
-    // namespace for all its events via _eventNamespace.
-
     parent.appendChild(media);
 
     [
@@ -120,17 +116,21 @@
       'pause', 'seeking', 'waiting', 'playing',
       'error', 'volumechange', 'loadedmetadata',
     ].forEach(function (event) {
-      media.addEventListener(event, function() {
+      media.addEventListener(event, function () {
         media.dispatchEvent(event);
       });
     });
 
-    media.addEventListener = function( type, listener, useCapture ) {
-      document.addEventListener( this._eventNamespace + type, listener, useCapture );
+    // Mimic DOM events with custom, namespaced events on the document.
+    // Each media element using this prototype needs to provide a unique
+    // namespace for all its events via _eventNamespace.
+
+    media.addEventListener = function (type, listener, useCapture) {
+      document.addEventListener(this._eventNamespace + type, listener, useCapture);
     };
 
-    media.removeEventListener = function( type, listener, useCapture ) {
-      document.removeEventListener( this._eventNamespace + type, listener, useCapture );
+    media.removeEventListener = function (type, listener, useCapture) {
+      document.removeEventListener(this._eventNamespace + type, listener, useCapture);
     };
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
@@ -138,27 +138,27 @@
 
     Object.defineProperties(media, {
       autoplay: {
-        get: function() {
+        get: function () {
           return impl.autoplay;
         },
-        set: function(aValue) {
+        set: function (aValue) {
           impl.autoplay = (typeof aValue === 'string' || aValue === true);
         }
       },
       qualities: {
-        get: function() {
+        get: function () {
           return impl.qualities;
         },
-        set: function(val = []) {
+        set: function (val = []) {
           impl.qualities = val;
         },
         configurable: true
       },
       quality: {
-        get: function() {
+        get: function () {
           return impl.quality;
         },
-        set: function(val) {
+        set: function (val) {
           impl.quality = val;
           if (updateQuality) {
             updateQuality(impl.quality);
@@ -167,10 +167,10 @@
         configurable: true
       },
       src: {
-        get: function() {
+        get: function () {
           return media._src;
         },
-        set: function(aSrc) {
+        set: function (aSrc) {
           function setRawSource(source) {
             var extension = source.split('.').reverse()[0];
             // IE and Edge do not understand source setting here for MSE BLOB
@@ -200,7 +200,7 @@
           }
           media._src = aSrc;
           function findMediaSource(sources, acceptableSources) {
-            return sources.filter(function(source) {
+            return sources.filter(function (source) {
               var extension = source.split('.').reverse()[0];
               return acceptableSources.indexOf(extension) !== -1;
             })[0];
@@ -217,9 +217,9 @@
             var extension = adaptiveMedia.split('.').reverse()[0];
             switch (extension) {
               case 'mpd':
-                loadDashJs(function() {
+                loadDashJs(function () {
                   var player = dashjs.MediaPlayer().create();
-                  player.on(dashjs.MediaPlayer.events.ERROR, function(event) {
+                  player.on(dashjs.MediaPlayer.events.ERROR, function (event) {
                     if (event.error === 'capability') {
                       // 23 says `message: "mediasource is not supported"`, so fallback to HLS
                       // as it happens mainly on Safari iOS
@@ -229,14 +229,14 @@
                       media.src = fallbackMedia;
                     }
                   });
-                  player.on(dashjs.MediaPlayer.events.SOURCE_INITIALIZED, function() {
+                  player.on(dashjs.MediaPlayer.events.SOURCE_INITIALIZED, function () {
                     player.setTrackSwitchModeFor('video', 'alwaysReplace');
                     player.setTrackSwitchModeFor('audio', 'alwaysReplace');
                     player.setAutoSwitchQualityFor('video', true);
                     player.setAutoSwitchQualityFor('audio', true);
                     player.setInitialBitrateFor('audio', 99999999);
                   });
-                  player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
+                  player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function () {
                     var bitrates = player.getBitrateInfoListFor('video');
                     if (bitrates && bitrates.length) {
                       bitrates = bitrates.map(function (q, idx) {
@@ -250,7 +250,7 @@
                       media.qualities = [];
                     }
                     media.quality = player.getQualityFor('video');
-                    media.dispatchEvent( "loadedbitrate" );
+                    media.dispatchEvent("loadedbitrate");
                     updateQuality = function (quality) {
                       if (quality === "auto") {
                         player.setAutoSwitchQualityFor('video', true);
@@ -264,7 +264,7 @@
                 });
                 break;
               case 'm3u8':
-                loadHlsJs(media, function(hls) {
+                loadHlsJs(media, function (hls) {
                   if(Hls.isSupported()) {
                     hls.on(Hls.Events.ERROR, function (error, data) {
                       // fallback to default media source
@@ -285,7 +285,7 @@
                       } else {
                         media.qualities = [];
                       }
-                      media.dispatchEvent( "loadedbitrate" );
+                      media.dispatchEvent("loadedbitrate");
                       updateQuality = function (quality) {
                         hls.currentLevel = quality === "auto" ? -1 : quality;
                       }
