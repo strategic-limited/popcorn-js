@@ -292,7 +292,7 @@
       var qualities = player.getAvailableQualityLevels();
       if (qualities) {
         if (Popcorn.current && Popcorn.current.media) {
-          Popcorn.current.media = qualities;
+          Popcorn.current.media.qualities = qualities;
           Popcorn.current.media.dispatchEvent('loadedbitrate');
         }
       }
