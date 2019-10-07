@@ -109,6 +109,9 @@
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
+    // Mimic DOM events with custom, namespaced events on the document.
+    // Each media element using this prototype needs to provide a unique
+    // namespace for all its events via _eventNamespace.
     media.addEventListener = function( type, listener, useCapture ) {
       document.addEventListener( this._eventNamespace + type, listener, useCapture );
     };
@@ -280,9 +283,6 @@
                         media.qualities = [];
                       }
                       media.dispatchEvent( "loadedbitrate" );
-                      parent.dispatchEvent(new CustomEvent("loadedbitrate", {
-                        detail: { bitrates: media.qualities }
-                      }));
                       updateQuality = function (quality) {
                         hls.currentLevel = quality === "auto" ? -1 : quality;
                       }
