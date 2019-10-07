@@ -249,10 +249,8 @@
                     } else {
                       media.qualities = [];
                     }
+                    media.quality = player.getQualityFor('video');
                     media.dispatchEvent( "loadedbitrate" );
-                    parent.dispatchEvent(new CustomEvent("loadedbitrate", {
-                      detail: { bitrates: media.qualities }
-                    }));
                     updateQuality = function (quality) {
                       if (quality === "auto") {
                         player.setAutoSwitchQualityFor('video', true);
