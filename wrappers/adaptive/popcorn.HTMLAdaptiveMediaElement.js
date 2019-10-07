@@ -112,21 +112,22 @@
     // Mimic DOM events with custom, namespaced events on the document.
     // Each media element using this prototype needs to provide a unique
     // namespace for all its events via _eventNamespace.
-    media.addEventListener = function( type, listener, useCapture ) {
-      document.addEventListener( this._eventNamespace + type, listener, useCapture );
-    };
 
     parent.appendChild(media);
 
     [
       'seeked', 'timeupdate', 'progress', 'play',
       'pause', 'seeking', 'waiting', 'playing',
-      'error', 'volumechange', 'loadedmetadata', 'loadedbitrate',
+      'error', 'volumechange', 'loadedmetadata',
     ].forEach(function (event) {
       media.addEventListener(event, function() {
         media.dispatchEvent(event);
       });
     });
+
+    media.addEventListener = function( type, listener, useCapture ) {
+      document.addEventListener( this._eventNamespace + type, listener, useCapture );
+    };
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
