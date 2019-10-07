@@ -88,10 +88,9 @@
 
     var impl = {
       autoplay: EMPTY_STRING,
+      qualities: [],
+      quality: "auto",
     };
-
-    var qualities = [],
-      quality = "auto";
 
     media.dispatchEvent = function (name, data) {
       var customEvent = document.createEvent('CustomEvent'),
@@ -133,6 +132,24 @@
         set: function(aValue) {
           impl.autoplay = (typeof aValue === 'string' || aValue === true);
         }
+      },
+      qualities: {
+        get: function() {
+          return impl.qualities;
+        },
+        configurable: true
+      },
+      quality: {
+        get: function() {
+          return impl.quality;
+        },
+        set: function(val) {
+          impl.quality = val;
+          if (updateQuality) {
+            updateQuality(impl.quality);
+          }
+        },
+        configurable: true
       },
       src: {
         get: function() {
@@ -213,15 +230,11 @@
                         return q;
                       });
                       bitrates.push({ resolution: "auto", value: "auto" });
-                      qualities = bitrates;
+                      media.qualities = bitrates;
                     } else {
-                      qualities = [];
+                      media.qualities = [];
                     }
-                    if (Popcorn.current && Popcorn.current.media) {
-                      Popcorn.current.media.dispatchEvent( "loadedbitrate" );
-                    } else {
-                      media.dispatchEvent( "loadedbitrate" );
-                    }
+                    media.dispatchEvent( "loadedbitrate" );
                     updateQuality = function (quality) {
                       if (quality === "auto") {
                         player.setAutoSwitchQualityFor('video', true);
@@ -281,27 +294,6 @@
           }
         }
       }
-    });
-
-    Object.defineProperties((Popcorn.current && Popcorn.current.media) || {}, {
-      qualities: {
-        get: function() {
-          return qualities;
-        },
-        configurable: true
-      },
-      quality: {
-        get: function() {
-          return quality;
-        },
-        set: function(val) {
-          quality = val;
-          if (updateQuality) {
-            updateQuality(quality);
-          }
-        },
-        configurable: true
-      },
     });
 
     return media;

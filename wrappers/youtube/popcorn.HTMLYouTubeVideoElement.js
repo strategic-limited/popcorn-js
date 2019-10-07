@@ -101,8 +101,6 @@
         ended: false,
         paused: true,
         error: null,
-      },
-      video = {
         quality: "auto",
         qualities: [],
       },
@@ -664,7 +662,30 @@
     }
 
     Object.defineProperties( self, {
-
+      qualities: {
+        get: function() {
+          return impl.qualities;
+        },
+        set: function(val) {
+          impl.qualities = val.map(function (q) {
+            var item = {};
+            item.value = q;
+            item.resolution = qualityNames[q];
+            return item;
+          })
+        },
+        configurable: true
+      },
+      quality: {
+        get: function() {
+          return impl.quality;
+        },
+        set: function(val) {
+          impl.quality = val;
+          player.setPlaybackQuality(val);
+        },
+        configurable: true
+      },
       src: {
         get: function() {
           return impl.src;
@@ -816,33 +837,6 @@
         },
         configurable: true
       }
-    });
-
-    Object.defineProperties((Popcorn.current && Popcorn.current.media) || {}, {
-      qualities: {
-        get: function() {
-          return video.qualities;
-        },
-        set: function(val) {
-          video.qualities = val.map(function (q) {
-            var item = {};
-            item.value = q;
-            item.resolution = qualityNames[q];
-            return item;
-          })
-        },
-        configurable: true
-      },
-      quality: {
-        get: function() {
-          return video.quality;
-        },
-        set: function(val) {
-          video.quality = val;
-          player.setPlaybackQuality(val);
-        },
-        configurable: true
-      },
     });
 
     self._canPlaySrc = Popcorn.HTMLYouTubeVideoElement._canPlaySrc;
