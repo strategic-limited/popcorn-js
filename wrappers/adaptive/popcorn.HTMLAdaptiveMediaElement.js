@@ -137,6 +137,9 @@
         get: function() {
           return impl.qualities;
         },
+        set: function(val = []) {
+          impl.qualities = val;
+        },
         configurable: true
       },
       quality: {
@@ -265,15 +268,11 @@
                           return q;
                         });
                         bitrates.push({ resolution: "auto", value: "auto" });
-                        qualities = bitrates;
+                        media.qualities = bitrates;
                       } else {
-                        qualities = [];
+                        media.qualities = [];
                       }
-                      if (Popcorn.current && Popcorn.current.media) {
-                        Popcorn.current.media.dispatchEvent( "loadedbitrate" );
-                      } else {
-                        media.dispatchEvent( "loadedbitrate" );
-                      }
+                      media.dispatchEvent( "loadedbitrate" );
                       updateQuality = function (quality) {
                         hls.currentLevel = quality === "auto" ? -1 : quality;
                       }
