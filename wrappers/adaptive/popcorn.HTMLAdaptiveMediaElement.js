@@ -129,6 +129,10 @@
       document.addEventListener( this._eventNamespace + type, listener, useCapture );
     };
 
+    media.removeEventListener = function( type, listener, useCapture ) {
+      document.removeEventListener( this._eventNamespace + type, listener, useCapture );
+    };
+
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
 
