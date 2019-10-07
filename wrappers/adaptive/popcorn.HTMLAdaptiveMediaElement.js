@@ -208,7 +208,7 @@
                     var bitrates = player.getBitrateInfoListFor('video');
                     if (bitrates && bitrates.length) {
                       bitrates = bitrates.map(function (q, idx) {
-                        q.resolution = q.width + "x" + q.height;
+                        q.resolution = q.height;
                         q.value = idx;
                         return q;
                       });
@@ -247,7 +247,7 @@
                       var bitrates = hls.levels;
                       if (bitrates && bitrates.length) {
                         bitrates = bitrates.map(function (q, idx) {
-                          q.resolution = q.width + "x" + q.height;
+                          q.resolution = q.height;
                           q.value = idx;
                           return q;
                         });

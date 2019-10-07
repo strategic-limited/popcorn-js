@@ -291,11 +291,9 @@
 
       var qualities = player.getAvailableQualityLevels();
       if (qualities) {
-        video.qualities  = qualities;
         if (Popcorn.current && Popcorn.current.media) {
+          Popcorn.current.media = qualities;
           Popcorn.current.media.dispatchEvent('loadedbitrate');
-        } else {
-          self.dispatchEvent('loadedbitrate');
         }
       }
 
