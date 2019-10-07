@@ -289,10 +289,8 @@
 
       var qualities = player.getAvailableQualityLevels();
       if (qualities) {
-        if (Popcorn.current && Popcorn.current.media) {
-          Popcorn.current.media.qualities = qualities;
-          Popcorn.current.media.dispatchEvent('loadedbitrate');
-        }
+        self.qualities = qualities;
+        self.dispatchEvent('loadedbitrate');
       }
 
       removeYouTubeEvent( "play", onFirstPlay );
