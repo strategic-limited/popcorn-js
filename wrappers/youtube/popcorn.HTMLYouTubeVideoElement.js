@@ -100,7 +100,11 @@
         duration: NaN,
         ended: false,
         paused: true,
-        error: null
+        error: null,
+      },
+      video = {
+        quality: "auto",
+        qualities: [],
       },
       playerReady = false,
       mediaReady = false,
@@ -286,19 +290,14 @@
       }
 
       var qualities = player.getAvailableQualityLevels();
-      qualities  = qualities.map(function (q) {
-        var item = {};
-        item.value = q;
-        item.resolution = qualityNames[q];
-        return item;
-      });
-      self.qualities = qualities;
-      if (Popcorn.current && Popcorn.current.media) {
-        Popcorn.current.media.dispatchEvent('loadedbitrate');
-      } else {
-        self.dispatchEvent('loadedbitrate');
+      if (qualities) {
+        video.qualities  = qualities;
+        if (Popcorn.current && Popcorn.current.media) {
+          Popcorn.current.media.dispatchEvent('loadedbitrate');
+        } else {
+          self.dispatchEvent('loadedbitrate');
+        }
       }
-
 
       removeYouTubeEvent( "play", onFirstPlay );
       if ( player.getCurrentTime() === 0 ) {
@@ -819,6 +818,33 @@
         },
         configurable: true
       }
+    });
+
+    Object.defineProperties((Popcorn.current && Popcorn.current.media) || {}, {
+      qualities: {
+        get: function() {
+          return video.qualities;
+        },
+        set: function(val) {
+          video.qualities = val.map(function (q) {
+            var item = {};
+            item.value = q;
+            item.resolution = qualityNames[q];
+            return item;
+          })
+        },
+        configurable: true
+      },
+      quality: {
+        get: function() {
+          return video.quality;
+        },
+        set: function(val) {
+          video.quality = val;
+          player.setPlaybackQuality(val);
+        },
+        configurable: true
+      },
     });
 
     self._canPlaySrc = Popcorn.HTMLYouTubeVideoElement._canPlaySrc;
