@@ -109,6 +109,10 @@
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
+    media.addEventListener = function( type, listener, useCapture ) {
+      document.addEventListener( this._eventNamespace + type, listener, useCapture );
+    };
+
     parent.appendChild(media);
 
     [
