@@ -75,7 +75,7 @@
     var protoElement = {},
         events = {},
         qualities = [],
-        currentQuality  = 'auto',
+        currentQuality  = -1,
         parentNode;
     if (!Object.prototype.__defineGetter__) {
       protoElement = document.createElement("div");

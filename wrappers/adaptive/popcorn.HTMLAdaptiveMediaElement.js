@@ -6,6 +6,8 @@
 
 (function(Popcorn, document) {
   var EMPTY_STRING = '';
+  var autoQuality = -1;
+  var autoQualityName = "auto";
 
   var audioFormats = {
     'mp3': 'audio/mpeg',
@@ -89,7 +91,7 @@
     var impl = {
       autoplay: EMPTY_STRING,
       qualities: [],
-      currentQuality: "auto",
+      currentQuality: autoQuality,
     };
 
     media.dispatchEvent = function(name, data) {
@@ -244,7 +246,7 @@
                         q.value = idx;
                         return q;
                       });
-                      bitrates.push({ resolution: "auto", value: "auto" });
+                      bitrates.push({ resolution: autoQualityName, value: autoQuality });
                       media.qualities = bitrates;
                     } else {
                       media.qualities = [];
@@ -252,7 +254,7 @@
                     media.currentQuality = player.getQualityFor('video');
                     media.dispatchEvent("loadedbitrate");
                     updateQuality = function(currentQuality) {
-                      if (currentQuality === "auto") {
+                      if (currentQuality === autoQuality) {
                         player.setAutoSwitchQualityFor('video', true);
                       } else {
                         player.setAutoSwitchQualityFor('video', false);
@@ -280,14 +282,14 @@
                           q.value = idx;
                           return q;
                         });
-                        bitrates.push({ resolution: "auto", value: "auto" });
+                        bitrates.push({ resolution: autoQualityName, value: autoQuality });
                         media.qualities = bitrates;
                       } else {
                         media.qualities = [];
                       }
                       media.dispatchEvent("loadedbitrate");
                       updateQuality = function(currentQuality) {
-                        hls.currentLevel = currentQuality === "auto" ? -1 : currentQuality;
+                        hls.currentLevel = currentQuality;
                       }
                     });
                     hls.loadSource(adaptiveMedia);
