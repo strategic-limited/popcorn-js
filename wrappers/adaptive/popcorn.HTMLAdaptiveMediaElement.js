@@ -252,7 +252,7 @@
                       media.qualities = [];
                     }
                     media.currentQuality = player.getQualityFor('video');
-                    media.dispatchEvent("loadedbitrate");
+                    media.dispatchEvent("bitrateloaded");
                     updateQuality = function(currentQuality) {
                       if (currentQuality === autoQuality) {
                         player.setAutoSwitchQualityFor('video', true);
@@ -287,7 +287,7 @@
                       } else {
                         media.qualities = [];
                       }
-                      media.dispatchEvent("loadedbitrate");
+                      media.dispatchEvent("bitrateloaded");
                       updateQuality = function(currentQuality) {
                         hls.currentLevel = currentQuality;
                       }
