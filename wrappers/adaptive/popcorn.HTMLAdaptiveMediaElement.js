@@ -4,8 +4,10 @@
  * to a wrapped object.
  */
 
-(function (Popcorn, document) {
+(function(Popcorn, document) {
   var EMPTY_STRING = '';
+  var autoQuality = -1;
+  var autoQualityName = "auto";
 
   var audioFormats = {
     'mp3': 'audio/mpeg',
@@ -18,6 +20,8 @@
     'webm': 'video/webm',
     'mp4': 'video/mp4',
   };
+  
+  var updateQuality;
 
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
@@ -86,9 +90,11 @@
 
     var impl = {
       autoplay: EMPTY_STRING,
+      qualities: [],
+      currentQuality: autoQuality,
     };
 
-    media.dispatchEvent = function (name, data) {
+    media.dispatchEvent = function(name, data) {
       var customEvent = document.createEvent('CustomEvent'),
         detail = {
           type: name,
@@ -110,12 +116,24 @@
     [
       'seeked', 'timeupdate', 'progress', 'play',
       'pause', 'seeking', 'waiting', 'playing',
-      'error', 'volumechange', 'loadedmetadata'
-    ].forEach(function (event) {
+      'error', 'volumechange', 'loadedmetadata',
+    ].forEach(function(event) {
       media.addEventListener(event, function() {
         media.dispatchEvent(event);
       });
     });
+
+    // Mimic DOM events with custom, namespaced events on the document.
+    // Each media element using this prototype needs to provide a unique
+    // namespace for all its events via _eventNamespace.
+
+    media.addEventListener = function(type, listener, useCapture) {
+      document.addEventListener(this._eventNamespace + type, listener, useCapture);
+    };
+
+    media.removeEventListener = function(type, listener, useCapture) {
+      document.removeEventListener(this._eventNamespace + type, listener, useCapture);
+    };
 
     // Add the helper function _canPlaySrc so this works like other wrappers.
     media._canPlaySrc = canPlaySrc;
@@ -128,6 +146,27 @@
         set: function(aValue) {
           impl.autoplay = (typeof aValue === 'string' || aValue === true);
         }
+      },
+      qualities: {
+        get: function() {
+          return impl.qualities;
+        },
+        set: function(val = []) {
+          impl.qualities = val;
+        },
+        configurable: true
+      },
+      currentQuality: {
+        get: function() {
+          return impl.currentQuality;
+        },
+        set: function(val) {
+          impl.currentQuality = val;
+          if (updateQuality) {
+            updateQuality(impl.currentQuality);
+          }
+        },
+        configurable: true
       },
       src: {
         get: function() {
@@ -197,8 +236,31 @@
                     player.setTrackSwitchModeFor('audio', 'alwaysReplace');
                     player.setAutoSwitchQualityFor('video', true);
                     player.setAutoSwitchQualityFor('audio', true);
-                    player.setInitialBitrateFor('video', 99999999);
                     player.setInitialBitrateFor('audio', 99999999);
+                  });
+                  player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
+                    var bitrates = player.getBitrateInfoListFor('video');
+                    if (bitrates && bitrates.length) {
+                      bitrates = bitrates.map(function(q, idx) {
+                        q.resolution = q.height;
+                        q.value = idx;
+                        return q;
+                      });
+                      bitrates.push({ resolution: autoQualityName, value: autoQuality });
+                      media.qualities = bitrates;
+                    } else {
+                      media.qualities = [];
+                    }
+                    media.currentQuality = player.getQualityFor('video');
+                    media.dispatchEvent("bitrateloaded");
+                    updateQuality = function(currentQuality) {
+                      if (currentQuality === autoQuality) {
+                        player.setAutoSwitchQualityFor('video', true);
+                      } else {
+                        player.setAutoSwitchQualityFor('video', false);
+                        player.setQualityFor('video', currentQuality);
+                      }
+                    }
                   });
                   player.initialize(media, adaptiveMedia, false);
                 });
@@ -206,10 +268,28 @@
               case 'm3u8':
                 loadHlsJs(media, function(hls) {
                   if(Hls.isSupported()) {
-                    hls.on(Hls.Events.ERROR, function (error, data) {
+                    hls.on(Hls.Events.ERROR, function(error, data) {
                       // fallback to default media source
                       if (data.type === 'networkError') {
                         media.src = fallbackMedia;
+                      }
+                    });
+                    hls.on(Hls.Events.MEDIA_ATTACHED, function() {
+                      var bitrates = hls.levels;
+                      if (bitrates && bitrates.length) {
+                        bitrates = bitrates.map(function(q, idx) {
+                          q.resolution = q.height;
+                          q.value = idx;
+                          return q;
+                        });
+                        bitrates.push({ resolution: autoQualityName, value: autoQuality });
+                        media.qualities = bitrates;
+                      } else {
+                        media.qualities = [];
+                      }
+                      media.dispatchEvent("bitrateloaded");
+                      updateQuality = function(currentQuality) {
+                        hls.currentLevel = currentQuality;
                       }
                     });
                     hls.loadSource(adaptiveMedia);
@@ -233,7 +313,7 @@
     return media;
   }
 
-  Popcorn.HTMLAdaptiveMediaElement = function (id) {
+  Popcorn.HTMLAdaptiveMediaElement = function(id) {
     return wrapMedia(id, 'video');
   };
   Popcorn.HTMLAdaptiveMediaElement._canPlaySrc = canPlaySrc;

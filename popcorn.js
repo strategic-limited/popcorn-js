@@ -903,7 +903,7 @@
     MouseEvents: "mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave click dblclick",
     Events: "loadstart progress suspend emptied stalled play pause error " +
             "loadedmetadata loadeddata waiting playing canplay canplaythrough " +
-            "seeking seeked timeupdate ended ratechange durationchange volumechange"
+            "seeking seeked timeupdate ended ratechange durationchange volumechange bitrateloaded"
   };
 
   Popcorn.Events.Natives = Popcorn.Events.UIEvents + " " +

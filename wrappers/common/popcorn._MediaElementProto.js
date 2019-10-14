@@ -5,7 +5,7 @@
  *   - parentNode: the element owning the media div/iframe
  *   - _eventNamespace: the unique namespace for all events
  */
-(function( Popcorn, document ) {
+(function(Popcorn, document) {
 
   /*********************************************************************************
    * parseUri 1.2.2
@@ -25,7 +25,7 @@
     }
 
     uri[o.q.name] = {};
-    uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+    uri[o.key[12]].replace(o.q.parser, function($0, $1, $2) {
       if ($1) {
         uri[o.q.name][$1] = $2;
       }
@@ -74,9 +74,11 @@
   function MediaElementProto() {
     var protoElement = {},
         events = {},
+        qualities = [],
+        currentQuality  = -1,
         parentNode;
-    if ( !Object.prototype.__defineGetter__ ) {
-      protoElement = document.createElement( "div" );
+    if (!Object.prototype.__defineGetter__) {
+      protoElement = document.createElement("div");
     }
     protoElement._util = {
       // Each wrapper stamps a type.
@@ -93,8 +95,8 @@
       //   autoplay
       //   autoplay="true"
       //   v.autoplay=true;
-      isAttributeSet: function( value ) {
-        return ( typeof value === "string" || value === true );
+      isAttributeSet: function(value) {
+        return (typeof value === "string" || value === true);
       },
 
       parseUri: parseUri
@@ -102,29 +104,29 @@
     // Mimic DOM events with custom, namespaced events on the document.
     // Each media element using this prototype needs to provide a unique
     // namespace for all its events via _eventNamespace.
-    protoElement.addEventListener = function( type, listener, useCapture ) {
-      document.addEventListener( this._eventNamespace + type, listener, useCapture );
+    protoElement.addEventListener = function(type, listener, useCapture) {
+      document.addEventListener(this._eventNamespace + type, listener, useCapture);
     };
 
-    protoElement.removeEventListener = function( type, listener, useCapture ) {
-      document.removeEventListener( this._eventNamespace + type, listener, useCapture );
+    protoElement.removeEventListener = function(type, listener, useCapture) {
+      document.removeEventListener(this._eventNamespace + type, listener, useCapture);
     };
 
-    protoElement.dispatchEvent = function( name, data ) {
-      var customEvent = document.createEvent( "CustomEvent" ),
+    protoElement.dispatchEvent = function(name, data) {
+      var customEvent = document.createEvent("CustomEvent"),
         detail = {
           type: name,
           target: this.parentNode,
           data: data
         };
 
-      customEvent.initCustomEvent( this._eventNamespace + name, false, false, detail );
-      document.dispatchEvent( customEvent );
+      customEvent.initCustomEvent(this._eventNamespace + name, false, false, detail);
+      document.dispatchEvent(customEvent);
     };
 
     protoElement.load = Popcorn.nop;
 
-    protoElement.canPlayType = function( url ) {
+    protoElement.canPlayType = function(url) {
       return "";
     };
 
@@ -143,7 +145,7 @@
     protoElement.HAVE_CURRENT_DATA = 2;
     protoElement.HAVE_FUTURE_DATA = 3;
     protoElement.HAVE_ENOUGH_DATA = 4;
-    Object.defineProperties( protoElement, {
+    Object.defineProperties(protoElement, {
 
       currentSrc: {
         get: function() {
@@ -156,7 +158,7 @@
         get: function() {
           return parentNode;
         },
-        set: function( val ) {
+        set: function(val) {
           parentNode = val;
         },
         configurable: true
@@ -229,6 +231,26 @@
         },
         configurable: true
       },
+      qualities: {
+        get: function() {
+          return qualities;
+        },
+        set: function(val) {
+          if (val) {
+            qualities = val;
+          }
+        },
+        configurable: true
+      },
+      currentQuality : {
+        get: function() {
+          return currentQuality ;
+        },
+        set: function(val) {
+          currentQuality  = val;
+        },
+        configurable: true
+      },
 
       style: {
         get: function() {
@@ -255,4 +277,4 @@
 
   Popcorn._MediaElementProto = MediaElementProto;
 
-}( Popcorn, window.document ));
+}(Popcorn, window.document));
