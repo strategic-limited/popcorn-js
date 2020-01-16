@@ -84,7 +84,7 @@
         loop: false,
         poster: EMPTY_STRING,
         volume: 1,
-        muted: false,
+        muted: true,
         currentTime: 0,
         duration: NaN,
         ended: false,
@@ -127,6 +127,8 @@
     }
 
     function onPlayerReady( event ) {
+
+      player.mute();
 
       var onMuted = function() {
         if ( self.muted ) {
@@ -428,6 +430,8 @@
       // Sync loop, but manage internally
       impl.loop = playerVars.loop === "1" || impl.loop;
       delete playerVars.loop;
+
+      impl.muted = playerVars.muted  || impl.muted;
 
       // Don't show related videos when ending
       playerVars.rel = playerVars.rel || 0;
