@@ -127,41 +127,33 @@
     }
 
     function onPlayerReady( event ) {
-
-      var onMuted = function() {
-        if ( self.muted ) {
-          // force an initial play on the video, to remove autostart on initial seekTo.
-          addYouTubeEvent( "play", onFirstPlay );
-          if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            player.playVideo();
-          } else {
-            self.dispatchEvent( "loadedmetadata" );
-            setTimeout(function() {
-              var el = document.getElementById("controls-big-play-button");
-              if (el) {
-                el.click();
-              }
-            }, 10);
-            //remove loading image so we can click actual youtube play button
-            document.getElementsByClassName("loading-message")[0].style.display = "none";
-            if (videoElement) {
-              videoElement.style.zIndex = 99999999999;
-            }
-
-          }
-        } else {
-          setTimeout( onMuted, 0 );
-        }
-      };
       playerReady = true;
       // XXX: this should really live in cued below, but doesn't work.
 
       // Browsers using flash will have the pause() call take too long and cause some
       // sound to leak out. Muting before to prevent this.
-      self.muted = true;
+      // self.muted = true;
 
       // ensure we are muted.
-      onMuted();
+
+      // force an initial play on the video, to remove autostart on initial seekTo.
+      addYouTubeEvent( "play", onFirstPlay );
+      if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+        player.playVideo();
+      } else {
+        self.dispatchEvent("loadedmetadata");
+        setTimeout(function() {
+          var el = document.getElementById("controls-big-play-button");
+          if (el) {
+            el.click();
+          }
+        }, 10);
+        //remove loading image so we can click actual youtube play button
+        document.getElementsByClassName("loading-message")[0].style.display = "none";
+        if (videoElement) {
+          videoElement.style.zIndex = 99999999999;
+        }
+      }
     }
 
     function onPlayerError(event) {
