@@ -128,8 +128,6 @@
 
     function onPlayerReady( event ) {
 
-      player.mute();
-
       var onMuted = function() {
         if ( self.muted ) {
           // force an initial play on the video, to remove autostart on initial seekTo.
