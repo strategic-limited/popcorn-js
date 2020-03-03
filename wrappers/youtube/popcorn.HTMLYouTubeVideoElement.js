@@ -429,8 +429,6 @@
       impl.loop = playerVars.loop === "1" || impl.loop;
       delete playerVars.loop;
 
-      impl.muted = playerVars.muted  || impl.muted;
-
       // Don't show related videos when ending
       playerVars.rel = playerVars.rel || 0;
 
