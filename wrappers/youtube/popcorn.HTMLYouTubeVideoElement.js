@@ -84,7 +84,7 @@
         loop: false,
         poster: EMPTY_STRING,
         volume: 1,
-        muted: true,
+        muted: false,
         currentTime: 0,
         duration: NaN,
         ended: false,
