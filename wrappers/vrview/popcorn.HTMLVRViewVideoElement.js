@@ -54,7 +54,7 @@
   }
 
   function isMobile() {
-    return (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g));
+    return (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g) || navigator.maxTouchPoints > 1);
   }
 
   function isSafari() {
