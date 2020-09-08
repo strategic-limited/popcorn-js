@@ -636,7 +636,7 @@
             setTimeout(function() {
               this.media[ name ]();
             }, 0);
-            return this;
+            // return this;
             // if (playPromise !== undefined) {
             //   playPromise.then(function(v) {
             //     return this;
