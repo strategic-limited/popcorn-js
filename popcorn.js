@@ -631,15 +631,19 @@
               this.media.currentTime = Popcorn.util.toSeconds( arg );
             }
 
-            var playPromise = this.media[ name ]();
-
-            if (playPromise !== undefined) {
-              playPromise.then(function(v) {
-                return this;
-              }, function(e) {
-                console.log("rejected", e);
-              })
-            }
+            // var playPromise = this.media[ name ]();
+            this.media.load();
+            setTimeout(function() {
+              this.media[ name ]();
+            }, 0);
+            return this;
+            // if (playPromise !== undefined) {
+            //   playPromise.then(function(v) {
+            //     return this;
+            //   }, function(e) {
+            //     console.log("rejected", e);
+            //   })
+            // }
           }
 
           if ( arg != null ) {
