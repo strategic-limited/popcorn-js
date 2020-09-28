@@ -20,13 +20,21 @@
     'webm': 'video/webm',
     'mp4': 'video/mp4',
   };
-  
+
   var updateQuality;
+
+  var activated;
 
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
       (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
       (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
+  }
+
+  function isIos() {
+    return true;
+    // return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
+    //   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
   function canPlaySrc(src) {
@@ -85,197 +93,167 @@
   }
 
   function wrapMedia(id, mediaType) {
-    var parent = typeof id === 'string' ? document.querySelector(id) : id,
+    var parent = typeof id === 'string' ? document.querySelector(id) : id;
+    var media;
+    if (isIos()) {
+      media = document.getElementById(mediaType + '-for-ios');
+      if (media.firstChild) {
+        media.firstChild.src = null;
+      }
+    } else {
       media = document.createElement(mediaType);
+    }
 
-    var impl = {
-      autoplay: EMPTY_STRING,
-      qualities: [],
-      currentQuality: autoQuality,
-    };
+    if (!activated) {
+      var impl = {
+        autoplay: EMPTY_STRING,
+        qualities: [],
+        currentQuality: autoQuality,
+      };
 
-    media.dispatchEvent = function(name, data) {
-      var customEvent = document.createEvent('CustomEvent'),
-        detail = {
-          type: name,
-          target: media.parentNode,
-          data: data
-        };
+      media.dispatchEvent = function(name, data) {
+        var customEvent = document.createEvent('CustomEvent'),
+          detail = {
+            type: name,
+            target: media.parentNode,
+            data: data
+          };
 
-      customEvent.initCustomEvent(media._eventNamespace + name, false, false, detail);
-      document.dispatchEvent(customEvent);
-    };
+        customEvent.initCustomEvent(media._eventNamespace + name, false, false, detail);
+        document.dispatchEvent(customEvent);
+      };
 
-    media._eventNamespace = Popcorn.guid('HTMLAdaptiveMediaElement::');
+      media._eventNamespace = Popcorn.guid('HTMLAdaptiveMediaElement::');
 
-    media.setAttribute('playsinline', '');
-    media.setAttribute('webkit-playsinline', '');
-
-    parent.appendChild(media);
-
-    [
-      'seeked', 'timeupdate', 'progress', 'play',
-      'pause', 'seeking', 'waiting', 'playing',
-      'error', 'volumechange', 'loadedmetadata',
-    ].forEach(function(event) {
-      media.addEventListener(event, function() {
-        media.dispatchEvent(event);
+      media.setAttribute('playsinline', '');
+      media.setAttribute('webkit-playsinline', '');
+      [
+        'seeked', 'timeupdate', 'progress', 'play',
+        'pause', 'seeking', 'waiting', 'playing',
+        'error', 'volumechange', 'loadedmetadata',
+      ].forEach(function(event) {
+        media.addEventListener(event, function() {
+          media.dispatchEvent(event);
+        });
       });
-    });
+      // Mimic DOM events with custom, namespaced events on the document.
+      // Each media element using this prototype needs to provide a unique
+      // namespace for all its events via _eventNamespace.
 
-    // Mimic DOM events with custom, namespaced events on the document.
-    // Each media element using this prototype needs to provide a unique
-    // namespace for all its events via _eventNamespace.
+      media.addEventListener = function(type, listener, useCapture) {
+        document.addEventListener(this._eventNamespace + type, listener, useCapture);
+      };
 
-    media.addEventListener = function(type, listener, useCapture) {
-      document.addEventListener(this._eventNamespace + type, listener, useCapture);
-    };
+      media.removeEventListener = function(type, listener, useCapture) {
+        document.removeEventListener(this._eventNamespace + type, listener, useCapture);
+      };
 
-    media.removeEventListener = function(type, listener, useCapture) {
-      document.removeEventListener(this._eventNamespace + type, listener, useCapture);
-    };
-
-    // Add the helper function _canPlaySrc so this works like other wrappers.
-    media._canPlaySrc = canPlaySrc;
-
-    Object.defineProperties(media, {
-      autoplay: {
-        get: function() {
-          return impl.autoplay;
-        },
-        set: function(aValue) {
-          impl.autoplay = (typeof aValue === 'string' || aValue === true);
-        }
-      },
-      qualities: {
-        get: function() {
-          return impl.qualities;
-        },
-        set: function(val = []) {
-          impl.qualities = val;
-        },
-        configurable: true
-      },
-      currentQuality: {
-        get: function() {
-          return impl.currentQuality;
-        },
-        set: function(val) {
-          impl.currentQuality = val;
-          if (updateQuality) {
-            updateQuality(impl.currentQuality);
+      // Add the helper function _canPlaySrc so this works like other wrappers.
+      media._canPlaySrc = canPlaySrc;
+      Object.defineProperties(media, {
+        autoplay: {
+          get: function() {
+            return impl.autoplay;
+          },
+          set: function(aValue) {
+            impl.autoplay = (typeof aValue === 'string' || aValue === true);
           }
         },
-        configurable: true
-      },
-      src: {
-        get: function() {
-          return media._src;
+        qualities: {
+          get: function() {
+            return impl.qualities;
+          },
+          set: function(val = []) {
+            impl.qualities = val;
+          },
+          configurable: true
         },
-        set: function(aSrc) {
-          function setRawSource(source) {
-            var extension = source.split('.').reverse()[0];
-            // IE and Edge do not understand source setting here for MSE BLOB
-            if (isMicrosoftBrowser()) {
-              if (source && source !== media.getAttribute('src')) {
-                if (videoFormats[extension] || audioFormats[extension]) {
-                  media.setAttribute('type', videoFormats[extension] || audioFormats[extension]);
+        currentQuality: {
+          get: function() {
+            return impl.currentQuality;
+          },
+          set: function(val) {
+            impl.currentQuality = val;
+            if (updateQuality) {
+              updateQuality(impl.currentQuality);
+            }
+          },
+          configurable: true
+        },
+        src: {
+          get: function() {
+            return media._src;
+          },
+          set: function(aSrc) {
+            function setRawSource(source) {
+              var extension = source.split('.').reverse()[0];
+              // IE and Edge do not understand source setting here for MSE BLOB
+              if (isMicrosoftBrowser()) {
+                if (source && source !== media.getAttribute('src')) {
+                  if (videoFormats[extension] || audioFormats[extension]) {
+                    media.setAttribute('type', videoFormats[extension] || audioFormats[extension]);
+                  }
+                  media.setAttribute('src', source);
+                  media.load();
                 }
-                media.setAttribute('src', source);
-                media.load();
-              }
-            } else {
-              var sources = media.getElementsByTagName('source');
-              if (!sources[0] || (source && source !== sources[0].src)) {
-                if (media.firstChild) {
-                  media.removeChild(media.firstChild);
+              } else {
+                var sources = media.getElementsByTagName('source');
+                if (!sources[0] || (source && source !== sources[0].src)) {
+                  if (media.firstChild) {
+                    media.removeChild(media.firstChild);
+                  }
+                  var mediaSource = document.createElement('source');
+                  if (videoFormats[extension] || audioFormats[extension]) {
+                    mediaSource.type = videoFormats[extension] || audioFormats[extension];
+                  }
+                  console.info('new source');
+                  mediaSource.src = source;
+                  console.info(mediaSource.src);
+                  media.appendChild(mediaSource);
+                  media.load();
                 }
-                var mediaSource = document.createElement('source');
-                if (videoFormats[extension] || audioFormats[extension]) {
-                  mediaSource.type = videoFormats[extension] || audioFormats[extension];
-                }
-                mediaSource.src = source;
-                media.appendChild(mediaSource);
-                media.load();
               }
             }
-          }
-          media._src = aSrc;
-          function findMediaSource(sources, acceptableSources) {
-            return sources.filter(function(source) {
-              var extension = source.split('.').reverse()[0];
-              return acceptableSources.indexOf(extension) !== -1;
-            })[0];
-          }
+            media._src = aSrc;
+            function findMediaSource(sources, acceptableSources) {
+              return sources.filter(function(source) {
+                var extension = source.split('.').reverse()[0];
+                return acceptableSources.indexOf(extension) !== -1;
+              })[0];
+            }
 
-          var sources = media._src.split('|');
-          var hlsMedia = findMediaSource(sources, ['m3u8']);
-          var dashMedia = findMediaSource(sources, ['mpd']);
-          var fallbackMedia = findMediaSource(sources, ['mp4', 'webm']);
+            var sources = media._src.split('|');
+            var hlsMedia = findMediaSource(sources, ['m3u8']);
+            var dashMedia = findMediaSource(sources, ['mpd']);
+            var fallbackMedia = findMediaSource(sources, ['mp4', 'webm']);
 
 
-          if (dashMedia || hlsMedia) {
-            var adaptiveMedia = dashMedia || hlsMedia;
-            var extension = adaptiveMedia.split('.').reverse()[0];
-            switch (extension) {
-              case 'mpd':
-                loadDashJs(function() {
-                  var player = dashjs.MediaPlayer().create();
-                  player.on(dashjs.MediaPlayer.events.ERROR, function(event) {
-                    if (event.error === 'capability') {
-                      // 23 says `message: "mediasource is not supported"`, so fallback to HLS
-                      // as it happens mainly on Safari iOS
-                      media.src = hlsMedia || fallbackMedia;
-                    } else if (event.error === 'download' && event.event.id === 'manifest') {
-                      // otherwise MPD manifest is not available so fallback to regular media file
-                      media.src = fallbackMedia;
-                    }
-                  });
-                  player.on(dashjs.MediaPlayer.events.SOURCE_INITIALIZED, function() {
-                    player.setTrackSwitchModeFor('video', 'alwaysReplace');
-                    player.setTrackSwitchModeFor('audio', 'alwaysReplace');
-                    player.setAutoSwitchQualityFor('video', true);
-                    player.setAutoSwitchQualityFor('audio', true);
-                    player.setInitialBitrateFor('audio', 99999999);
-                  });
-                  player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
-                    var bitrates = player.getBitrateInfoListFor('video');
-                    if (bitrates && bitrates.length) {
-                      bitrates = bitrates.map(function(q, idx) {
-                        q.resolution = q.height;
-                        q.value = idx;
-                        return q;
-                      });
-                      bitrates.push({ resolution: autoQualityName, value: autoQuality });
-                      media.qualities = bitrates;
-                    } else {
-                      media.qualities = [];
-                    }
-                    media.currentQuality = player.getQualityFor('video');
-                    media.dispatchEvent("bitrateloaded");
-                    updateQuality = function(currentQuality) {
-                      if (currentQuality === autoQuality) {
-                        player.setAutoSwitchQualityFor('video', true);
-                      } else {
-                        player.setAutoSwitchQualityFor('video', false);
-                        player.setQualityFor('video', currentQuality);
-                      }
-                    }
-                  });
-                  player.initialize(media, adaptiveMedia, false);
-                });
-                break;
-              case 'm3u8':
-                loadHlsJs(media, function(hls) {
-                  if(Hls.isSupported()) {
-                    hls.on(Hls.Events.ERROR, function(error, data) {
-                      // fallback to default media source
-                      if (data.type === 'networkError') {
+            if (dashMedia || hlsMedia) {
+              var adaptiveMedia = dashMedia || hlsMedia;
+              var extension = adaptiveMedia.split('.').reverse()[0];
+              switch (extension) {
+                case 'mpd':
+                  loadDashJs(function() {
+                    var player = dashjs.MediaPlayer().create();
+                    player.on(dashjs.MediaPlayer.events.ERROR, function(event) {
+                      if (event.error === 'capability') {
+                        // 23 says `message: "mediasource is not supported"`, so fallback to HLS
+                        // as it happens mainly on Safari iOS
+                        media.src = hlsMedia || fallbackMedia;
+                      } else if (event.error === 'download' && event.event.id === 'manifest') {
+                        // otherwise MPD manifest is not available so fallback to regular media file
                         media.src = fallbackMedia;
                       }
                     });
-                    hls.on(Hls.Events.MEDIA_ATTACHED, function() {
-                      var bitrates = hls.levels;
+                    player.on(dashjs.MediaPlayer.events.SOURCE_INITIALIZED, function() {
+                      player.setTrackSwitchModeFor('video', 'alwaysReplace');
+                      player.setTrackSwitchModeFor('audio', 'alwaysReplace');
+                      player.setAutoSwitchQualityFor('video', true);
+                      player.setAutoSwitchQualityFor('audio', true);
+                      player.setInitialBitrateFor('audio', 99999999);
+                    });
+                    player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
+                      var bitrates = player.getBitrateInfoListFor('video');
                       if (bitrates && bitrates.length) {
                         bitrates = bitrates.map(function(q, idx) {
                           q.resolution = q.height;
@@ -287,29 +265,73 @@
                       } else {
                         media.qualities = [];
                       }
+                      media.currentQuality = player.getQualityFor('video');
                       media.dispatchEvent("bitrateloaded");
                       updateQuality = function(currentQuality) {
-                        hls.currentLevel = currentQuality;
+                        if (currentQuality === autoQuality) {
+                          player.setAutoSwitchQualityFor('video', true);
+                        } else {
+                          player.setAutoSwitchQualityFor('video', false);
+                          player.setQualityFor('video', currentQuality);
+                        }
                       }
                     });
-                    hls.loadSource(adaptiveMedia);
-                    hls.attachMedia(media);
-                  } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
-                    setRawSource(adaptiveMedia);
-                  }
-                });
-                break;
-              default:
-                setRawSource(adaptiveMedia);
-                break;
+                    player.initialize(media, adaptiveMedia, false);
+                  });
+                  break;
+                case 'm3u8':
+                  loadHlsJs(media, function(hls) {
+                    if(Hls.isSupported()) {
+                      hls.on(Hls.Events.ERROR, function(error, data) {
+                        // fallback to default media source
+                        if (data.type === 'networkError') {
+                          media.src = fallbackMedia;
+                        }
+                      });
+                      hls.on(Hls.Events.MEDIA_ATTACHED, function() {
+                        var bitrates = hls.levels;
+                        if (bitrates && bitrates.length) {
+                          bitrates = bitrates.map(function(q, idx) {
+                            q.resolution = q.height;
+                            q.value = idx;
+                            return q;
+                          });
+                          bitrates.push({ resolution: autoQualityName, value: autoQuality });
+                          media.qualities = bitrates;
+                        } else {
+                          media.qualities = [];
+                        }
+                        media.dispatchEvent("bitrateloaded");
+                        updateQuality = function(currentQuality) {
+                          hls.currentLevel = currentQuality;
+                        }
+                      });
+                      hls.loadSource(adaptiveMedia);
+                      hls.attachMedia(media);
+                    } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
+                      setRawSource(adaptiveMedia);
+                    }
+                  });
+                  break;
+                default:
+                  setRawSource(adaptiveMedia);
+                  break;
+              }
+            } else {
+              setRawSource(fallbackMedia || aSrc);
             }
-          } else {
-            setRawSource(fallbackMedia || aSrc);
           }
         }
-      }
-    });
+      });
+    }
 
+    if (!isIos()) {
+      parent.appendChild(media);
+    }
+
+    if (isIos()) {
+      activated = true;
+    }
     return media;
   }
 
