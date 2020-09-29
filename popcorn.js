@@ -633,25 +633,29 @@
               this.media.currentTime = Popcorn.util.toSeconds( arg );
             }
 
-            const _thisMedia = this.media;
+            const _this = this;
 
             if (/play/.test(name) ) {
               allowedPause = false;
+              debugger;
               const promise = this.media[ name ]();
               if (promise) {
                 promise.then(function () {
                   allowedPause = true;
-                  console.info('play')
+                  console.info('play');
+                  return _this;
                 }).catch(function (error) {
                   allowedPause = true;
-                  _thisMedia.pause();
+                  _this.media.pause();
                   console.error(error);
+                  return _this;
                 })
               } else {
                 allowedPause = true;
+                return this;
               }
             } else if (/pause/.test(name) && !allowedPause) {
-              return;
+              return this;
             }
             this.media[ name ]();
 
