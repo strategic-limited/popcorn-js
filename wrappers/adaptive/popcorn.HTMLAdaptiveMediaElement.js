@@ -199,10 +199,15 @@
               } else {
                 var sources = media.getElementsByTagName('source');
                 if (!sources[0] || (source && source !== sources[0].src)) {
-                  if (media.firstChild) {
-                    media.removeChild(media.firstChild);
+                  var mediaSource;
+                  if (!isIos()) {
+                    if (media.firstChild) {
+                      media.removeChild(media.firstChild);
+                      mediaSource = document.createElement('source');
+                    }  else {
+                      mediaSource = sources[0];
+                    }
                   }
-                  var mediaSource = document.createElement('source');
                   if (videoFormats[extension] || audioFormats[extension]) {
                     mediaSource.type = videoFormats[extension] || audioFormats[extension];
                   }

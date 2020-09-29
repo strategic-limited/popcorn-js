@@ -637,7 +637,6 @@
 
             if (/play/.test(name) ) {
               allowedPause = false;
-              debugger;
               const promise = this.media[ name ]();
               if (promise) {
                 promise.then(function () {
