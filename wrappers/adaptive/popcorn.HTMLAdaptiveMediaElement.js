@@ -32,20 +32,20 @@
       (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
       (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
   }
+  function isIosMobile() {
+    return true;
+    // return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
+    //   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
 
   function getExtension(source) {
-    const existTiming = !isIos() && source.match(/#t=/g);
+    const existTiming = !isIosMobile() && source.match(/#t=/g);
     let sourceString = source;
     if (existTiming) {
       sourceString = source.split('#')[0];
     }
-    return sourceString.split('.').reverse()[0];;
-  }
-
-  function isIos() {
-    return true;
-    // return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
-    //   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    return sourceString.split('.').reverse()[0];
   }
 
   function canPlaySrc(src) {
@@ -104,7 +104,7 @@
 
   function wrapMedia(id, mediaType) {
     var parent = typeof id === 'string' ? document.querySelector(id) : id;
-    var isIos = isIos();
+    var isIos = isIosMobile();
     var media;
     var mediaSource;
     if (!activated && isIos && parent) {
@@ -386,11 +386,11 @@
       });
     }
 
-    if (!isIos()) {
+    if (!isIos) {
       parent.appendChild(media);
     }
 
-    if (isIos()) {
+    if (isIos) {
       activated = true;
     }
     return media;
