@@ -25,10 +25,21 @@
 
   var activated;
 
+  var iosContainer = 'video-for-ios';
+
   function isMicrosoftBrowser() {
     return navigator.appName === 'Microsoft Internet Explorer' ||
       (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Edge') > -1) ||
       (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
+  }
+
+  function getExtension(source) {
+    const existTiming = !isIos() && source.match(/#t=/g);
+    let sourceString = source;
+    if (existTiming) {
+      sourceString = source.split('#')[0];
+    }
+    return sourceString.split('.').reverse()[0];;
   }
 
   function isIos() {
@@ -77,8 +88,7 @@
       script.addEventListener('load', function() {
         window.define = requireDefine;
         if(Hls.isSupported()) {
-          var hls = new Hls();
-          hls.startLevel = -1;
+          var hls = new Hls({ autoStartLoad: false });
           window.Hls.instance = hls;
           callback(hls);
         } else {
@@ -94,12 +104,33 @@
 
   function wrapMedia(id, mediaType) {
     var parent = typeof id === 'string' ? document.querySelector(id) : id;
+    var isIos = isIos();
     var media;
-    if (isIos()) {
-      media = document.getElementById(mediaType + '-for-ios');
-      if (media.firstChild) {
-        media.firstChild.src = null;
-      }
+    var mediaSource;
+    if (!activated && isIos && parent) {
+      var container = document.createElement('div');
+      container.id = 'container-video-for-ios';
+      container.className = "popcorn-sequencer";
+      container.style.position = "absolute";
+      container.style.width = "100%";
+      container.style.height = "100%";
+      container.style.top = 0;
+      container.style.left = 0;
+      container.style.zIndex = 2;
+
+      var video = document.createElement('video');
+      video.style.width = "100%";
+      video.style.height = "100%";
+      video.id = iosContainer;
+
+      mediaSource = document.createElement('source');
+      video.appendChild(mediaSource);
+      container.appendChild(video);
+      parent.appendChild(container);
+    }
+
+    if (isIos) {
+      media = document.getElementById(iosContainer);
     } else {
       media = document.createElement(mediaType);
     }
@@ -186,7 +217,7 @@
           },
           set: function(aSrc) {
             function setRawSource(source) {
-              var extension = source.split('.').reverse()[0];
+              var extension = getExtension(source);
               // IE and Edge do not understand source setting here for MSE BLOB
               if (isMicrosoftBrowser()) {
                 if (source && source !== media.getAttribute('src')) {
@@ -197,33 +228,42 @@
                   media.load();
                 }
               } else {
-                var sources = media.getElementsByTagName('source');
-                if (!sources[0] || (source && source !== sources[0].src)) {
-                  var mediaSource;
-                  if (!isIos()) {
-                    if (media.firstChild) {
-                      media.removeChild(media.firstChild);
-                      mediaSource = document.createElement('source');
-                    }  else {
-                      mediaSource = sources[0];
-                    }
-                  }
+                if (isIos) {
                   if (videoFormats[extension] || audioFormats[extension]) {
                     mediaSource.type = videoFormats[extension] || audioFormats[extension];
                   }
-                  console.info('new source');
                   mediaSource.src = source;
-                  console.info(mediaSource.src);
-                  media.appendChild(mediaSource);
                   media.load();
+                } else {
+                  var sources = media.getElementsByTagName('source');
+                  if (!sources[0] || (source && source !== sources[0].src)) {
+                    if (media.firstChild) {
+                      media.removeChild(media.firstChild);
+                    }
+                    var mediaSource = document.createElement('source');
+                    if (videoFormats[extension] || audioFormats[extension]) {
+                      mediaSource.type = videoFormats[extension] || audioFormats[extension];
+                    }
+                    mediaSource.src = source;
+                    media.appendChild(mediaSource);
+                    media.load();
+                  }
                 }
               }
             }
             media._src = aSrc;
             function findMediaSource(sources, acceptableSources) {
               return sources.filter(function(source) {
-                var extension = source.split('.').reverse()[0];
-                return acceptableSources.indexOf(extension) !== -1;
+                var extension = getExtension(sourceString);
+                return acceptableSources && acceptableSources.indexOf(extension) !== -1;
+              })[0];
+            }
+            function findTimeSource(sources) {
+              if (!isIos()) {
+                return null;
+              }
+              return sources.filter(function(source) {
+                return source.match(/#t=/g);
               })[0];
             }
 
@@ -231,7 +271,17 @@
             var hlsMedia = findMediaSource(sources, ['m3u8']);
             var dashMedia = findMediaSource(sources, ['mpd']);
             var fallbackMedia = findMediaSource(sources, ['mp4', 'webm']);
-
+            var timeMedia = findTimeSource(sources);
+            var timeArr;
+            if (timeMedia) {
+              timeArr = (timeMedia).split('#t=');
+            }
+            var timeStr = '';
+            var from = 0;
+            if (timeArr && timeArr.length > 1) {
+              timeStr = timeArr[1];
+              from = timeStr.split(',')[0];
+            }
 
             if (dashMedia || hlsMedia) {
               var adaptiveMedia = dashMedia || hlsMedia;
@@ -311,9 +361,15 @@
                           hls.currentLevel = currentQuality;
                         }
                       });
+                      console.info(from);
+                      hls.startLoad(from);
                       hls.loadSource(adaptiveMedia);
                       hls.attachMedia(media);
                     } else if (media.canPlayType('application/vnd.apple.mpegurl')) {
+                      const existTiming = adaptiveMedia.match(/#t=/g);
+                      if (!existTiming) {
+                        adaptiveMedia = adaptiveMedia + "#t=" + from;
+                      }
                       setRawSource(adaptiveMedia);
                     }
                   });
