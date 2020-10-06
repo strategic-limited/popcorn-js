@@ -254,7 +254,7 @@
             media._src = aSrc;
             function findMediaSource(sources, acceptableSources) {
               return sources.filter(function(source) {
-                var extension = getExtension(sourceString);
+                var extension = getExtension(source);
                 return acceptableSources && acceptableSources.indexOf(extension) !== -1;
               })[0];
             }
