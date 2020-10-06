@@ -33,9 +33,8 @@
       (navigator.appName === "Netscape" && navigator.appVersion.indexOf('Trident') > -1)
   }
   function isIosMobile() {
-    return true;
-    // return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
-    //   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
 
