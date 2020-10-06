@@ -106,7 +106,6 @@
     var parent = typeof id === 'string' ? document.querySelector(id) : id;
     var isIos = isIosMobile();
     var media;
-    var mediaSource;
     if (!activated && isIos && parent) {
       var container = document.createElement('div');
       container.id = 'container-video-for-ios';
@@ -123,7 +122,8 @@
       video.style.height = "100%";
       video.id = iosContainer;
 
-      mediaSource = document.createElement('source');
+      const mediaSource = document.createElement('source');
+      mediaSource.id = 'video-src-for-ios';
       video.appendChild(mediaSource);
       container.appendChild(video);
       parent.appendChild(container);
@@ -229,6 +229,7 @@
                 }
               } else {
                 if (isIos) {
+                  var mediaSource = document.getElementById('video-src-for-ios');
                   if (videoFormats[extension] || audioFormats[extension]) {
                     mediaSource.type = videoFormats[extension] || audioFormats[extension];
                   }
