@@ -259,7 +259,7 @@
               })[0];
             }
             function findTimeSource(sources) {
-              if (!isIos()) {
+              if (!isIos) {
                 return null;
               }
               return sources.filter(function(source) {
