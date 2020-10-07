@@ -37,7 +37,6 @@
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
-
   function getExtension(source) {
     const existTiming = !isIosMobile() && source.match(/#t=/g);
     let sourceString = source;
