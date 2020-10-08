@@ -5,6 +5,14 @@
  */
 (function (Popcorn, document) {
 
+  var activated;
+
+  function isIos() {
+    return true;
+    // return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
+    //   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
   // rethink exclusive detection
   var existingTypes = [/^(?:https?:\/\/www\.|https?:\/\/m\.|https?:\/\/|www\.|\.|^)youtu/,
       /vr360:\/\/(.)*\.(mp4|m3u8|mpd)/,
@@ -66,57 +74,73 @@
     var parent = typeof id === "string" ? document.querySelector(id) : id,
       media = document.createElement(mediaType);
 
+    if (isIos()) {
+      media = document.getElementById(mediaType + '-for-ios');
+      if (media.firstChild) {
+        media.firstChild.src = null;
+      }
+    } else {
+      media = document.createElement(mediaType);
+    }
+
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
-    var source = document.createElement('source');
-    media.appendChild(source);
+    if (!activated) {
+      var source = document.createElement('source');
+      media.appendChild(source);
+      // Add the helper function _canPlaySrc so this works like other wrappers.
+      media._canPlaySrc = function (src) {
+        if (media.tagName === 'VIDEO') {
+          return canPlayVideoSrc(src);
+        } else {
+          return canPlayAudioSrc(src);
+        }
+      };
 
-    parent.appendChild(media);
+      media._play = media.play;
+      media._pause = media.pause;
+      media.play = function () {
+        media._play();
+      };
+      media.pause = function () {
+        media._pause();
+      };
 
-    // Add the helper function _canPlaySrc so this works like other wrappers.
-    media._canPlaySrc = function (src) {
-      if (media.tagName === 'VIDEO') {
-        return canPlayVideoSrc(src);
-      } else {
-        return canPlayAudioSrc(src);
-      }
-    };
+      Object.defineProperties(media, {
 
-    media._play = media.play;
-    media._pause = media.pause;
-    media.play = function () {
-      media._play();
-    };
-    media.pause = function () {
-      media._pause();
-    };
-
-    Object.defineProperties(media, {
-
-      src: {
-        get: function () {
-          return isMicrosoftBrowser() ? media.getAttribute('src') : media.getElementsByTagName('source')[0].src;
-        },
-        set: function (aSrc) {
-          if (isMicrosoftBrowser()) {
-            if (aSrc && aSrc !== media.getAttribute('src')) {
-              media.setAttribute('src', aSrc);
-              media.setAttribute('type', videoFormats[extension] || audioFormats[extension]);
-              media.load();
-            }
-          } else {
-            var sources = media.getElementsByTagName('source');
-            if (aSrc && aSrc !== sources[0].src) {
-              var extension = aSrc.split('.').reverse()[0];
-              sources[0].src = aSrc;
-              sources[0].type = videoFormats[extension] || audioFormats[extension];
-              media.load();
+        src: {
+          get: function () {
+            return isMicrosoftBrowser() ? media.getAttribute('src') : media.getElementsByTagName('source')[0].src;
+          },
+          set: function (aSrc) {
+            if (isMicrosoftBrowser()) {
+              if (aSrc && aSrc !== media.getAttribute('src')) {
+                media.setAttribute('src', aSrc);
+                media.setAttribute('type', videoFormats[extension] || audioFormats[extension]);
+                media.load();
+              }
+            } else {
+              var sources = media.getElementsByTagName('source');
+              if (aSrc && aSrc !== sources[0].src) {
+                var extension = aSrc.split('.').reverse()[0];
+                sources[0].src = aSrc;
+                sources[0].type = videoFormats[extension] || audioFormats[extension];
+                media.load();
+              }
             }
           }
         }
-      }
-    });
+      });
+    }
+
+    if (!isIos()) {
+      parent.appendChild(media);
+    }
+
+    if (isIos()) {
+      activated = true;
+    }
 
     return media;
   }
