@@ -8,9 +8,8 @@
   var activated;
 
   function isIos() {
-    return true;
-    // return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
-    //   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
   // rethink exclusive detection
