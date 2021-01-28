@@ -298,6 +298,9 @@
       // Create the base vimeo player string. It will always have query string options
       src = VIMEO_HOST + '/video/' + ( /\d+$/ ).exec(src.path) + "?";
 
+      elem.style.width = '100%';
+      elem.style.height = '100%';
+
       initVimeoAPI(function () {
         elem.id = playerUID;
         elem.allow = 'autoplay; fullscreen';
@@ -308,12 +311,19 @@
           byline: false,
           portrait: false,
           title: false,
-          responsive: true
+          responsive: false
         });
 
         parent.appendChild(elem);
 
         player.ready().then(function () {
+          const iframes = elem.getElementsByTagName('iframe');
+          if (iframes && iframes.length) {
+            for (let i = 0; i < iframes.length; i++) {
+              iframes[i].style.width = '100%';
+              iframes[i].style.height = '100%';
+            }
+          }
           if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
             player.setVolume(0);
             player.play().then(function () {
