@@ -211,6 +211,7 @@
                   }
                   mediaSource.src = source;
                   if (fallback) {
+                    let errorCatcher;
                     mediaSource.addEventListener('error', errorCatcher = function () {
                       setRawSource(fallback);
                       mediaSource.removeEventListener('error', errorCatcher);
