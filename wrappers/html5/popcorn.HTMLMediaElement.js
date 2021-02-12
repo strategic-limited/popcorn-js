@@ -80,14 +80,14 @@
       }
     } else {
       media = document.createElement(mediaType);
+      var source = document.createElement('source');
+      media.appendChild(source);
     }
 
     media.setAttribute('playsinline', '');
     media.setAttribute('webkit-playsinline', '');
 
     if (!activated) {
-      var source = document.createElement('source');
-      media.appendChild(source);
       // Add the helper function _canPlaySrc so this works like other wrappers.
       media._canPlaySrc = function (src) {
         if (media.tagName === 'VIDEO') {

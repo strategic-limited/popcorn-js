@@ -38,7 +38,7 @@
   }
 
   function getExtension(source) {
-    const existTiming = !isIosMobile() && source.match(/#t=/g);
+    const existTiming = source.match(/#t=/g);
     let sourceString = source;
     if (existTiming) {
       sourceString = source.split('#')[0];
@@ -104,30 +104,8 @@
     var parent = typeof id === 'string' ? document.querySelector(id) : id;
     var isIos = isIosMobile();
     var media;
-    if (!activated && isIos && parent) {
-      var container = document.createElement('div');
-      container.id = 'container-video-for-ios';
-      container.className = "popcorn-sequencer";
-      container.style.position = "absolute";
-      container.style.width = "100%";
-      container.style.height = "100%";
-      container.style.top = 0;
-      container.style.left = 0;
-      container.style.zIndex = 2;
-
-      var video = document.createElement('video');
-      video.style.width = "100%";
-      video.style.height = "100%";
-      video.id = iosContainer;
-
-      const mediaSource = document.createElement('source');
-      mediaSource.id = 'video-src-for-ios';
-      video.appendChild(mediaSource);
-      container.appendChild(video);
-      parent.appendChild(container);
-    }
-
     if (isIos) {
+      debugger
       media = document.getElementById(iosContainer);
     } else {
       media = document.createElement(mediaType);
@@ -214,7 +192,7 @@
             return media._src;
           },
           set: function(aSrc) {
-            function setRawSource(source) {
+            function setRawSource(source, fallback) {
               var extension = getExtension(source);
               // IE and Edge do not understand source setting here for MSE BLOB
               if (isMicrosoftBrowser()) {
@@ -232,6 +210,13 @@
                     mediaSource.type = videoFormats[extension] || audioFormats[extension];
                   }
                   mediaSource.src = source;
+                  if (fallback) {
+                    let errorCatcher;
+                    mediaSource.addEventListener('error', errorCatcher = function () {
+                      setRawSource(fallback);
+                      mediaSource.removeEventListener('error', errorCatcher);
+                    });
+                  }
                   media.load();
                 } else {
                   var sources = media.getElementsByTagName('source');
@@ -360,7 +345,6 @@
                           hls.currentLevel = currentQuality;
                         }
                       });
-                      console.info(from);
                       hls.startLoad(from);
                       hls.loadSource(adaptiveMedia);
                       hls.attachMedia(media);
@@ -369,7 +353,7 @@
                       if (!existTiming) {
                         adaptiveMedia = adaptiveMedia + "#t=" + from;
                       }
-                      setRawSource(adaptiveMedia);
+                      setRawSource(adaptiveMedia, fallbackMedia);
                     }
                   });
                   break;
