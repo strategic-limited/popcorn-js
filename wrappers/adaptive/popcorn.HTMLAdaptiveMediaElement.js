@@ -210,13 +210,14 @@
                     mediaSource.type = videoFormats[extension] || audioFormats[extension];
                   }
                   mediaSource.src = source;
-                  if (fallback) {
-                    let errorCatcher;
-                    mediaSource.addEventListener('error', errorCatcher = function () {
+                  mediaSource.addEventListener('error', errorCatcher = function () {
+                    if (fallback) {
                       setRawSource(fallback);
-                      mediaSource.removeEventListener('error', errorCatcher);
-                    });
-                  }
+                    } else {
+                      media.dispatchEvent("error", { isWebmError: true });
+                    }
+                    mediaSource.removeEventListener('error', errorCatcher);
+                  });
                   media.load();
                 } else {
                   var sources = media.getElementsByTagName('source');
