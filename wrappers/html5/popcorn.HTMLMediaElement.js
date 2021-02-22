@@ -7,6 +7,15 @@
 
   var activated;
 
+  function getExtension(source) {
+    const existTiming = source.match(/#t=/g);
+    let sourceString = source;
+    if (existTiming) {
+      sourceString = source.split('#')[0];
+    }
+    return sourceString.split('.').reverse()[0];
+  }
+
   function isIos() {
     return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -48,7 +57,8 @@
         return EMPTY_STRING;
       }
     }
-    var extension = src.split('.').reverse()[0];
+    // var extension = src.split('.').reverse()[0];
+    var extension = getExtension(src);
     if (!audioFormats[extension]) {
       return EMPTY_STRING;
     }
@@ -113,6 +123,7 @@
             return isMicrosoftBrowser() ? media.getAttribute('src') : media.getElementsByTagName('source')[0].src;
           },
           set: function (aSrc) {
+            var extension = getExtension(aSrc);
             if (isMicrosoftBrowser()) {
               if (aSrc && aSrc !== media.getAttribute('src')) {
                 media.setAttribute('src', aSrc);
@@ -122,7 +133,6 @@
             } else {
               var sources = media.getElementsByTagName('source');
               if (aSrc && aSrc !== sources[0].src) {
-                var extension = aSrc.split('.').reverse()[0];
                 sources[0].src = aSrc;
                 sources[0].type = videoFormats[extension] || audioFormats[extension];
                 media.load();

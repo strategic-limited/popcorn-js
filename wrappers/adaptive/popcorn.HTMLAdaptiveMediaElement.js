@@ -105,7 +105,6 @@
     var isIos = isIosMobile();
     var media;
     if (isIos) {
-      debugger
       media = document.getElementById(iosContainer);
     } else {
       media = document.createElement(mediaType);
