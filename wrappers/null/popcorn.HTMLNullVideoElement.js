@@ -7,20 +7,24 @@
  *
  */
 (function( Popcorn, document ) {
+  function isIos() {
+    return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
 
   var
 
-  // How often (ms) to update the video's current time,
-  // and by how much (s).
-  DEFAULT_UPDATE_RESOLUTION_MS = 16,
-  DEFAULT_UPDATE_RESOLUTION_S = DEFAULT_UPDATE_RESOLUTION_MS / 1000,
+    // How often (ms) to update the video's current time,
+    // and by how much (s).
+    DEFAULT_UPDATE_RESOLUTION_MS = 16,
+    DEFAULT_UPDATE_RESOLUTION_S = DEFAULT_UPDATE_RESOLUTION_MS / 1000,
 
-  EMPTY_STRING = "",
+    EMPTY_STRING = "",
 
-  // We currently support simple temporal fragments:
-  //   #t=,100   -- a null video of 100s (starts at 0s)
-  //   #t=5,100  -- a null video of 100s, which starts at 5s (i.e., 95s duration)
-  temporalRegex = /#t=(\d+\.?\d*)?,?(\d+\.?\d*)/;
+    // We currently support simple temporal fragments:
+    //   #t=,100   -- a null video of 100s (starts at 0s)
+    //   #t=5,100  -- a null video of 100s, which starts at 5s (i.e., 95s duration)
+    temporalRegex = /#t=(\d+\.?\d*)?,?(\d+\.?\d*)/;
 
   function NullPlayer( options ) {
     this.startTime = 0;
@@ -41,7 +45,7 @@
       video.ended();
     }
     if( video.currentTime < 0 ) {
-       video.pause(0);   
+      video.pause(0);
     }
   }
 
@@ -53,7 +57,7 @@
         this.paused = false;
         this.startTime = Date.now();
         this.playInterval = setInterval( function() { nullPlay( video ); },
-                                         DEFAULT_UPDATE_RESOLUTION_MS );
+          DEFAULT_UPDATE_RESOLUTION_MS );
       }
     },
 
@@ -181,8 +185,8 @@
 
       // Parse out the start and duration, if specified
       var fragments = temporalRegex.exec( aSrc ),
-          start = +fragments[ 1 ],
-          duration = +fragments[ 2 ];
+        start = +fragments[ 1 ],
+        duration = +fragments[ 2 ];
 
       player = new NullPlayer({
         currentTime: start,
@@ -258,7 +262,7 @@
       }
 
       timeUpdateInterval = setInterval( onTimeUpdate,
-                                        self._util.TIMEUPDATE_MS );
+        self._util.TIMEUPDATE_MS );
     }
 
     self.play = function() {
@@ -440,10 +444,10 @@
           setMuted( self._util.isAttributeSet( aValue ) );
         }
       },
-      
+
       playbackRate: {
         get: function() {
-          return player.playbackRate;   
+          return player.playbackRate;
         },
         set: function( aValue ) {
           player.playbackRate = aValue;
@@ -470,6 +474,9 @@
 
   // Helper for identifying URLs we know how to play.
   Popcorn.HTMLNullVideoElement._canPlaySrc = function( url ) {
+    if (url && (url.includes('mp3') || url.includes('aac')) && isIos()) {
+      return EMPTY_STRING;
+    }
     return ( temporalRegex ).test( url ) ?
       "probably" :
       EMPTY_STRING;
