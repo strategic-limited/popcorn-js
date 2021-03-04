@@ -397,6 +397,7 @@
           message: "Media Source Not Supported",
           code: MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
         };
+        self.dispatchEvent( "error" );
         return;
       }
 
