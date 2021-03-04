@@ -17,9 +17,15 @@
 
   var videoElement;
   var initialZindex;
+  var destroyed = false;
 
   function isMobile() {
     return navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g);
+  }
+
+  function isIos() {
+    return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
   function onYouTubeIframeAPIReady() {
@@ -71,7 +77,7 @@
 
     var self = new Popcorn._MediaElementProto(),
       parent = typeof id === "string" ? document.querySelector( id ) : id,
-      elem = document.createElement( "div" ),
+      elem = isIos() ? document.getElementById('container-video-for-ios') : document.createElement( "div" ),
       mobileTapFix,
       impl = {
         src: EMPTY_STRING,
@@ -357,7 +363,10 @@
       removeYouTubeEvent( "ended", onEnded );
       removeYouTubeEvent( "play", onPlay );
       removeYouTubeEvent( "pause", onPause );
+      console.info('p1');
       onPause();
+      clearInterval( timeUpdateInterval );
+      self.dispatchEvent( "pause" );
       mediaReady = false;
       loopedPlay = false;
       impl.currentTime = 0;
@@ -367,7 +376,15 @@
       player.stopVideo();
       player.clearVideo();
       player.destroy();
-      elem = document.createElement( "div" );
+      elem = isIos() ? document.getElementById('container-video-for-ios') : document.createElement( "div" );
+      if (isIos()) {
+        destroyed = true;
+        impl.readyState = -1;
+        const fixElement = document.querySelector('.mobile-tap-fix');
+        if (fixElement && fixElement.parentNode) {
+          fixElement.parentNode.removeChild(fixElement);
+        }
+      }
     }
 
     function changeSrc( aSrc ) {
@@ -377,7 +394,6 @@
           message: "Media Source Not Supported",
           code: MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
         };
-        self.dispatchEvent( "error" );
         return;
       }
 
@@ -417,7 +433,9 @@
         }
       });
 
-      parent.appendChild( elem );
+      if (isIos()) {
+        parent.appendChild( elem );
+      }
 
       // Use any player vars passed on the URL
       var playerVars = self._util.parseUri( aSrc ).queryKey;
@@ -482,6 +500,9 @@
       });
 
       impl.networkState = self.NETWORK_LOADING;
+      console.info('222');
+      console.info(self);
+      self.dispatchEvent( "pause" );
       self.dispatchEvent( "loadstart" );
       self.dispatchEvent( "progress" );
     }
@@ -549,6 +570,7 @@
     }
 
     function onPlay() {
+      console.info('onPlay');
       if( impl.ended ) {
         changeCurrentTime( 0 );
         impl.ended = false;
@@ -579,6 +601,11 @@
 
     self.play = function() {
       impl.paused = false;
+      if (destroyed) {
+        destroyed = false;
+        impl.readyState = 4;
+        return self.dispatchEvent( "loadedmetadata" );
+      }
       if( !mediaReady ) {
         addMediaReadyCallback( function() {
           self.play();
