@@ -363,7 +363,6 @@
       removeYouTubeEvent( "ended", onEnded );
       removeYouTubeEvent( "play", onPlay );
       removeYouTubeEvent( "pause", onPause );
-      console.info('p1');
       onPause();
       clearInterval( timeUpdateInterval );
       self.dispatchEvent( "pause" );
@@ -388,7 +387,11 @@
     }
 
     function changeSrc( aSrc ) {
-      if( !self._canPlaySrc( aSrc ) ) {
+      const needDestroy = isIos() && aSrc === 'failed';
+      if (needDestroy) {
+        destroyPlayer();
+      }
+      if( !self._canPlaySrc( aSrc )) {
         impl.error = {
           name: "MediaError",
           message: "Media Source Not Supported",
@@ -433,9 +436,7 @@
         }
       });
 
-      if (isIos()) {
-        parent.appendChild( elem );
-      }
+      parent.appendChild( elem );
 
       // Use any player vars passed on the URL
       var playerVars = self._util.parseUri( aSrc ).queryKey;
@@ -500,8 +501,6 @@
       });
 
       impl.networkState = self.NETWORK_LOADING;
-      console.info('222');
-      console.info(self);
       self.dispatchEvent( "pause" );
       self.dispatchEvent( "loadstart" );
       self.dispatchEvent( "progress" );
@@ -570,7 +569,6 @@
     }
 
     function onPlay() {
-      console.info('onPlay');
       if( impl.ended ) {
         changeCurrentTime( 0 );
         impl.ended = false;
