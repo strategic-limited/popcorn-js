@@ -1,10 +1,18 @@
 (function (Popcorn, window, document) {
 
+  const digiRegExp = new RegExp(/\d+$/);
+
+  var inited = false;
   var
 
     EMPTY_STRING = "",
     VIMEO_HOST = "https://player.vimeo.com"
   ;
+
+  function isIos() {
+    return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
 
   function initVimeoAPI(callback) {
     var script;
@@ -31,10 +39,23 @@
     if (!window.postMessage) {
       throw "ERROR: HTMLVimeoVideoElement requires window.postMessage";
     }
+    var parent;
+
+    if (isIos()) {
+      parent = document.getElementById('container-video-for-ios');
+      const videos = parent.getElementsByTagName('video');
+      if (videos && videos.length) {
+        for (let i = 0; i < videos.length; i++) {
+          videos[i].style.display = 'none';
+        }
+      }
+    } else {
+      parent = typeof id === "string" ? Popcorn.dom.find(id) : id;
+    }
 
     var self = new Popcorn._MediaElementProto(),
-      parent = typeof id === "string" ? Popcorn.dom.find(id) : id,
-      elem = document.createElement("div"),
+
+      elem = document.createElement( "div" ),
       impl = {
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
@@ -96,11 +117,22 @@
       self.dispatchEvent("loadstart");
       self.dispatchEvent("progress");
 
-      impl.readyState = self.HAVE_METADATA;
-      self.dispatchEvent( "loadedmetadata" );
+      if (isIos()) {
+        player.getVideoId().then(function(id) {
+          player.loadVideo(id).then(function() {
+            setTimeout(() => {
+              impl.readyState = self.HAVE_METADATA;
+              self.dispatchEvent( "loadedmetadata" );
+            },1000);
+          });
+        });
+      } else {
+        impl.readyState = self.HAVE_METADATA;
+        self.dispatchEvent( "loadedmetadata" );
 
-      impl.readyState = self.HAVE_ENOUGH_DATA;
-      self.dispatchEvent( "canplaythrough" );
+        impl.readyState = self.HAVE_ENOUGH_DATA;
+        self.dispatchEvent( "canplaythrough" );
+      }
     }
 
     function updateDuration(newDuration) {
@@ -138,14 +170,24 @@
     }
 
     function destroyPlayer() {
-      if (!( playerReady && player )) {
+      inited = false;
+      if (!player) {
         return;
       }
       player.pause();
       player.unload();
 
+      if (isIos()) {
+        parent = document.getElementById('container-video-for-ios');
+        const videos = parent.getElementsByTagName('video');
+        if (videos && videos.length) {
+          for (let i = 0; i < videos.length; i++) {
+            videos[i].style.display = '';
+          }
+        }
+      }
       parent.removeChild(elem);
-      elem = document.createElement("iframe");
+      elem = document.createElement("div");
     }
 
     self.play = function () {
@@ -267,6 +309,10 @@
     }
 
     function changeSrc(aSrc) {
+      const needDestroy = isIos() && aSrc === 'failed';
+      if (needDestroy) {
+        return destroyPlayer();
+      }
       if (!self._canPlaySrc(aSrc)) {
         impl.error = {
           name: "MediaError",
@@ -278,6 +324,9 @@
       }
 
       impl.src = aSrc;
+      if (isIos()) {
+        impl.readyState = -1;
+      }
 
       if (playerReady) {
         destroyPlayer();
@@ -285,8 +334,9 @@
 
       playerReady = false;
 
-      var src = self._util.parseUri(aSrc),
-        queryKey = src.queryKey;
+      var parsedSrc = self._util.parseUri(aSrc),
+        queryKey = parsedSrc.queryKey;
+      var src;
 
       // Sync loop and autoplay based on URL params, and delete.
       // We'll manage both internally.
@@ -296,49 +346,64 @@
       delete queryKey.autoplay;
 
       // Create the base vimeo player string. It will always have query string options
-      src = VIMEO_HOST + '/video/' + ( /\d+$/ ).exec(src.path) + "?";
-
+      src = VIMEO_HOST + '/video/' + digiRegExp.exec(parsedSrc.path) + "?";
+      const idExec = digiRegExp.exec(parsedSrc.path);
+      let id = undefined;
+      if (idExec && idExec.length) {
+        id = idExec[0];
+      }
       elem.style.width = '100%';
       elem.style.height = '100%';
 
-      initVimeoAPI(function () {
-        elem.id = playerUID;
-        elem.allow = 'autoplay; fullscreen';
-        player = new Vimeo.Player(elem, {
-          url: src,
-          autoplay: impl.autoplay,
-          loop: false,
-          byline: false,
-          portrait: false,
-          title: false,
-          responsive: false
+      if (inited) {
+        player.loadVideo(id).then(function() {
+          setTimeout(() => {
+            impl.readyState = self.HAVE_METADATA;
+            self.dispatchEvent( "loadedmetadata" );
+          },1000);
         });
+      }
+      else {
+        initVimeoAPI(function () {
+          elem.id = playerUID;
+          elem.allow = 'autoplay; fullscreen';
+          player = new Vimeo.Player(elem, {
+            url: src,
+            autoplay: impl.autoplay,
+            loop: false,
+            byline: false,
+            portrait: false,
+            title: false,
+            responsive: false
+          });
 
-        parent.appendChild(elem);
+          parent.appendChild(elem);
 
-        player.ready().then(function () {
-          const iframes = elem.getElementsByTagName('iframe');
-          if (iframes && iframes.length) {
-            for (let i = 0; i < iframes.length; i++) {
-              iframes[i].style.width = '100%';
-              iframes[i].style.height = '100%';
+          player.ready().then(function () {
+            inited = true;
+            const iframes = elem.getElementsByTagName('iframe');
+            if (iframes && iframes.length) {
+              for (let i = 0; i < iframes.length; i++) {
+                iframes[i].style.width = '100%';
+                iframes[i].style.height = '100%';
+              }
             }
-          }
-          if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
-            player.setVolume(0);
-            player.play().then(function () {
-              player.pause();
-              player.getDuration().then(function (duration) {
-                player.setVolume(1);
-                updateDuration(duration);
-                onPlayerReady();
+            if (!navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/g)) {
+              player.setVolume(0);
+              player.play().then(function () {
+                player.pause();
+                player.getDuration().then(function (duration) {
+                  player.setVolume(1);
+                  updateDuration(duration);
+                  onPlayerReady();
+                });
               });
-            });
-          } else {
-            onPlayerReady();
-          }
+            } else {
+              onPlayerReady();
+            }
+          });
         });
-      });
+      }
     }
 
     Object.defineProperties(self, {

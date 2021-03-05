@@ -389,7 +389,7 @@
     function changeSrc( aSrc ) {
       const needDestroy = isIos() && aSrc === 'failed';
       if (needDestroy) {
-        destroyPlayer();
+        return destroyPlayer();
       }
       if( !self._canPlaySrc( aSrc )) {
         impl.error = {
